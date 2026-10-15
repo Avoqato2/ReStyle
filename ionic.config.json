@@ -1,0 +1,7 @@
+{
+  "name": "ReStyle",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
