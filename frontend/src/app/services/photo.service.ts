@@ -2,28 +2,40 @@ import { Injectable, signal } from '@angular/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import type { Photo } from '@capacitor/camera';
 import { Filesystem, Directory } from '@capacitor/filesystem';
+import {Preferences} from "@capacitor/preferences";
 
 @Injectable({
   providedIn: 'root',
 })
 export class PhotoService {
+  // signal updates HTML automatically if the array changes
+  // (variable "photos" is the signal in this case)
   public photos = signal<UserPhoto[]>([]);
 
+  private PHOTO_STORAGE: string = 'photos';
+
   public async addNewPhotoToGallery() {
-    // Take a photo
+    // getPhoto opens the camera and takes a pic
     const capturedPhoto = await Camera.getPhoto({
       resultType: CameraResultType.Uri,
       source: CameraSource.Camera,
       quality: 100,
     });
 
-    // Save the picture and add it to photo collection
+    // Save captured pic
     const savedImageFile = await this.savePicture(capturedPhoto);
-
+    // add new pic to the first index of the array
     this.photos.update((photos) => [savedImageFile, ...photos]);
+
+    // cache images
+    Preferences.set({
+      key: this.PHOTO_STORAGE,
+      value: JSON.stringify(this.photos()),
+    });
   }
 
   private async savePicture(photo: Photo) {
+    // base64 converts pic (or files) into text-format
     const base64Data = await this.base64FromPath(photo.webPath!);
 
     // Write the file to the data directory
@@ -31,11 +43,9 @@ export class PhotoService {
     const savedFile = await Filesystem.writeFile({
       path: fileName,
       data: base64Data,
-      directory: Directory.Data,
+      directory: Directory.Data, // internal app-directory for pictures, notes and user-data
     });
 
-    // Use webPath to display the new image instead of base64 since it's
-    // already loaded into memory
     return {
       filepath: fileName,
       webviewPath: photo.webPath,
@@ -43,11 +53,15 @@ export class PhotoService {
   }
 
   private async base64FromPath(path: string): Promise<string> {
+
     const response = await fetch(path);
+    // extracts the responst (image) as raw binary data (blob)
     const blob = await response.blob();
+
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onerror = reject;
+
       reader.onload = () => {
         if (typeof reader.result === 'string') {
           resolve(reader.result);
@@ -57,6 +71,23 @@ export class PhotoService {
       };
       reader.readAsDataURL(blob);
     });
+  }
+
+  public async loadSaved(){
+
+    const {value: photoList} = await Preferences.get({key: this.PHOTO_STORAGE});
+    const photos = (photoList ? JSON.parse(photoList) : []) as UserPhoto[];
+
+    for (const photo of photos){
+      const file = await Filesystem.readFile({
+        path: photo.filepath,
+        directory: Directory.Data,
+      });
+
+      photo.webviewPath = `data:image/jpeg;base64,${file.data}`;
+    }
+
+    this.photos.set(photos);
   }
 }
 
