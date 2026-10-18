@@ -1,0 +1,27 @@
+name: Branch Naming Convention
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  check-branch-name:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check branch name convention
+        run: |
+          
+          BRANCH_NAME="${{ github.head_ref }}"
+          
+          
+          REGEX="^(frontend|backend)/[a-z0-9]+/(feat|bugfix|hotfix|release)/[A-Z]+-[0-9]+-.+$"
+          
+          if [[ ! $BRANCH_NAME =~ $REGEX ]]; then
+            echo "::error::FEHLER: Der Branch-Name '$BRANCH_NAME' entspricht nicht der Konvention!"
+            echo "::error::Erwartetes Format: <bereich>/<agent>/<typ>/<ticket>-<name>"
+            echo "::error::Beispiel: frontend/claude/feat/SCRUM-19-Git-Setup"
+            exit 1
+          fi
+          
+          echo "Branch-Name '$BRANCH_NAME' ist gültig. ✅"
+        shell: bash
