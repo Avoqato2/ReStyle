@@ -2,8 +2,7 @@ name: Backend CI/CD
 
 on:
   pull_request:
-    paths:
-      - "backend/supabase/**"
+    branches: [main]
   push:
     branches: [main]
     paths:
