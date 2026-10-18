@@ -1,8 +1,10 @@
-import { Injectable, signal } from '@angular/core';
+import {inject, Injectable, signal} from '@angular/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import type { Photo } from '@capacitor/camera';
 import { Filesystem, Directory } from '@capacitor/filesystem';
-import {Preferences} from "@capacitor/preferences";
+import {Preferences} from '@capacitor/preferences';
+import {Platform} from '@ionic/angular';
+import {Capacitor} from '@capacitor/core'
 
 @Injectable({
   providedIn: 'root',
@@ -13,6 +15,8 @@ export class PhotoService {
   public photos = signal<UserPhoto[]>([]);
 
   private PHOTO_STORAGE: string = 'photos';
+
+  private platform = inject(Platform);
 
   public async addNewPhotoToGallery() {
     // getPhoto opens the camera and takes a pic
@@ -36,7 +40,16 @@ export class PhotoService {
 
   private async savePicture(photo: Photo) {
     // base64 converts pic (or files) into text-format
-    const base64Data = await this.base64FromPath(photo.webPath!);
+    let base64Data: string | Blob;
+
+    if(this.platform.is('hybrid')){
+      const file = await Filesystem.readFile({
+        path: photo.path!
+      });
+      base64Data = file.data;
+    } else {
+      base64Data = await this.base64FromPath(photo.webPath!);
+    }
 
     // Write the file to the data directory
     const fileName = Date.now() + '.jpeg';
@@ -46,10 +59,17 @@ export class PhotoService {
       directory: Directory.Data, // internal app-directory for pictures, notes and user-data
     });
 
-    return {
-      filepath: fileName,
-      webviewPath: photo.webPath,
-    };
+    if(this.platform.is('hybrid')){
+      return {
+        filepath: savedFile.uri,
+        webviewPath: Capacitor.convertFileSrc(savedFile.uri),
+      };
+    } else {
+      return {
+        filepath: fileName,
+        webviewPath: photo.webPath,
+      };
+    }
   }
 
   private async base64FromPath(path: string): Promise<string> {
@@ -78,15 +98,16 @@ export class PhotoService {
     const {value: photoList} = await Preferences.get({key: this.PHOTO_STORAGE});
     const photos = (photoList ? JSON.parse(photoList) : []) as UserPhoto[];
 
-    for (const photo of photos){
-      const file = await Filesystem.readFile({
-        path: photo.filepath,
-        directory: Directory.Data,
-      });
-
-      photo.webviewPath = `data:image/jpeg;base64,${file.data}`;
+    //if running on desktop
+    if(!this.platform.is('hybrid')){
+      for (const photo of photos){
+        const file = await Filesystem.readFile({
+          path: photo.filepath,
+          directory: Directory.Data,
+        });
+        photo.webviewPath = `data:image/jpeg;base64,${file.data}`;
+      }
     }
-
     this.photos.set(photos);
   }
 }
