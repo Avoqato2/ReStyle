@@ -5,6 +5,7 @@ import { Filesystem, Directory } from '@capacitor/filesystem';
 import {Preferences} from '@capacitor/preferences';
 import {Platform} from '@ionic/angular';
 import {Capacitor} from '@capacitor/core'
+import {removeBackground} from "@imgly/background-removal";
 
 @Injectable({
   providedIn: 'root',
@@ -26,8 +27,11 @@ export class PhotoService {
       quality: 85,
     });
 
-    // Save captured pic
-    const savedImageFile = await this.savePicture(capturedPhoto);
+    //remove background from image
+    const removedBackgroundImage = await this.removeImageBackground(capturedPhoto)
+
+    // Save picture without background
+    const savedImageFile = await this.savePicture(removedBackgroundImage);
     // add new pic to the first index of the array
     this.photos.update((photos) => [savedImageFile, ...photos]);
 
@@ -38,28 +42,21 @@ export class PhotoService {
     });
   }
 
-  private async savePicture(photo: Photo) {
-    // base64 converts pic (or files) into text-format
-    let base64Data: string | Blob;
+  private async savePicture(photo: Photo): Promise<UserPhoto> {
+    // converts pic/file into text-format
+    const base64Data = await this.base64FromPath(photo.webPath!);
 
-    if(this.platform.is('hybrid')){
-      const file = await Filesystem.readFile({
-        path: photo.path!
-      });
-      base64Data = file.data;
-    } else {
-      base64Data = await this.base64FromPath(photo.webPath!);
-    }
+    const fileFormat = photo.format || 'png';
+    const fileName = `${Date.now()}.${fileFormat}`;
 
-    // Write the file to the data directory
-    const fileName = Date.now() + '.jpeg';
     const savedFile = await Filesystem.writeFile({
       path: fileName,
       data: base64Data,
-      directory: Directory.Data, // internal app-directory for pictures, notes and user-data
+      directory: Directory.Data,
     });
 
-    if(this.platform.is('hybrid')){
+    // if this platform is mobile
+    if (this.platform.is('hybrid')) {
       return {
         filepath: savedFile.uri,
         webviewPath: Capacitor.convertFileSrc(savedFile.uri),
@@ -105,10 +102,30 @@ export class PhotoService {
           path: photo.filepath,
           directory: Directory.Data,
         });
-        photo.webviewPath = `data:image/jpeg;base64,${file.data}`;
+        photo.webviewPath = `data:image/png;base64,${file.data}`;
       }
     }
     this.photos.set(photos);
+  }
+
+  public async removeImageBackground (photo: Photo): Promise<Photo> {
+    try{
+      const resultBlob = await removeBackground(photo.webPath!);
+      return this.blobToPhoto(resultBlob);
+    } catch (error) {
+      console.error("Error: ", error);
+      throw error;
+    }
+  }
+
+  private blobToPhoto(blob: Blob): Photo{
+    // blob.type could like this: 'image/png' and we want to get the format only
+    const format = blob.type.split('/')[1] || 'png';
+    return {
+      webPath: URL.createObjectURL(blob),
+      format: format,
+      saved: false,
+    }
   }
 }
 
