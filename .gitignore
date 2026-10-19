@@ -3,9 +3,5 @@
 .env.*
 !.env.example
 
-# Supabase CLI (lokal, maschinenspezifisch)
-backend/supabase/.temp/
-backend/supabase/.branches/
-
 # IDE
 .idea/
