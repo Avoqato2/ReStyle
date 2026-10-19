@@ -14,7 +14,7 @@ jobs:
           BRANCH_NAME="${{ github.head_ref }}"
           
           
-          REGEX="^(frontend|backend)/[a-z0-9]+/(feat|bugfix|hotfix|release)/[A-Z]+-[0-9]+-.+$"
+          REGEX="^(frontend|backend)/[a-zA-Z0-9_-]+/(feat|bugfix|hotfix|release)/[a-zA-Z]+-[0-9]+-.+$"
           
           if [[ ! $BRANCH_NAME =~ $REGEX ]]; then
             echo "::error::FEHLER: Der Branch-Name '$BRANCH_NAME' entspricht nicht der Konvention!"
