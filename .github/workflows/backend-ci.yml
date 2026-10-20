@@ -21,10 +21,10 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # Prüft, ob Dateien im Backend-Ordner geändert wurden
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -32,7 +32,7 @@ jobs:
               - 'backend/supabase/**'
 
       # Startet Supabase NUR, wenn sich das Backend geändert hat
-      - uses: supabase/setup-cli@v1
+      - uses: supabase/setup-cli@v3
         if: steps.changes.outputs.backend == 'true'
         with:
           version: latest
@@ -52,8 +52,8 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: supabase/setup-cli@v1
+      - uses: actions/checkout@v7
+      - uses: supabase/setup-cli@v3
         with:
           version: latest
       - name: Deploy DB
