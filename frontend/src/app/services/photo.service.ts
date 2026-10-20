@@ -29,7 +29,6 @@ export class PhotoService {
 
     //remove background from image
     const removedBackgroundImage = await this.removeImageBackground(capturedPhoto)
-
     // Save picture without background
     const savedImageFile = await this.savePicture(removedBackgroundImage);
     // add new pic to the first index of the array
