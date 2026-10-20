@@ -46,7 +46,7 @@ export class PhotoService {
     // converts pic/file into text-format
     const base64Data = await this.base64FromPath(photo.webPath!);
 
-    const fileFormat = photo.format || 'png';
+    const fileFormat = photo.format || 'webp';
     const fileName = `${Date.now()}.${fileFormat}`;
 
     const savedFile = await Filesystem.writeFile({
@@ -98,11 +98,17 @@ export class PhotoService {
     //if running on desktop
     if(!this.platform.is('hybrid')){
       for (const photo of photos){
-        const file = await Filesystem.readFile({
-          path: photo.filepath,
-          directory: Directory.Data,
-        });
-        photo.webviewPath = `data:image/png;base64,${file.data}`;
+        try{
+          const file = await Filesystem.readFile({
+            path: photo.filepath,
+            directory: Directory.Data,
+          });
+
+        const extension = photo.filepath.split('.').pop()?.toLowerCase() || 'webp';
+        photo.webviewPath = `data:image/${extension};base64,${file.data}`;
+        } catch (error) {
+          console.warn('Filepath not found: ', error);
+        }
       }
     }
     this.photos.set(photos);
@@ -110,22 +116,55 @@ export class PhotoService {
 
   public async removeImageBackground (photo: Photo): Promise<Photo> {
     try{
-      const resultBlob = await removeBackground(photo.webPath!);
-      return this.blobToPhoto(resultBlob);
+      const pngBlob = await removeBackground(photo.webPath!);
+      const webpBlob = await this.convertBlobToWebp(pngBlob);
+      return this.blobToPhoto(webpBlob);
     } catch (error) {
-      console.error("Error: ", error);
+      console.error("Error removing background or converting to webp: ", error);
       throw error;
     }
   }
 
   private blobToPhoto(blob: Blob): Photo{
-    // blob.type could like this: 'image/png' and we want to get the format only
-    const format = blob.type.split('/')[1] || 'png';
+    // blob.type could look like this: 'image/webp' and we want to get the format only
+    const format = blob.type.split('/')[1] || 'webp';
     return {
       webPath: URL.createObjectURL(blob),
       format: format,
       saved: false,
     }
+  }
+
+  // compressing images to a smaller size for the backend
+  private async convertBlobToWebp(blob: Blob, quality = 0.6): Promise<Blob> {
+    // so we can get the width and height of the blob
+    const imageBitmap = await createImageBitmap(blob);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = imageBitmap.width;
+    canvas.height = imageBitmap.height;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Could not get canvas context');
+
+    // draws the image from the most top left pixel;
+    // Without it, the image/canvas would be empty and we can't convert to webp
+    ctx.drawImage(imageBitmap, 0, 0);
+
+    return new Promise((resolve, reject) => {
+      canvas.toBlob(
+        (webpBlob) => {
+          if (webpBlob) {
+            resolve(webpBlob);
+          } else {
+            // Falls die WebView/der Browser kein Webp-Encoding unterstützt:
+            reject(new Error('Webp encoding failed or not supported by browser/webview'));
+          }
+        },
+        'image/webp',
+        quality
+      );
+    });
   }
 }
 
