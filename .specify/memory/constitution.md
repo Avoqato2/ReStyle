@@ -1,50 +1,115 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+- Version change: 1.0.0 -> 1.1.0
+- Modified principles: none.
+- Modified sections: Entwicklungsprozess und Qualitätssicherung; Governance.
+- Added sections: none.
+- Removed sections: none.
+- Follow-up TODOs: TODO(RATIFICATION_DATE) requires the original adoption date.
+-->
+
+# ReStyle Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. MVP zuerst und klarer Produktumfang
+ReStyle MUST im MVP ausschließlich die digitale Garderobe, manuelle
+Merkmalerfassung, Filter, den 3-Layer-Swiper zur Outfit-Kombination und das
+Speichern von Outfits liefern. KI-Erkennung, Empfehlungen, Wetter, Anlass,
+Nachhaltigkeit, Social- und Shopping-Funktionen dürfen erst nach dem MVP und
+nur auf Grundlage einer eigenen User Story umgesetzt werden. Jede User Story
+MUST prüfbare Akzeptanzkriterien enthalten. Diese Begrenzung schützt den
+Liefertermin und verhindert, dass optionale Funktionen die Kernnutzung
+verzögern.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Typisierte Architektur und sichere Datenhoheit
+Das Frontend MUST Ionic und Angular verwenden; das Backend MUST Supabase mit
+Postgres, Auth und Storage verwenden. Der Datenzugriff MUST ausschließlich
+über typisierte Angular-Services erfolgen. Änderungen am Datenbankschema
+MÜSSEN über versionierte Migrationen eingebracht werden. Jede
+nutzerbezogene Tabelle und jeder nutzerbezogene Zugriff MUST durch Row Level
+Security auf den jeweiligen User begrenzt sein. Diese Regeln halten
+Schnittstellen nachvollziehbar und schützen private Kleidungs- und Outfitdaten.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Strikte, wartbare Codequalität
+TypeScript MUST im Strict-Modus laufen. Neue UI-Funktionalität MUST in kleinen
+Standalone-Komponenten umgesetzt werden. ESLint und Prettier sind
+verpflichtende Qualitätsprüfungen und dürfen nicht umgangen werden. Die
+Regeln reduzieren Fehler, halten Komponenten testbar und sichern ein
+einheitliches Codebild.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Nachweisbare Tests und Akzeptanz
+Services und Datenlogik MÜSSEN durch Unit-Tests abgedeckt sein. Jede
+User Story MUST prüfbare Akzeptanzkriterien besitzen, und die CI MUSS vor
+jedem Merge erfolgreich durchlaufen. Änderungen dürfen nicht als fertig
+gelten, wenn ihre relevanten Tests oder Qualitätsprüfungen fehlschlagen.
+Dadurch bleiben fachliche Anforderungen und technische Integrität
+nachvollziehbar.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Mobile-first und veröffentlichbare Plattform
+Die Benutzeroberfläche MUST mobile-first gestaltet werden und für zentrale
+Interaktionen Ionic-Komponenten statt eigener UI-Ersatzkomponenten verwenden.
+Die Anwendung MUST über Capacitor auf iOS und Android lauffähig sein. Das
+Projektziel ist die Veröffentlichung in mindestens einem App Store bis zum
+2027-01-19. Diese Vorgaben richten technische Entscheidungen auf reale mobile
+Nutzung und das verbindliche Veröffentlichungsziel aus.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+### VI. Deutschsprachige Spec-Kit-Dokumentation
+Alle Spec-Kit-Dokumente MÜSSEN auf Deutsch verfasst werden. Dazu gehören
+insbesondere Spezifikationen, Pläne, Aufgabenlisten und weitere durch
+Spec-Kit erzeugte Projektartefakte. Eine einheitliche Dokumentationssprache
+verbessert die gemeinsame Prüfung von Anforderungen und Entscheidungen.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+## Produktumfang und Priorisierung
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+Der MVP-Funktionsumfang ist verbindlich und hat Vorrang vor jeder Erweiterung.
+Neue Funktionen außerhalb des MVP benötigen eine eigene User Story,
+akzeptierte Kriterien und eine bewusste Priorisierung nach dem MVP. Die
+Priorisierung darf keine Pflichtfunktion des MVP verdrängen, solange deren
+Akzeptanzkriterien nicht erfüllt und durch CI verifiziert sind.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+## Architektur und Datenschutz
+
+Die Systemgrenzen zwischen Ionic/Angular und Supabase sind über typisierte
+Services zu dokumentieren und einzuhalten. Datenbankänderungen ohne
+versionierte Migration sind unzulässig. Row Level Security MUSS für jeden
+Zugriff geprüft werden, der Daten einem User oder dessen privaten Inhalten
+zuordnet. Authentifizierung, Speicherung und Datenzugriff dürfen keine
+Umgehung dieser Regeln einführen.
+
+## Entwicklungsprozess und Qualitätssicherung
+
+Arbeit MUSS auf Feature-Branches stattfinden. Jeder Branch MUSS genau einem
+Arbeitsbereich zugeordnet sein: `frontend` oder `backend`. Agents dürfen auf
+einem Frontend-Branch ausschließlich Frontend-Arbeiten und auf einem
+Backend-Branch ausschließlich Backend-Arbeiten durchführen. Ein Branch darf
+keine Änderungen aus beiden Bereichen vermischen; bereichsübergreifende
+Arbeit MUSS in getrennten Branches und Pull Requests erfolgen. Diese Trennung
+reduziert Konflikte, macht Verantwortlichkeiten nachvollziehbar und hält die
+Architekturgrenzen zwischen Frontend und Backend durchsetzbar.
+
+Änderungen an `main` MÜSSEN über einen Pull Request mit mindestens einem
+Review und erfolgreich durchlaufener CI integriert werden. Reviews MÜSSEN
+mindestens Umfang, Akzeptanzkriterien, Tests, Typisierung,
+Linting/Formatierung und betroffene Migrationen beziehungsweise RLS-Regeln
+prüfen. Der Releaseprozess MUSS die iOS-/Android-Lauffähigkeit und die für
+die App-Store-Veröffentlichung erforderlichen Nachweise berücksichtigen.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+Diese Constitution ist die maßgebliche Governance für das Projekt. Bei
+Konflikten haben ihre Regeln Vorrang vor lokalen Konventionen und
+unbegründeten Abkürzungen. Änderungen werden in einem Pull Request
+dokumentiert, reviewed und mit einem Sync Impact Report versehen. Der
+Pull-Request-Beschreibung MUSS die betroffenen Prinzipien, Auswirkungen auf
+Tests und gegebenenfalls notwendige Migrationen benennen.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+Die Versionsnummer folgt Semantic Versioning: MAJOR für rückwärtsinkompatible
+Entfernungen oder Neudefinitionen von Governance-Regeln, MINOR für neue oder
+wesentlich erweiterte Prinzipien und PATCH für Klarstellungen ohne
+semantische Änderung. Jede Änderung aktualisiert das Änderungsdatum. Die
+Verfassung wird bei jedem relevanten Pull Request auf Einhaltung geprüft;
+CI und Review sind verbindliche Qualitätstore vor dem Merge.
+
+**Version**: 1.1.0 | **Ratified**: TODO(RATIFICATION_DATE): ursprüngliches
+Annahmedatum ermitteln | **Last Amended**: 2026-10-20
