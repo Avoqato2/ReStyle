@@ -18,7 +18,7 @@ jobs:
           
           if [[ ! $BRANCH_NAME =~ $REGEX ]]; then
             echo "::error::FEHLER: Der Branch-Name '$BRANCH_NAME' entspricht nicht der Konvention!"
-            echo "::error::Erwartetes Format: <bereich>/<agent>/<typ>/<ticket>-<name>"
+            echo "::error::Erwartetes Format: <bereich>/<agent>/<typ>/<ticket>-<ticketnummer>-<name>"
             echo "::error::Beispiel: frontend/claude/feat/SCRUM-19-Git-Setup"
             exit 1
           fi
