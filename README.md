@@ -5,6 +5,9 @@ make more sustainable fashion choices.
 ***
 
 ## Features
+- **Digital Wardrobe:** Upload and manage clothing items in a personal virtual closet.
+- **Background Removal:** Automatically isolate garments from uploaded photos for a clean display.
+- **Intelligent Outfit Suggestions:** Get personalized daily outfit recommendations based on the user's inventory.
 
 ***
 
