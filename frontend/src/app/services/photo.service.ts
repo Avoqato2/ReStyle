@@ -1,6 +1,5 @@
 import {inject, Injectable, signal} from '@angular/core';
-import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
-import type { Photo } from '@capacitor/camera';
+import {Camera, MediaResult} from '@capacitor/camera';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import {Preferences} from '@capacitor/preferences';
 import {Platform} from '@ionic/angular';
@@ -19,12 +18,11 @@ export class PhotoService {
 
   private platform = inject(Platform);
 
-  public async addNewPhotoToGallery() {
+  public async HandlePhoto() {
     // getPhoto opens the camera and takes a pic
-    const capturedPhoto = await Camera.getPhoto({
-      resultType: CameraResultType.Uri,
-      source: CameraSource.Camera,
+    const capturedPhoto = await Camera.takePhoto({
       quality: 85,
+      includeMetadata: true,
     });
 
     //remove background from image
@@ -41,11 +39,13 @@ export class PhotoService {
     });
   }
 
-  private async savePicture(photo: Photo): Promise<UserPhoto> {
+  private async savePicture(photo: MediaResult): Promise<UserPhoto> {
     // converts pic/file into text-format
     const base64Data = await this.base64FromPath(photo.webPath!);
 
-    const fileFormat = photo.format || 'webp';
+    const info = photo.metadata;
+    const fileFormat = info?.format || 'webp';
+
     const fileName = `${Date.now()}.${fileFormat}`;
 
     const savedFile = await Filesystem.writeFile({
@@ -113,23 +113,24 @@ export class PhotoService {
     this.photos.set(photos);
   }
 
-  public async removeImageBackground (photo: Photo): Promise<Photo> {
+  public async removeImageBackground (photo: MediaResult): Promise<MediaResult> {
     try{
       const pngBlob = await removeBackground(photo.webPath!);
       const webpBlob = await this.convertBlobToWebp(pngBlob);
-      return this.blobToPhoto(webpBlob);
+      return this.blobToMediaResult(webpBlob);
     } catch (error) {
       console.error("Error removing background or converting to webp: ", error);
       throw error;
     }
   }
 
-  private blobToPhoto(blob: Blob): Photo{
+  private blobToMediaResult(blob: Blob): MediaResult {
     // blob.type could look like this: 'image/webp' and we want to get the format only
     const format = blob.type.split('/')[1] || 'webp';
     return {
       webPath: URL.createObjectURL(blob),
-      format: format,
+      type: 0, //0 = image; 1 = video;
+      metadata: {format},
       saved: false,
     }
   }
