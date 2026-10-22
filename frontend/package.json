@@ -1,5 +1,5 @@
 {
-  "name": "ReStyle",
+  "name": "restyle",
   "version": "0.0.1",
   "author": "mobile-mlab",
   "homepage": "https://ionicframework.com/",
@@ -9,7 +9,10 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "build:ionic": "ionic build",
+    "build:android": "",
+    "build:ios": ""
   },
   "private": true,
   "dependencies": {
