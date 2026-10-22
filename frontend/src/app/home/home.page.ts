@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import {
   IonHeader,
   IonToolbar,
@@ -22,15 +22,16 @@ import { PhotoService } from '../services/photo.service';
   styleUrls: ['home.page.scss'],
   imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, IonFab, IonFabButton, IonIcon],
 })
-export class HomePage {
+export class HomePage implements OnInit {
   public photoService = inject(PhotoService);
   constructor() {
-    addIcons({camera});
+    addIcons({ camera });
   }
 
   // when user gets to this page, pics are loaded automatically
   async ngOnInit() {
     await this.photoService.loadSaved();
+    console.log('hi');
   }
   addPhotoToGallery() {
     this.photoService.addNewPhotoToGallery();

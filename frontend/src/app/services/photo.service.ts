@@ -1,10 +1,10 @@
-import {inject, Injectable, signal} from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import type { Photo } from '@capacitor/camera';
 import { Filesystem, Directory } from '@capacitor/filesystem';
-import {Preferences} from '@capacitor/preferences';
-import {Platform} from '@ionic/angular';
-import {Capacitor} from '@capacitor/core'
+import { Preferences } from '@capacitor/preferences';
+import { Platform } from '@ionic/angular';
+import { Capacitor } from '@capacitor/core';
 
 @Injectable({
   providedIn: 'root',
@@ -42,9 +42,9 @@ export class PhotoService {
     // base64 converts pic (or files) into text-format
     let base64Data: string | Blob;
 
-    if(this.platform.is('hybrid')){
+    if (this.platform.is('hybrid')) {
       const file = await Filesystem.readFile({
-        path: photo.path!
+        path: photo.path!,
       });
       base64Data = file.data;
     } else {
@@ -59,7 +59,7 @@ export class PhotoService {
       directory: Directory.Data, // internal app-directory for pictures, notes and user-data
     });
 
-    if(this.platform.is('hybrid')){
+    if (this.platform.is('hybrid')) {
       return {
         filepath: savedFile.uri,
         webviewPath: Capacitor.convertFileSrc(savedFile.uri),
@@ -73,7 +73,6 @@ export class PhotoService {
   }
 
   private async base64FromPath(path: string): Promise<string> {
-
     const response = await fetch(path);
     // extracts the responst (image) as raw binary data (blob)
     const blob = await response.blob();
@@ -93,14 +92,13 @@ export class PhotoService {
     });
   }
 
-  public async loadSaved(){
-
-    const {value: photoList} = await Preferences.get({key: this.PHOTO_STORAGE});
+  public async loadSaved() {
+    const { value: photoList } = await Preferences.get({ key: this.PHOTO_STORAGE });
     const photos = (photoList ? JSON.parse(photoList) : []) as UserPhoto[];
 
     //if running on desktop
-    if(!this.platform.is('hybrid')){
-      for (const photo of photos){
+    if (!this.platform.is('hybrid')) {
+      for (const photo of photos) {
         const file = await Filesystem.readFile({
           path: photo.filepath,
           directory: Directory.Data,
