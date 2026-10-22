@@ -136,13 +136,11 @@ export class PhotoService {
 
   // compressing images to a smaller size for the backend
   private async convertBlobToWebp(blob: Blob, quality = 0.6): Promise<Blob> {
+
     // so we can get the width and height of the blob
+    // edit: using createImageBitmap so we don't have to use outdated Promises
     const imageBitmap = await createImageBitmap(blob);
-
-    const canvas = document.createElement('canvas');
-    canvas.width = imageBitmap.width;
-    canvas.height = imageBitmap.height;
-
+    const canvas = new OffscreenCanvas(imageBitmap.width, imageBitmap.height);
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('Could not get canvas context');
 
@@ -150,20 +148,10 @@ export class PhotoService {
     // Without it, the image/canvas would be empty and we can't convert to webp
     ctx.drawImage(imageBitmap, 0, 0);
 
-    return new Promise((resolve, reject) => {
-      canvas.toBlob(
-        (webpBlob) => {
-          if (webpBlob) {
-            resolve(webpBlob);
-          } else {
-            // Falls die WebView/der Browser kein Webp-Encoding unterstützt:
-            reject(new Error('Webp encoding failed or not supported by browser/webview'));
-          }
-        },
-        'image/webp',
-        quality
-      );
-    });
+    return await canvas.convertToBlob({
+      type: 'image/webp',
+      quality: quality,
+    })
   }
 }
 
