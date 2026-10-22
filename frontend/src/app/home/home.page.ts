@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import {
   IonHeader,
   IonToolbar,
@@ -22,7 +22,7 @@ import { PhotoService } from '../services/photo.service';
   styleUrls: ['home.page.scss'],
   imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, IonFab, IonFabButton, IonIcon],
 })
-export class HomePage {
+export class HomePage implements OnInit {
   public photoService = inject(PhotoService);
   constructor() {
     addIcons({camera});
@@ -33,6 +33,6 @@ export class HomePage {
     await this.photoService.loadSaved();
   }
   addPhotoToGallery() {
-    this.photoService.addNewPhotoToGallery();
+    this.photoService.HandlePhoto();
   }
 }

@@ -1,10 +1,10 @@
 import {inject, Injectable, signal} from '@angular/core';
-import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
-import type { Photo } from '@capacitor/camera';
+import {Camera, MediaResult} from '@capacitor/camera';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import {Preferences} from '@capacitor/preferences';
 import {Platform} from '@ionic/angular';
 import {Capacitor} from '@capacitor/core'
+import {removeBackground} from "@imgly/background-removal";
 
 @Injectable({
   providedIn: 'root',
@@ -18,16 +18,17 @@ export class PhotoService {
 
   private platform = inject(Platform);
 
-  public async addNewPhotoToGallery() {
+  public async HandlePhoto() {
     // getPhoto opens the camera and takes a pic
-    const capturedPhoto = await Camera.getPhoto({
-      resultType: CameraResultType.Uri,
-      source: CameraSource.Camera,
+    const capturedPhoto = await Camera.takePhoto({
       quality: 85,
+      includeMetadata: true,
     });
 
-    // Save captured pic
-    const savedImageFile = await this.savePicture(capturedPhoto);
+    //remove background from image
+    const removedBackgroundImage = await this.removeImageBackground(capturedPhoto)
+    // Save picture without background
+    const savedImageFile = await this.savePicture(removedBackgroundImage);
     // add new pic to the first index of the array
     this.photos.update((photos) => [savedImageFile, ...photos]);
 
@@ -38,28 +39,23 @@ export class PhotoService {
     });
   }
 
-  private async savePicture(photo: Photo) {
-    // base64 converts pic (or files) into text-format
-    let base64Data: string | Blob;
+  private async savePicture(photo: MediaResult): Promise<UserPhoto> {
+    // converts pic/file into text-format
+    const base64Data = await this.base64FromPath(photo.webPath!);
 
-    if(this.platform.is('hybrid')){
-      const file = await Filesystem.readFile({
-        path: photo.path!
-      });
-      base64Data = file.data;
-    } else {
-      base64Data = await this.base64FromPath(photo.webPath!);
-    }
+    const info = photo.metadata;
+    const fileFormat = info?.format || 'webp';
 
-    // Write the file to the data directory
-    const fileName = Date.now() + '.jpeg';
+    const fileName = `${Date.now()}.${fileFormat}`;
+
     const savedFile = await Filesystem.writeFile({
       path: fileName,
       data: base64Data,
-      directory: Directory.Data, // internal app-directory for pictures, notes and user-data
+      directory: Directory.Data,
     });
 
-    if(this.platform.is('hybrid')){
+    // if this platform is mobile
+    if (this.platform.is('hybrid')) {
       return {
         filepath: savedFile.uri,
         webviewPath: Capacitor.convertFileSrc(savedFile.uri),
@@ -101,14 +97,62 @@ export class PhotoService {
     //if running on desktop
     if(!this.platform.is('hybrid')){
       for (const photo of photos){
-        const file = await Filesystem.readFile({
-          path: photo.filepath,
-          directory: Directory.Data,
-        });
-        photo.webviewPath = `data:image/jpeg;base64,${file.data}`;
+        try{
+          const file = await Filesystem.readFile({
+            path: photo.filepath,
+            directory: Directory.Data,
+          });
+
+        const extension = photo.filepath.split('.').pop()?.toLowerCase() || 'webp';
+        photo.webviewPath = `data:image/${extension};base64,${file.data}`;
+        } catch (error) {
+          console.warn('Filepath not found: ', error);
+        }
       }
     }
     this.photos.set(photos);
+  }
+
+  public async removeImageBackground (photo: MediaResult): Promise<MediaResult> {
+    try{
+      const pngBlob = await removeBackground(photo.webPath!);
+      const webpBlob = await this.convertBlobToWebp(pngBlob);
+      return this.blobToMediaResult(webpBlob);
+    } catch (error) {
+      console.error("Error removing background or converting to webp: ", error);
+      throw error;
+    }
+  }
+
+  private blobToMediaResult(blob: Blob): MediaResult {
+    // blob.type could look like this: 'image/webp' and we want to get the format only
+    const format = blob.type.split('/')[1] || 'webp';
+    return {
+      webPath: URL.createObjectURL(blob),
+      type: 0, //0 = image; 1 = video;
+      metadata: {format},
+      saved: false,
+    }
+  }
+
+  // compressing images to a smaller size for the backend
+  private async convertBlobToWebp(blob: Blob, quality = 0.6): Promise<Blob> {
+
+    // so we can get the width and height of the blob
+    // edit: using createImageBitmap so we don't have to use outdated Promises
+    const imageBitmap = await createImageBitmap(blob);
+    const canvas = new OffscreenCanvas(imageBitmap.width, imageBitmap.height);
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Could not get canvas context');
+
+    // draws the image from the most top left pixel;
+    // Without it, the image/canvas would be empty and we can't convert to webp
+    ctx.drawImage(imageBitmap, 0, 0);
+
+    return await canvas.convertToBlob({
+      type: 'image/webp',
+      quality: quality,
+    })
   }
 }
 
