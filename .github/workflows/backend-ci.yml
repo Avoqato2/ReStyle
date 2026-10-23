@@ -7,57 +7,77 @@ on:
     branches: [main]
     paths:
       - "backend/supabase/**"
+  # Deploy nochmal anstoßen ohne Dummy-Commit
+  workflow_dispatch:
+
 permissions:
   contents: read
   pull-requests: read
 
-# Bricht alte PR-Läufe automatisch ab
+# Bricht alte PR-Läufe automatisch ab, wenn neuer Code gepusht wird
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  validate:
-    if: github.event_name == 'pull_request'
+  # Prüft zentral, ob Backend betroffen ist
+  detect-changes:
+    name: Detect changes
     runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ github.event_name == 'workflow_dispatch' || steps.changes.outputs.backend == 'true' }}
     steps:
       - uses: actions/checkout@v7
 
       # Prüft, ob Dateien im Backend-Ordner geändert wurden
       - uses: dorny/paths-filter@v4
         id: changes
+        if: github.event_name != 'workflow_dispatch'
         with:
           filters: |
             backend:
               - 'backend/supabase/**'
 
-      # Startet Supabase NUR, wenn sich das Backend geändert hat
+  validate:
+    name: Validate Migrations
+    needs: detect-changes
+    # Führt das Setup und den Test NUR aus, wenn das Backend geändert wurde
+    if: needs.detect-changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v7
+
       - uses: supabase/setup-cli@v3
-        if: steps.changes.outputs.backend == 'true'
         with:
           version: latest
 
       - name: Test Database Migrations
-        if: steps.changes.outputs.backend == 'true'
-        working-directory: backend
         run: |
           supabase db start
           supabase db reset
 
-      - name: Skip Info
-        if: steps.changes.outputs.backend == 'false'
-        run: echo "Keine Backend-Änderungen. Datenbank-Test übersprungen! ✅"
-
   deploy:
-    if: github.event_name == 'push'
+    name: Deploy to Supabase
+    needs: [ detect-changes, validate ]
+    if: >-
+      github.ref == 'refs/heads/main'
+      && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+      && needs.detect-changes.outputs.backend == 'true'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - uses: actions/checkout@v7
+
       - uses: supabase/setup-cli@v3
         with:
           version: latest
+
       - name: Deploy DB
-        working-directory: backend
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
