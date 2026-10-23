@@ -46,6 +46,7 @@ export class PhotoService {
     const info = photo.metadata;
     const fileFormat = info?.format || 'webp';
 
+    //here is a test comment
     const fileName = `${Date.now()}.${fileFormat}`;
 
     const savedFile = await Filesystem.writeFile({
