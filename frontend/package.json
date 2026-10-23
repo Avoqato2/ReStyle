@@ -17,9 +17,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
-    "build:ionic": "ionic build",
-    "build:android": "",
-    "build:ios": ""
+    "build:ionic": "ionic build"
   },
   "private": true,
   "dependencies": {

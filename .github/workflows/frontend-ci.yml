@@ -7,6 +7,9 @@ on:
     branches: [main]
     paths:
       - "frontend/**"
+  # Deploy nochmal anstoßen ohne Dummy-Commit
+  workflow_dispatch:
+
 permissions:
   contents: read
   pull-requests: read
@@ -17,51 +20,94 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  # Prüft zentral, ob Frontend betroffen ist
+  detect-changes:
+    name: Detect changes
     runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.frontend == 'true' }}
     steps:
       - uses: actions/checkout@v7
 
       # Prüft, ob Dateien im Frontend-Ordner geändert wurden
       - uses: dorny/paths-filter@v4
         id: changes
+        if: github.event_name != 'workflow_dispatch'
         with:
           filters: |
             frontend:
               - 'frontend/**'
+  test:
+    name: Lint & Test
+    needs: detect-changes
+    # Führt das Setup und den Build NUR aus, wenn das Frontend geändert wurde
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v7
 
-      # Führt das Setup und den Build NUR aus, wenn das Frontend geändert wurde
       - uses: actions/setup-node@v7
-        if: steps.changes.outputs.frontend == 'true'
         with:
           node-version: "24"
           cache: "npm"
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install Dependencies
-        if: steps.changes.outputs.frontend == 'true'
-        working-directory: frontend
         run: npm ci
 
       - name: Lint
-        if: steps.changes.outputs.frontend == 'true'
-        working-directory: frontend
         run: npm run lint --if-present
       
       # Run tests using Vitest before build process
       - name: Unit Tests (Vitest)
-        if: steps.changes.outputs.frontend == 'true'
-        working-directory: frontend
         run: npx ng test --no-watch
-      
-      - name: Build Frontend
-        if: steps.changes.outputs.frontend == 'true'
-        working-directory: frontend
-        run: npm run build
-        
+
       # Optional to add: vitest coverage to check if tests are covered
-        
-      # Überspringt den Rest elegant, wenn es ein reiner Backend-PR ist
-      - name: Skip Info
-        if: steps.changes.outputs.frontend == 'false'
-        run: echo "Keine Frontend-Änderungen. Build übersprungen! ✅"
+
+  build:
+    name: Build
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.frontend == 'true
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package.json
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Frontend
+        run: npm run build -- --base-href "/${{ github.event.repository.name }}/"
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: frontend/www
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: [ detect-changes, build ]
+    if: >-
+      github.ref == 'refs/heads/main'
+      && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+      && needs.detect-changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
