@@ -1,238 +1,407 @@
-
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
-  
-  "graphql_public": {
-          Tables: {
-            [_ in never]: never
-          }
-          Views: {
-            [_ in never]: never
-          }
-          Functions: {
-            "graphql":
-{ Args: { "extensions"?: Json,"operationName"?: string,"query"?: string,"variables"?: Json }; Returns: Json
-                           }
-          }
-          Enums: {
-            [_ in never]: never
-          }
-          CompositeTypes: {
-            [_ in never]: never
-          }
-        },"public": {
-          Tables: {
-            "garments": {
-                  Row: {
-                    "brand": string | null,"category": Database["public"]['Enums']["garment_category"],"colors": (Database["public"]['Enums']["garment_color"])[],"created_at": string,"id": string,"image_path": string,"layer": Database["public"]['Enums']["garment_layer"],"material": Database["public"]['Enums']["garment_material"] | null,"name": string | null,"notes": string | null,"seasons": (Database["public"]['Enums']["garment_season"])[],"size_label": string | null,"user_id": string
-                  }
-                  ComputedFields: never
-                  Insert: {
-                    "brand"?: string | null,"category": Database["public"]['Enums']["garment_category"],"colors"?: (Database["public"]['Enums']["garment_color"])[],"created_at"?: string,"id"?: string,"image_path": string,"layer": Database["public"]['Enums']["garment_layer"],"material"?: Database["public"]['Enums']["garment_material"] | null,"name"?: string | null,"notes"?: string | null,"seasons"?: (Database["public"]['Enums']["garment_season"])[],"size_label"?: string | null,"user_id"?: string
-                  }
-                  Update: {
-                    "brand"?: string | null,"category"?: Database["public"]['Enums']["garment_category"],"colors"?: (Database["public"]['Enums']["garment_color"])[],"created_at"?: string,"id"?: string,"image_path"?: string,"layer"?: Database["public"]['Enums']["garment_layer"],"material"?: Database["public"]['Enums']["garment_material"] | null,"name"?: string | null,"notes"?: string | null,"seasons"?: (Database["public"]['Enums']["garment_season"])[],"size_label"?: string | null,"user_id"?: string
-                  }
-                  Relationships: [
-                    {
-      foreignKeyName: "garments_user_id_fkey"
-      columns: ["user_id"]
-isOneToOne: false
-      referencedRelation: "profiles"
-      referencedColumns: ["id"]
-    }
-                  ]
-                },"outfit_items": {
-                  Row: {
-                    "garment_id": string,"layer": Database["public"]['Enums']["garment_layer"],"outfit_id": string
-                  }
-                  ComputedFields: never
-                  Insert: {
-                    "garment_id": string,"layer": Database["public"]['Enums']["garment_layer"],"outfit_id": string
-                  }
-                  Update: {
-                    "garment_id"?: string,"layer"?: Database["public"]['Enums']["garment_layer"],"outfit_id"?: string
-                  }
-                  Relationships: [
-                    {
-      foreignKeyName: "outfit_items_garment_id_layer_fkey"
-      columns: ["garment_id","layer"]
-isOneToOne: false
-      referencedRelation: "garments"
-      referencedColumns: ["id","layer"]
-    },{
-      foreignKeyName: "outfit_items_outfit_id_fkey"
-      columns: ["outfit_id"]
-isOneToOne: false
-      referencedRelation: "outfits"
-      referencedColumns: ["id"]
-    }
-                  ]
-                },"outfits": {
-                  Row: {
-                    "created_at": string,"id": string,"name": string | null,"user_id": string
-                  }
-                  ComputedFields: never
-                  Insert: {
-                    "created_at"?: string,"id"?: string,"name"?: string | null,"user_id"?: string
-                  }
-                  Update: {
-                    "created_at"?: string,"id"?: string,"name"?: string | null,"user_id"?: string
-                  }
-                  Relationships: [
-                    {
-      foreignKeyName: "outfits_user_id_fkey"
-      columns: ["user_id"]
-isOneToOne: false
-      referencedRelation: "profiles"
-      referencedColumns: ["id"]
-    }
-                  ]
-                },"profiles": {
-                  Row: {
-                    "created_at": string,"display_name": string | null,"id": string,"preferences": NonNullable<Json>
-                  }
-                  ComputedFields: never
-                  Insert: {
-                    "created_at"?: string,"display_name"?: string | null,"id": string,"preferences"?: NonNullable<Json>
-                  }
-                  Update: {
-                    "created_at"?: string,"display_name"?: string | null,"id"?: string,"preferences"?: NonNullable<Json>
-                  }
-                  Relationships: [
-                    
-                  ]
-                }
-          }
-          Views: {
-            [_ in never]: never
-          }
-          Functions: {
-            [_ in never]: never
-          }
-          Enums: {
-            "garment_category": "jacket"|"blazer"|"coat"|"t_shirt"|"shirt"|"blouse"|"polo"|"tank_top"|"sweater"|"hoodie"|"cardigan"|"jeans"|"trousers"|"shorts"|"skirt"|"leggings"|"sweatpants"|"dress"|"jumpsuit"|"sneakers"|"boots"|"sandals"|"heels"|"dress_shoes"|"other","garment_color": "black"|"white"|"grey"|"beige"|"brown"|"red"|"pink"|"orange"|"yellow"|"green"|"blue"|"purple"|"gold"|"silver"|"multicolor","garment_layer": "outer"|"top"|"bottom"|"full_body"|"shoes","garment_material": "cotton"|"linen"|"wool"|"cashmere"|"silk"|"denim"|"leather"|"faux_leather"|"suede"|"polyester"|"viscose"|"nylon"|"other","garment_season": "spring"|"summer"|"autumn"|"winter"
-          }
-          CompositeTypes: {
-            [_ in never]: never
-          }
-        }
-}
+  graphql_public: {
+    Tables: {
+      [_ in never]: never;
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      graphql: { Args: { extensions?: Json; operationName?: string; query?: string; variables?: Json }; Returns: Json };
+    };
+    Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
+  };
+  public: {
+    Tables: {
+      garments: {
+        Row: {
+          brand: string | null;
+          category: Database['public']['Enums']['garment_category'];
+          colors: Database['public']['Enums']['garment_color'][];
+          created_at: string;
+          id: string;
+          image_path: string;
+          layer: Database['public']['Enums']['garment_layer'];
+          material: Database['public']['Enums']['garment_material'] | null;
+          name: string | null;
+          notes: string | null;
+          seasons: Database['public']['Enums']['garment_season'][];
+          size_label: string | null;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          brand?: string | null;
+          category: Database['public']['Enums']['garment_category'];
+          colors?: Database['public']['Enums']['garment_color'][];
+          created_at?: string;
+          id?: string;
+          image_path: string;
+          layer: Database['public']['Enums']['garment_layer'];
+          material?: Database['public']['Enums']['garment_material'] | null;
+          name?: string | null;
+          notes?: string | null;
+          seasons?: Database['public']['Enums']['garment_season'][];
+          size_label?: string | null;
+          user_id?: string;
+        };
+        Update: {
+          brand?: string | null;
+          category?: Database['public']['Enums']['garment_category'];
+          colors?: Database['public']['Enums']['garment_color'][];
+          created_at?: string;
+          id?: string;
+          image_path?: string;
+          layer?: Database['public']['Enums']['garment_layer'];
+          material?: Database['public']['Enums']['garment_material'] | null;
+          name?: string | null;
+          notes?: string | null;
+          seasons?: Database['public']['Enums']['garment_season'][];
+          size_label?: string | null;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'garments_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      outfit_items: {
+        Row: {
+          garment_id: string;
+          layer: Database['public']['Enums']['garment_layer'];
+          outfit_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          garment_id: string;
+          layer: Database['public']['Enums']['garment_layer'];
+          outfit_id: string;
+        };
+        Update: {
+          garment_id?: string;
+          layer?: Database['public']['Enums']['garment_layer'];
+          outfit_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'outfit_items_garment_id_layer_fkey';
+            columns: ['garment_id', 'layer'];
+            isOneToOne: false;
+            referencedRelation: 'garments';
+            referencedColumns: ['id', 'layer'];
+          },
+          {
+            foreignKeyName: 'outfit_items_outfit_id_fkey';
+            columns: ['outfit_id'];
+            isOneToOne: false;
+            referencedRelation: 'outfits';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      outfits: {
+        Row: {
+          created_at: string;
+          id: string;
+          name: string | null;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          id?: string;
+          name?: string | null;
+          user_id?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          name?: string | null;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'outfits_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      profiles: {
+        Row: {
+          created_at: string;
+          display_name: string | null;
+          id: string;
+          preferences: NonNullable<Json>;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          display_name?: string | null;
+          id: string;
+          preferences?: NonNullable<Json>;
+        };
+        Update: {
+          created_at?: string;
+          display_name?: string | null;
+          id?: string;
+          preferences?: NonNullable<Json>;
+        };
+        Relationships: [];
+      };
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      [_ in never]: never;
+    };
+    Enums: {
+      garment_category:
+        | 'jacket'
+        | 'blazer'
+        | 'coat'
+        | 't_shirt'
+        | 'shirt'
+        | 'blouse'
+        | 'polo'
+        | 'tank_top'
+        | 'sweater'
+        | 'hoodie'
+        | 'cardigan'
+        | 'jeans'
+        | 'trousers'
+        | 'shorts'
+        | 'skirt'
+        | 'leggings'
+        | 'sweatpants'
+        | 'dress'
+        | 'jumpsuit'
+        | 'sneakers'
+        | 'boots'
+        | 'sandals'
+        | 'heels'
+        | 'dress_shoes'
+        | 'other';
+      garment_color:
+        | 'black'
+        | 'white'
+        | 'grey'
+        | 'beige'
+        | 'brown'
+        | 'red'
+        | 'pink'
+        | 'orange'
+        | 'yellow'
+        | 'green'
+        | 'blue'
+        | 'purple'
+        | 'gold'
+        | 'silver'
+        | 'multicolor';
+      garment_layer: 'outer' | 'top' | 'bottom' | 'full_body' | 'shoes';
+      garment_material:
+        | 'cotton'
+        | 'linen'
+        | 'wool'
+        | 'cashmere'
+        | 'silk'
+        | 'denim'
+        | 'leather'
+        | 'faux_leather'
+        | 'suede'
+        | 'polyester'
+        | 'viscose'
+        | 'nylon'
+        | 'other';
+      garment_season: 'spring' | 'summer' | 'autumn' | 'winter';
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
+  };
+};
 
-type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>
+type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>;
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, 'public'>];
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-      Row: infer R
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
+      Row: infer R;
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-  ? (DefaultSchema["Tables"] & DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-      Row: infer R
-    }
-    ? R
-    : never
-  : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
+    ? (DefaultSchema['Tables'] & DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R;
+      }
+      ? R
+      : never
+    : never;
 
 export type TablesInsert<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
+  DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables'] | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+      Insert: infer I;
     }
     ? I
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-      Insert: infer I
-    }
-    ? I
-    : never
-  : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I;
+      }
+      ? I
+      : never
+    : never;
 
 export type TablesUpdate<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
+  DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables'] | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+      Update: infer U;
     }
     ? U
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-      Update: infer U
-    }
-    ? U
-    : never
-  : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U;
+      }
+      ? U
+      : never
+    : never;
 
 export type Enums<
-  DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
-    | { schema: keyof DatabaseWithoutInternals },
+  DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums'] | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
+    : never = never,
 > = DefaultSchemaEnumNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-  ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-  : never
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
+    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
+    : never;
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema["CompositeTypes"]
+    | keyof DefaultSchema['CompositeTypes']
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+    : never = never,
 > = PublicCompositeTypeNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-  ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-  : never
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
+    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
+    : never;
 
 export const Constants = {
-  "graphql_public": {
-          Enums: {
-            
-          }
-        },"public": {
-          Enums: {
-            "garment_category": ["jacket", "blazer", "coat", "t_shirt", "shirt", "blouse", "polo", "tank_top", "sweater", "hoodie", "cardigan", "jeans", "trousers", "shorts", "skirt", "leggings", "sweatpants", "dress", "jumpsuit", "sneakers", "boots", "sandals", "heels", "dress_shoes", "other"],"garment_color": ["black", "white", "grey", "beige", "brown", "red", "pink", "orange", "yellow", "green", "blue", "purple", "gold", "silver", "multicolor"],"garment_layer": ["outer", "top", "bottom", "full_body", "shoes"],"garment_material": ["cotton", "linen", "wool", "cashmere", "silk", "denim", "leather", "faux_leather", "suede", "polyester", "viscose", "nylon", "other"],"garment_season": ["spring", "summer", "autumn", "winter"]
-          }
-        }
-} as const
+  graphql_public: {
+    Enums: {},
+  },
+  public: {
+    Enums: {
+      garment_category: [
+        'jacket',
+        'blazer',
+        'coat',
+        't_shirt',
+        'shirt',
+        'blouse',
+        'polo',
+        'tank_top',
+        'sweater',
+        'hoodie',
+        'cardigan',
+        'jeans',
+        'trousers',
+        'shorts',
+        'skirt',
+        'leggings',
+        'sweatpants',
+        'dress',
+        'jumpsuit',
+        'sneakers',
+        'boots',
+        'sandals',
+        'heels',
+        'dress_shoes',
+        'other',
+      ],
+      garment_color: [
+        'black',
+        'white',
+        'grey',
+        'beige',
+        'brown',
+        'red',
+        'pink',
+        'orange',
+        'yellow',
+        'green',
+        'blue',
+        'purple',
+        'gold',
+        'silver',
+        'multicolor',
+      ],
+      garment_layer: ['outer', 'top', 'bottom', 'full_body', 'shoes'],
+      garment_material: [
+        'cotton',
+        'linen',
+        'wool',
+        'cashmere',
+        'silk',
+        'denim',
+        'leather',
+        'faux_leather',
+        'suede',
+        'polyester',
+        'viscose',
+        'nylon',
+        'other',
+      ],
+      garment_season: ['spring', 'summer', 'autumn', 'winter'],
+    },
+  },
+} as const;
