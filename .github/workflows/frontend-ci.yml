@@ -41,7 +41,7 @@ jobs:
     name: Lint & Test
     needs: detect-changes
     # Führt das Setup und den Build NUR aus, wenn das Frontend geändert wurde
-    if: needs.changes.outputs.frontend == 'true'
+    if: needs.detect-changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -70,7 +70,7 @@ jobs:
   build:
     name: Build
     needs: [detect-changes, test]
-    if: needs.detect-changes.outputs.frontend == 'true
+    if: needs.detect-changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
