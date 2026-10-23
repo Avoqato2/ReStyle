@@ -1,10 +1,10 @@
-import {inject, Injectable, signal} from '@angular/core';
-import {Camera, MediaResult} from '@capacitor/camera';
+import { inject, Injectable, signal } from '@angular/core';
+import { Camera, MediaResult } from '@capacitor/camera';
 import { Filesystem, Directory } from '@capacitor/filesystem';
-import {Preferences} from '@capacitor/preferences';
-import {Platform} from '@ionic/angular';
-import {Capacitor} from '@capacitor/core'
-import {removeBackground} from "@imgly/background-removal";
+import { Preferences } from '@capacitor/preferences';
+import { Platform } from '@ionic/angular';
+import { Capacitor } from '@capacitor/core';
+import { removeBackground } from '@imgly/background-removal';
 
 @Injectable({
   providedIn: 'root',
@@ -26,7 +26,7 @@ export class PhotoService {
     });
 
     //remove background from image
-    const removedBackgroundImage = await this.removeImageBackground(capturedPhoto)
+    const removedBackgroundImage = await this.removeImageBackground(capturedPhoto);
     // Save picture without background
     const savedImageFile = await this.savePicture(removedBackgroundImage);
     // add new pic to the first index of the array
@@ -46,6 +46,7 @@ export class PhotoService {
     const info = photo.metadata;
     const fileFormat = info?.format || 'webp';
 
+    //here is a test comment
     const fileName = `${Date.now()}.${fileFormat}`;
 
     const savedFile = await Filesystem.writeFile({
@@ -69,7 +70,6 @@ export class PhotoService {
   }
 
   private async base64FromPath(path: string): Promise<string> {
-
     const response = await fetch(path);
     // extracts the responst (image) as raw binary data (blob)
     const blob = await response.blob();
@@ -89,22 +89,21 @@ export class PhotoService {
     });
   }
 
-  public async loadSaved(){
-
-    const {value: photoList} = await Preferences.get({key: this.PHOTO_STORAGE});
+  public async loadSaved() {
+    const { value: photoList } = await Preferences.get({ key: this.PHOTO_STORAGE });
     const photos = (photoList ? JSON.parse(photoList) : []) as UserPhoto[];
 
     //if running on desktop
-    if(!this.platform.is('hybrid')){
-      for (const photo of photos){
-        try{
+    if (!this.platform.is('hybrid')) {
+      for (const photo of photos) {
+        try {
           const file = await Filesystem.readFile({
             path: photo.filepath,
             directory: Directory.Data,
           });
 
-        const extension = photo.filepath.split('.').pop()?.toLowerCase() || 'webp';
-        photo.webviewPath = `data:image/${extension};base64,${file.data}`;
+          const extension = photo.filepath.split('.').pop()?.toLowerCase() || 'webp';
+          photo.webviewPath = `data:image/${extension};base64,${file.data}`;
         } catch (error) {
           console.warn('Filepath not found: ', error);
         }
@@ -113,13 +112,13 @@ export class PhotoService {
     this.photos.set(photos);
   }
 
-  public async removeImageBackground (photo: MediaResult): Promise<MediaResult> {
-    try{
+  public async removeImageBackground(photo: MediaResult): Promise<MediaResult> {
+    try {
       const pngBlob = await removeBackground(photo.webPath!);
       const webpBlob = await this.convertBlobToWebp(pngBlob);
       return this.blobToMediaResult(webpBlob);
     } catch (error) {
-      console.error("Error removing background or converting to webp: ", error);
+      console.error('Error removing background or converting to webp: ', error);
       throw error;
     }
   }
@@ -130,14 +129,13 @@ export class PhotoService {
     return {
       webPath: URL.createObjectURL(blob),
       type: 0, //0 = image; 1 = video;
-      metadata: {format},
+      metadata: { format },
       saved: false,
-    }
+    };
   }
 
   // compressing images to a smaller size for the backend
   private async convertBlobToWebp(blob: Blob, quality = 0.6): Promise<Blob> {
-
     // so we can get the width and height of the blob
     // edit: using createImageBitmap so we don't have to use outdated Promises
     const imageBitmap = await createImageBitmap(blob);
@@ -152,7 +150,7 @@ export class PhotoService {
     return await canvas.convertToBlob({
       type: 'image/webp',
       quality: quality,
-    })
+    });
   }
 }
 

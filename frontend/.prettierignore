@@ -1,0 +1,13 @@
+# Build- und Cache-Ordner
+www
+dist
+.angular/
+node_modules/
+coverage
+
+src/index.html
+*.scss
+src/main.ts
+tsconfig*.json
+angular.json
+capacitor.config.ts

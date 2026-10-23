@@ -25,12 +25,13 @@ import { PhotoService } from '../services/photo.service';
 export class HomePage implements OnInit {
   public photoService = inject(PhotoService);
   constructor() {
-    addIcons({camera});
+    addIcons({ camera });
   }
 
   // when user gets to this page, pics are loaded automatically
   async ngOnInit() {
     await this.photoService.loadSaved();
+    console.log('hi');
   }
   addPhotoToGallery() {
     this.photoService.HandlePhoto();
