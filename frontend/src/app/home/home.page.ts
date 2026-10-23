@@ -34,6 +34,6 @@ export class HomePage implements OnInit {
     console.log('hi');
   }
   addPhotoToGallery() {
-    this.photoService.addNewPhotoToGallery();
+    this.photoService.HandlePhoto();
   }
 }

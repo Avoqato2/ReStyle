@@ -1,4 +1,5 @@
 # ReStyle
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ReStyle is a cross-platform mobile app that helps users manage their wardrobe, discover outfits and
 make more sustainable fashion choices.
