@@ -41,6 +41,7 @@
     "@imgly/background-removal": "^1.1.5",
     "@ionic/angular": "^9.0.0",
     "@ionic/pwa-elements": "^3.4.0",
+    "@supabase/supabase-js": "^2.118.0",
     "ionicons": "^8.1.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
