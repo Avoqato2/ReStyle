@@ -38,7 +38,7 @@
     "@capacitor/preferences": "^8.0.1",
     "@capacitor/status-bar": "8.0.4",
     "@eslint/js": "^10.0.1",
-    "@imgly/background-removal": "^1.7.0",
+    "@imgly/background-removal": "^1.1.5",
     "@ionic/angular": "^9.0.0",
     "@ionic/pwa-elements": "^3.4.0",
     "ionicons": "^8.1.0",
@@ -46,7 +46,7 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@angular/build": "^22.2.2",
+    "@angular/build": "^22.1.9",
     "@angular/cli": "^22.2.2",
     "@angular/compiler-cli": "^22.2.3",
     "@angular/language-service": "^22.2.3",
@@ -63,5 +63,12 @@
     "typescript-eslint": "^8.61.0",
     "vitest": "^4.1.11"
   },
-  "description": "A digital wardrobe and outfit planer based on Ionic"
+  "description": "A digital wardrobe and outfit planer based on Ionic",
+  "allowScripts": {
+    "@parcel/watcher@2.6.0": true,
+    "esbuild@0.28.2": true,
+    "lmdb@3.5.6": true,
+    "msgpackr-extract@3.0.4": true,
+    "protobufjs@7.6.6": true
+  }
 }
