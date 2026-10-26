@@ -23,19 +23,6 @@ begin
     select 1
     from public.outfit_items i
     where i.outfit_id = new.outfit_id
-
-      -- Bei einem UPDATE ist die alte Zeile noch vorhanden.
-      -- Sie wird ausgeschlossen, damit ein direkter Wechsel wie
-      -- full_body -> top nicht fälschlicherweise blockiert wird.
-      --
-      -- Bei einem INSERT wird dieser Teil nicht ausgewertet,
-      -- weil TG_OP dann nicht 'UPDATE' ist.
-      and not (
-        tg_op = 'UPDATE'
-        and i.outfit_id = old.outfit_id
-        and i.layer = old.layer
-      )
-
       -- Ungültig ist nur full_body zusammen mit top oder bottom.
       and (
         (new.layer = 'full_body' and i.layer in ('top', 'bottom'))
