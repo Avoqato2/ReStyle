@@ -38,3 +38,8 @@ begin
   return new;
 end;
 $$;
+create or replace trigger outfit_items_check_layers
+before insert on public.outfit_items
+for each row execute function public.check_outfit_layers();
+
+revoke update on public.outfit_items from authenticated;
