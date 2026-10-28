@@ -11,4 +11,4 @@ src/main.ts
 tsconfig*.json
 angular.json
 capacitor.config.ts
-src/supabase.types.ts
+src/app/supabase
