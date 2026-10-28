@@ -1,8 +1,9 @@
 <!--
 Sync Impact Report
-- Version change: 1.0.0 -> 1.1.0
+- Version change: 1.1.0 -> 1.2.0
 - Modified principles: none.
-- Modified sections: Entwicklungsprozess und Qualitätssicherung; Governance.
+- Modified sections: Entwicklungsprozess und Qualitätssicherung (Ausnahme für
+  Spec-Kit-Artefakte unter `specs/` und `.specify/` ergänzt).
 - Added sections: none.
 - Removed sections: none.
 - Follow-up TODOs: TODO(RATIFICATION_DATE) requires the original adoption date.
@@ -88,6 +89,14 @@ Arbeit MUSS in getrennten Branches und Pull Requests erfolgen. Diese Trennung
 reduziert Konflikte, macht Verantwortlichkeiten nachvollziehbar und hält die
 Architekturgrenzen zwischen Frontend und Backend durchsetzbar.
 
+Spec-Kit-Artefakte unter `specs/` und `.specify/` sind bereichsübergreifend
+und gehören weder zu `frontend` noch zu `backend`. Neue oder geänderte
+Spezifikationen, Pläne und Aufgabenlisten werden in einem eigenen Pull Request
+ohne Code-Änderungen eingebracht; dieser darf auf einem `backend/`-Branch
+erfolgen. Auf Implementierungs-Branches dürfen Agents in `specs/`
+ausschließlich erledigte Aufgaben in `tasks.md` abhaken; inhaltliche
+Spec-Änderungen MÜSSEN in einem separaten Spec-PR erfolgen.
+
 Änderungen an `main` MÜSSEN über einen Pull Request mit mindestens einem
 Review und erfolgreich durchlaufener CI integriert werden. Reviews MÜSSEN
 mindestens Umfang, Akzeptanzkriterien, Tests, Typisierung,
@@ -111,5 +120,5 @@ semantische Änderung. Jede Änderung aktualisiert das Änderungsdatum. Die
 Verfassung wird bei jedem relevanten Pull Request auf Einhaltung geprüft;
 CI und Review sind verbindliche Qualitätstore vor dem Merge.
 
-**Version**: 1.1.0 | **Ratified**: TODO(RATIFICATION_DATE): ursprüngliches
-Annahmedatum ermitteln | **Last Amended**: 2026-10-20
+**Version**: 1.2.0 | **Ratified**: TODO(RATIFICATION_DATE): ursprüngliches
+Annahmedatum ermitteln | **Last Amended**: 2026-10-28
