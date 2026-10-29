@@ -9,8 +9,14 @@ Keine Schemaänderung, keine Migration. Bestehende Strukturen werden genutzt.
 | Account | `auth.users` (Supabase) | `id`, `email`, `email_confirmed_at`, Identities (`email`, `google`) | Wird von Supabase Auth verwaltet, nicht direkt beschrieben |
 | Profil | `public.profiles` | `id` (= `auth.users.id`), `display_name`, `preferences` | Per Trigger `on_auth_user_created` angelegt, RLS auf eigenen User ([mvp_schema](../../backend/supabase/migrations/20261021120000_mvp_schema.sql)) |
 
-Google-Login mit vorhandener E-Mail erzeugt keinen neuen `auth.users`-Eintrag, sondern eine
-zusätzliche Identity am bestehenden Account (FR-017); daher auch kein zweites Profil.
+Google-Login mit vorhandener E-Mail verknüpft die Google-Identity mit dem
+bestehenden Account (FR-017). Der `auth.users`-Eintrag und das zugehörige
+Profil bleiben erhalten; es entsteht kein zweites Profil.
+
+Ist das bestehende Konto noch nicht bestätigt, entfernt Supabase beim
+Google-Login dessen andere unbestätigte Identities, etwa E-Mail/Passwort.
+Die bisherige unbestätigte E-Mail/Passwort-Anmeldung bleibt daher nicht
+als zusätzlicher Anmeldeweg erhalten.
 
 ## Client-Zustand (AuthService)
 
