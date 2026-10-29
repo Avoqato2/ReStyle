@@ -116,7 +116,7 @@ werden in F01 bzw. F04/F05 angelegt.
 |---|---|---|
 | 1 | Spec | `specs/002-user-auth/*` (dieser Branch) |
 | 2 | backend | `config.toml`, Mail-Templates, SMTP-/Secret-Doku |
-| 3 | frontend | Supabase-Client, `AuthService`, Guards, Callback, Tests |
+| 3 | backend | Supabase-Client, `AuthService`, Guards, Callback, Tests (`[BE]` unter `frontend/`, Constitution 1.3.0) |
 | 4 | frontend | Native Konfiguration: `appId`, Android-intent-filter, iOS URL Types |
 | 5 | frontend | Auth-Screens gegen [contracts/auth-service.md](contracts/auth-service.md) (parallel zu 3 möglich) |
 

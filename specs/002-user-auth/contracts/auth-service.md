@@ -82,6 +82,20 @@ Aufrufs geben dasselbe Promise zurück.
 | `callbackEvents` | `Observable<AuthCallbackEvent>` | Ein Event pro eingelöstem Link/Google-Redirect. Navigation übernimmt die App-Shell (`AppComponent`), Screens zeigen nur Hinweise. |
 | `handleCallbackUrl(url: string): Promise<AuthCallbackEvent>` | | Intern vom `appUrlOpen`-Listener und der Web-Route `/auth/callback` genutzt; öffentlich für Tests |
 
+### Navigation nach Callback-Events (AppComponent)
+
+| Event | Ziel | Screen zeigt |
+|---|---|---|
+| `email_confirmed` | `/home` | – |
+| `email_confirmed_login_required` | `/auth/login?hint=confirmed` | „E-Mail bestätigt, bitte einloggen“ |
+| `password_recovery` | `/auth/reset-password` | – |
+| `oauth_signed_in` | `/home` | – |
+| `link_invalid` (`signup`) | `/auth/login?hint=link_invalid` | „Link ungültig oder E-Mail bereits bestätigt“ + Neue Mail anfordern |
+| `link_invalid` (`recovery`) | `/auth/forgot-password?hint=link_invalid` | „Link ungültig oder abgelaufen“ |
+
+Sitzungsablauf: Login mit `signOutReason() === 'expired'` zeigt „Sitzung abgelaufen, bitte erneut
+einloggen“.
+
 ## Hilfsfunktionen (`frontend/src/app/auth/password-rules.ts`)
 
 ```ts
