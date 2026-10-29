@@ -105,6 +105,15 @@ User genau seine eigenen Teile im Grid sieht und eine leere Garderobe den Hinwei
 8. **Given** die Garderobe wurde auf dem Gerät schon einmal geladen, **When** der User sie
    erneut öffnet, **Then** sieht er sofort die zuletzt geladenen Teile, und Änderungen aus der
    Aktualisierung erscheinen ohne manuelles Neuladen.
+9. **Given** ein eingeloggter User sieht seine zuletzt geladene Garderobe
+   ohne Internetverbindung und Anlegen, Bearbeiten und Löschen sind deaktiviert,
+   **When** die Internetverbindung wiederhergestellt wird,
+   **Then** aktualisiert die App die Garderobe und gibt Anlegen, Bearbeiten
+   und Löschen wieder frei.
+10. **Given** ein User ist nicht eingeloggt,
+    **When** er die Garderobe oder die Detailansicht eines Kleidungsstücks
+    direkt aufruft,
+    **Then** verweigert die App den Zugriff und zeigt keine Garderobendaten an.
 
 ---
 
