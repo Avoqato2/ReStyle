@@ -19,7 +19,7 @@ export type AuthErrorCode =
   | 'invalid_credentials'   // falsche Daten ODER unbekannte E-Mail (bewusst nicht unterscheidbar)
   | 'email_not_confirmed'   // Login vor Bestätigung → „Mail erneut senden“ anbieten
   | 'weak_password'         // Server lehnt Passwort ab (Regeln siehe isPasswordValid)
-  | 'rate_limited'          // zu früh erneut gesendet → resendAvailableAt beachten
+  | 'rate_limited'          // zu früh erneut gesendet → signupResend bzw. recoveryResend beachten
   | 'network'               // keine Verbindung / Timeout
   | 'oauth_failed'          // Google-Anmeldung aus anderem Grund als Abbruch fehlgeschlagen
   | 'unknown';
@@ -57,7 +57,13 @@ export type AuthCallbackEvent =
 | `user` | `Signal<AuthUser \| null>` | Eingeloggter User |
 | `isAuthenticated` | `Signal<boolean>` | `status() === 'authenticated'` |
 | `signOutReason` | `Signal<SignOutReason \| null>` | Login zeigt bei `'expired'` „Sitzung abgelaufen, bitte erneut einloggen“; wird bei nächstem Login zurückgesetzt |
-| `resendAvailableAt` | `Signal<Date \| null>` | Frühester Zeitpunkt für erneutes Senden (Countdown) |
+| `signupResend` | `Signal<{ email: string; availableAt: Date } \| null>` | Countdown für die Bestätigungsmail zur angegebenen Adresse |
+| `recoveryResend` | `Signal<{ email: string; availableAt: Date } \| null>` | Countdown für den Reset-Link zur angegebenen Adresse |
+
+Die UI verwendet einen Countdown nur, wenn die Adresse im jeweiligen Signal
+mit der aktuell angezeigten Adresse übereinstimmt. Der Service und die UI
+verwenden dafür dieselbe E-Mail-Normalisierung. Ohne passenden Eintrag zeigt
+die UI keinen Countdown an. Die serverseitige Versandbegrenzung bleibt maßgeblich.
 
 ## Methoden
 
@@ -70,8 +76,8 @@ Aufrufs geben dasselbe Promise zurück.
 | `signUp(email, password): Promise<AuthResult>` | → `/auth/check-email` | `weak_password`, `rate_limited`, `network`, `unknown` | Auch bei bereits registrierter E-Mail `ok: true` (FR-006) |
 | `signIn(email, password): Promise<AuthResult>` | Sitzung aktiv → Garderobe | `invalid_credentials`, `email_not_confirmed`, `network`, `unknown` | |
 | `signInWithGoogle(): Promise<AuthResult<'signed_in' \| 'cancelled'>>` | `'signed_in'` → Garderobe; `'cancelled'` → im Login bleiben, keine Meldung | `oauth_failed`, `network` | Öffnet In-App-Browser; resolved erst nach Callback oder Schließen |
-| `signOut(): Promise<void>` | Login; lokale Daten entfernt | – | Nur dieses Gerät |
-| `resendConfirmation(email): Promise<AuthResult>` | Hinweis „Mail gesendet“ | `rate_limited`, `network` | Setzt `resendAvailableAt` |
+| `resendConfirmation(email): Promise<AuthResult>` | Hinweis „Mail gesendet“ | `rate_limited`, `network` | Setzt `signupResend` mit Adresse und frühestem Sendezeitpunkt bei Erfolg und bei `rate_limited`; verändert `recoveryResend` nicht |
+| `requestPasswordReset(email): Promise<AuthResult>` | Neutrale Bestätigung (FR-011) | `rate_limited`, `network` | Immer `ok: true` bei unbekannter E-Mail; setzt `recoveryResend` mit Adresse und frühestem Sendezeitpunkt bei Erfolg und bei `rate_limited`; verändert `signupResend` nicht |
 | `requestPasswordReset(email): Promise<AuthResult>` | Neutrale Bestätigung (FR-011) | `rate_limited`, `network` | Immer `ok: true` bei unbekannter E-Mail |
 | `updatePassword(newPassword): Promise<AuthResult>` | Eingeloggt → Garderobe | `weak_password`, `network`, `unknown` | Nur nach `password_recovery`; meldet andere Geräte ab |
 | `registerSignOutCleanup(fn: () => void \| Promise<void>): void` | – | – | Für Features mit lokalen Daten (F01-Cache) |
