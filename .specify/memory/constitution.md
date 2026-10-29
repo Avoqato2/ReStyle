@@ -2,8 +2,12 @@
 Sync Impact Report
 - Version change: 1.2.0 -> 1.3.0
 - Modified principles: none.
-- Modified sections: Entwicklungsprozess und Qualitätssicherung (Ausnahme für
-  `[BE]`-Tasks unter `frontend/` auf `backend/`-Branches ergänzt).
+- Modified sections: Entwicklungsprozess und Qualitätssicherung:
+  - `[BE]`-Ausnahme für Logik ohne Oberfläche unter `frontend/` auf `backend/`-Branches.
+  - `specs/` und `.specify/` als bereichsübergreifende Artefakte eingeordnet.
+  - Neue oder geänderte Specs, Pläne und Aufgabenlisten nur in separaten Spec-PRs ohne Code-Änderungen.
+  - Agents dürfen auf Implementierungs-Branches in `specs/` nur erledigte
+    Aufgaben in `tasks.md` abhaken.
 - Templates: keine Anpassung nötig; `[BE]`/`[FE]`-Marker werden pro Feature in
   `tasks.md` vergeben.
 - Added sections: none.
