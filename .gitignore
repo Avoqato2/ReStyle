@@ -8,4 +8,4 @@ backend/supabase/.temp/
 backend/supabase/.branches/
 
 # IDE
-.idea/
+./.idea
