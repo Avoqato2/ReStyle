@@ -67,9 +67,19 @@ die UI keinen Countdown an. Die serverseitige Versandbegrenzung bleibt maßgebli
 
 ## Methoden
 
-Alle Methoden werfen nicht, sondern liefern `AuthResult`. Ladezustand und Formularsperre
-verwaltet der Screen (`await` der Methode, FR-009b). Mehrfachaufrufe während eines laufenden
-Aufrufs geben dasselbe Promise zurück.
+Methoden mit dem Rückgabetyp `Promise<AuthResult<T>>` liefern ihr Ergebnis
+als `AuthResult<T>`. Fehler werden über dessen Fehlerfall zurückgegeben.
+
+Davon ausgenommen sind:
+- `signOut(): Promise<void>`
+- `registerSignOutCleanup(...): void`
+- `handleCallbackUrl(...): Promise<AuthCallbackEvent>`
+
+Für diese Methoden gelten die jeweils dokumentierten Rückgabeformen.
+
+Ladezustand und Formularsperre verwaltet der Screen
+(`await` der Methode, FR-009b). Mehrfachaufrufe derselben asynchronen Methode
+während eines laufenden Aufrufs geben dasselbe Promise zurück.
 
 | Methode | Erfolg | Mögliche Fehler | Hinweis |
 |---|---|---|---|
