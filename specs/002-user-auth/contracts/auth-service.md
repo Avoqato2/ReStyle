@@ -43,6 +43,7 @@ export type AuthCallbackEvent =
   | { type: 'email_confirmed_login_required' }   // Bestätigt, aber anderes Gerät → Login mit Hinweis
   | { type: 'password_recovery' }                // → /auth/reset-password
   | { type: 'oauth_signed_in' }                  // Google erfolgreich → Garderobe
+  | { type: 'oauth_failed'; error: AuthError }   // → Login mit Fehlermeldung
   | { type: 'link_invalid'; flow: 'signup' | 'recovery' };
       // signup:   „Link ungültig oder E-Mail bereits bestätigt“ + Einloggen / Neue Mail
       // recovery: „Link ungültig oder abgelaufen“ + Neuen Link anfordern
