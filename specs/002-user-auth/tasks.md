@@ -59,7 +59,7 @@ Deep Links, Guards
 - [ ] T015 [P] [BE] Reine Funktion `parseCallbackUrl(url)` → `{ flow, code?, error? }` (Query und Fragment, `flow` = `signup|recovery|google`) in frontend/src/app/auth/auth-callback.ts + frontend/src/app/auth/auth-callback.spec.ts
 - [ ] T016 [BE] `AuthService` mit Signals `status` (Start `initializing`), `user`, `isAuthenticated`, `signOutReason`, `resendAvailableAt`; Init über `getSession()` und `onAuthStateChange` in frontend/src/app/supabase/services/auth.service.ts + frontend/src/app/supabase/services/auth.service.spec.ts
 - [ ] T017 [BE] `handleCallbackUrl(url)` und `callbackEvents` nach research R2 (Fehler → `link_invalid`, `exchangeCodeForSession`, Fehlschlag bei `signup` → `email_confirmed_login_required`, doppelte URL ignorieren) in frontend/src/app/supabase/services/auth.service.ts + Tests aller Zweige in auth.service.spec.ts
-- [ ] T018 [BE] `App.addListener('appUrlOpen')` im AuthService-Init registrieren und an `handleCallbackUrl` übergeben (`@capacitor/app` gemockt) in frontend/src/app/supabase/services/auth.service.ts + auth.service.spec.ts
+- [ ] T018 [BE] `App.addListener('appUrlOpen')` ausschließlich in `AppComponent` registrieren und die empfangene URL an `AuthService.handleCallbackUrl(url)` weitergeben; keinen `appUrlOpen`-Listener im AuthService registrieren. Die Navigation nach `callbackEvents` bleibt in `AppComponent`. Zugehörige Tests mit gemocktem `@capacitor/app` in `app.component.spec.ts` ergänzen.
 - [ ] T019 [BE] `authGuard` (wartet bis `status !== 'initializing'`, sonst `/auth/login`) und `guestGuard` (mit Sitzung → `/home`) in frontend/src/app/auth/guards.ts + frontend/src/app/auth/guards.spec.ts
 - [ ] T020 [BE] Navigation nach `callbackEvents` gemäß Contract-Tabelle „Navigation nach Callback-Events“ in frontend/src/app/app.component.ts + frontend/src/app/app.component.spec.ts
 
@@ -170,6 +170,7 @@ Accounts → gleiche User-ID; Browser schließen → im Login ohne Meldung.
 Setup (T001–T006)
   └─► Fundament (T007–T022)
         ├─► US1 (T023–T028) ─┐
+        ├─► US1 (T023–T028, nach T033) ─┐
         ├─► US2 (T029–T037) ─┤  US2 nutzt Login-Screen auch für US1-Hinweise
         ├─► US3 (T038–T043)  │  T038–T043 brauchen T034 (Link „Passwort vergessen“) nur für den Checkpoint
         └─► US4 (T044–T047)  │  T047 erweitert den Login-Screen aus T034
