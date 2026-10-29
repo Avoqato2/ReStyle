@@ -84,7 +84,10 @@ in [quickstart.md](quickstart.md) gegen die echte Supabase-Instanz geprüft.
 ## R8 – Rate-Limit fürs erneute Senden
 
 - **Decision**: `max_frequency = "60s"` (FR-015). Fehler `over_email_send_rate_limit` →
-  `rate_limited`; der Service setzt `resendAvailableAt` für den Countdown. `[auth.rate_limit]
+    `rate_limited`; der Service setzt für Bestätigungsmails `signupResend`
+  und für Reset-Links `recoveryResend`. Beide Signale enthalten die normalisierte
+  Adresse und den frühesten Sendezeitpunkt. Die UI verwendet nur Einträge,
+  deren Adresse mit der aktuell angezeigten Adresse übereinstimmt. `[auth.rate_limit]
   email_sent` wird mit Custom SMTP auf 30/h erhöht (Default 2/h reicht nicht für Tests).
 
 ## R9 – Sitzung, Logout, Ablauf
