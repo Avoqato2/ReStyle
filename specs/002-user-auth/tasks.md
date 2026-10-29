@@ -57,7 +57,7 @@ Deep Links, Guards
 - [ ] T013 [BE] `SUPABASE_CLIENT`-InjectionToken und `createClient<Database>` mit `flowType: 'pkce'`, `persistSession: true`, `autoRefreshToken: true`, `detectSessionInUrl: false` und Storage-Adapter auf `@capacitor/preferences` in frontend/src/app/supabase/supabase.client.ts; Provider in frontend/src/main.ts registrieren
 - [ ] T014 [P] [BE] `AuthErrorCode`, `AuthError`, `AuthResult` aus dem Contract und `mapAuthError()` (Supabase-Codes `invalid_credentials`, `email_not_confirmed`, `weak_password`, `over_email_send_rate_limit`, Netzwerkfehler → Contract-Codes, deutsche Meldungen) in frontend/src/app/auth/auth-errors.ts + frontend/src/app/auth/auth-errors.spec.ts
 - [ ] T015 [P] [BE] Reine Funktion `parseCallbackUrl(url)` → `{ flow, code?, error? }` (Query und Fragment, `flow` = `signup|recovery|google`) in frontend/src/app/auth/auth-callback.ts + frontend/src/app/auth/auth-callback.spec.ts
-- [ ] T016 [BE] `AuthService` mit Signals `status` (Start `initializing`), `user`, `isAuthenticated`, `signOutReason`, `resendAvailableAt`; Init über `getSession()` und `onAuthStateChange` in frontend/src/app/supabase/services/auth.service.ts + frontend/src/app/supabase/services/auth.service.spec.ts
+- [ ] T016 [BE] `AuthService` mit Signals `status` (Start `initializing`), `user`, `isAuthenticated`, `signOutReason`, `signupResend`, `recoveryResend` (jeweils Adresse und frühester Sendezeitpunkt, initial `null`); Init über `getSession()` und `onAuthStateChange` in frontend/src/app/supabase/services/auth.service.ts + frontend/src/app/supabase/services/auth.service.spec.ts
 - [ ] T017 [BE] `handleCallbackUrl(url)` und `callbackEvents` nach research R2 (Callback-Fehler bei `signup`/`recovery` → `link_invalid`, bei `google` → `oauth_failed` mit `error: AuthError`; Google-Abbruch ohne Fehlermeldung zum Login, `exchangeCodeForSession`, Fehlschlag bei `signup` → `email_confirmed_login_required`, doppelte URL ignorieren) in frontend/src/app/supabase/services/auth.service.ts + Tests aller Zweige in auth.service.spec.ts
 - [ ] T018 [BE] `App.addListener('appUrlOpen')` ausschließlich in `AppComponent` registrieren und die empfangene URL an `AuthService.handleCallbackUrl(url)` weitergeben; keinen `appUrlOpen`-Listener im AuthService registrieren. Die Navigation nach `callbackEvents` bleibt in `AppComponent`. Zugehörige Tests mit gemocktem `@capacitor/app` in `app.component.spec.ts` ergänzen.
 - [ ] T019 [BE] `authGuard` (wartet bis `status !== 'initializing'`, sonst `/auth/login`) und `guestGuard` (mit Sitzung → `/home`) in frontend/src/app/auth/guards.ts + frontend/src/app/auth/guards.spec.ts
@@ -86,10 +86,10 @@ Link im Emulator öffnen → eingeloggt.
 
 - [ ] T023 [P] [US1] [BE] `checkPasswordRules()` und `isPasswordValid()` („mindestens 8 Zeichen, mindestens ein Buchstabe und eine Ziffer“) in frontend/src/app/auth/password-rules.ts + frontend/src/app/auth/password-rules.spec.ts
 - [ ] T024 [US1] [BE] `signUp(email, password)` mit `emailRedirectTo: 'restyle://auth/callback?flow=signup'`; bereits registrierte E-Mail (leere Identities) liefert `ok: true` (FR-006); In-Flight-Promise wiederverwenden in auth.service.ts + auth.service.spec.ts
-- [ ] T025 [US1] [BE] `resendConfirmation(email)` mit `resend({ type: 'signup' })`; setzt `resendAvailableAt` (+60 s) bei Erfolg und bei `rate_limited` in auth.service.ts + auth.service.spec.ts
+- [ ] T025 [US1] [BE] `resendConfirmation(email)` mit `resend({ type: 'signup' })`; setzt `signupResend` mit der normalisierten Adresse und dem frühesten Sendezeitpunkt (+60 s) bei Erfolg und bei `rate_limited`; verändert `recoveryResend` nicht in auth.service.ts + auth.service.spec.ts
 - [ ] T026 [US1] [BE] Routen `/auth/register` und `/auth/check-email` mit `guestGuard` in frontend/src/app/app.routes.ts
 - [ ] T027 [P] [US1] [FE] Registrierungs-Screen nach Figma: E-Mail, Passwort mit Live-Regelanzeige (`checkPasswordRules`), Feldfehler, Ladeanzeige und gesperrtes Formular während `signUp`, Link zum Login in frontend/src/app/auth/pages/register/register.page.ts|html|scss
-- [ ] T028 [P] [US1] [FE] „Bestätigungsmail unterwegs“-Screen nach Figma mit „Erneut senden“ und Countdown aus `resendAvailableAt`, Fehleranzeige für `network` in frontend/src/app/auth/pages/check-email/check-email.page.ts|html|scss
+- [ ] T028 [P] [US1] [FE] „Bestätigungsmail unterwegs“-Screen nach Figma mit „Erneut senden“ und Countdown aus `signupResend`, nur wenn dessen Adresse mit der normalisierten Adresse des Screens übereinstimmt, Fehleranzeige für `network` in frontend/src/app/auth/pages/check-email/check-email.page.ts|html|scss
 
 **Checkpoint US1 (Emulator/Gerät)**: Quickstart-Szenarien 1, 3, 4 und 6. Mail aus dem lokalen
 Testpostfach im Emulator-Browser öffnen → App öffnet sich eingeloggt auf `/home`.
@@ -126,7 +126,7 @@ ist eingeloggt; andere Geräte werden abgemeldet.
 **Independent Test**: Reset anfordern → Link im Emulator öffnen → neues Passwort → eingeloggt;
 altes Passwort ungültig.
 
-- [ ] T038 [US3] [BE] `requestPasswordReset(email)` mit `redirectTo: 'restyle://auth/callback?flow=recovery'`; unbekannte E-Mail → `ok: true` (FR-011); `rate_limited` setzt `resendAvailableAt` in auth.service.ts + auth.service.spec.ts
+- [ ] T038 [US3] [BE] `requestPasswordReset(email)` mit `redirectTo: 'restyle://auth/callback?flow=recovery'`; unbekannte E-Mail → `ok: true` (FR-011); setzt `recoveryResend` mit der normalisierten Adresse und dem frühesten Sendezeitpunkt (+60 s) bei Erfolg und bei `rate_limited`; verändert `signupResend` nicht in auth.service.ts + auth.service.spec.ts
 - [ ] T039 [US3] [BE] `updatePassword(newPassword)` mit `updateUser({ password })`, danach `signOut({ scope: 'others' })` in auth.service.ts + auth.service.spec.ts
 - [ ] T040 [US3] [BE] `recoveryGuard`: `/auth/reset-password` nur nach Event `password_recovery`, sonst `/auth/login` in frontend/src/app/auth/guards.ts + guards.spec.ts
 - [ ] T041 [US3] [BE] Routen `/auth/forgot-password` (`guestGuard`) und `/auth/reset-password` (`recoveryGuard`) in frontend/src/app/app.routes.ts
