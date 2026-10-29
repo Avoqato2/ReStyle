@@ -60,10 +60,18 @@ in [quickstart.md](quickstart.md) gegen die echte Supabase-Instanz geprüft.
 
 - **Decision**: Supabase-Standard „automatic identity linking“: Google-Identität wird an einen
   bestehenden User mit gleicher, bestätigter E-Mail gehängt (FR-017).
-- **Verifizieren**: Verhalten bei unbestätigtem E-Mail/Passwort-Account. Erwartung: Supabase
-  verknüpft und bestätigt die Adresse, entfernt aber zum Schutz vor Account-Übernahme das bisher
-  ungeprüfte Passwort. Der User kann per „Passwort vergessen“ ein neues setzen (deckt sich mit der
-  Annahme in der Spec).
+**Unbestätigtes E-Mail/Passwort-Konto:** Beim Google-Login mit derselben
+E-Mail-Adresse bleibt der bestehende Account einschließlich Profil erhalten.
+Supabase entfernt dabei andere unbestätigte Identities des Accounts.
+Die bisherige unbestätigte E-Mail/Passwort-Anmeldung bleibt daher nicht
+als zusätzlicher Anmeldeweg erhalten.
+
+**Quelle:** https://supabase.com/docs/guides/auth/auth-identity-linking
+
+**Implementierungsprüfung:** Mit der eingesetzten Supabase-Version prüfen:
+E-Mail/Passwort-Konto ohne E-Mail-Bestätigung anlegen, anschließend mit Google
+und derselben E-Mail-Adresse anmelden. Erwartet werden dieselbe User-ID,
+genau ein Profil und die Entfernung der unbestätigten E-Mail-Identity.
 
 ## R6 – Passwortregeln
 
