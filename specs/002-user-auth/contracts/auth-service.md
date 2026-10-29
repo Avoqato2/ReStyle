@@ -91,6 +91,7 @@ Aufrufs geben dasselbe Promise zurück.
 | `email_confirmed_login_required` | `/auth/login?hint=confirmed` | „E-Mail bestätigt, bitte einloggen“ |
 | `password_recovery` | `/auth/reset-password` | – |
 | `oauth_signed_in` | `/home` | – |
+| `oauth_failed` | `/auth/login` | Deutsche Fehlermeldung aus `event.error.message` |
 | `link_invalid` (`signup`) | `/auth/login?hint=link_invalid` | „Link ungültig oder E-Mail bereits bestätigt“ + Neue Mail anfordern |
 | `link_invalid` (`recovery`) | `/auth/forgot-password?hint=link_invalid` | „Link ungültig oder abgelaufen“ |
 
