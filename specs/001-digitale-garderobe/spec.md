@@ -348,5 +348,7 @@ Foto und betroffenes Outfit nicht mehr vorhanden.
 - Ein Kleidungsstück hat genau ein Foto; mehrere Fotos pro Teil sind nicht vorgesehen.
 - Das Grid zeigt bei großen Garderoben alle Teile, ggf. schrittweise nachgeladen; eine
   Obergrenze für die Anzahl der Kleidungsstücke gibt es in F01 nicht.
-- Nicht Teil von F01: optionale Merkmale und automatische Layer-Vorbelegung (F02), Filter (F03),
-  Outfits erstellen und verwalten (F04/F05), Hintergrund freistellen und KI-Erkennung (F12).
+- Als Eingabeformate aus Kamera und Galerie sind ausschließlich JPEG, PNG und
+  WebP erlaubt. Andere Eingabeformate, etwa HEIC, werden auch dann abgelehnt,
+  wenn eine Konvertierung möglich wäre. Gespeicherte Fotos liegen ebenfalls
+  in JPEG, PNG oder WebP vor und sind nach der Verkleinerung höchstens 5 MB groß.
