@@ -241,6 +241,10 @@ Foto und betroffenes Outfit nicht mehr vorhanden.
   Foto, Layer und Kategorie öffnen.
 - **FR-016**: Users MUST be able to Foto, Layer und Kategorie eines Kleidungsstücks ändern; für
   die Bearbeitung gelten dieselben Pflicht-, Format- und Größenregeln wie beim Erfassen.
+- **FR-016a**: Nach einer Layer-Änderung MUST das System prüfen, ob die
+  gewählte Kategorie zum neuen Layer gehört oder „Sonstiges“ ist.
+  Bei einer ungültigen Kategorie MUST das System eine neue Auswahl verlangen
+  und das Speichern bis zur Auswahl einer gültigen Kategorie verhindern.
 - **FR-017**: System MUST beim Ersetzen eines Fotos das alte Foto erst entfernen, wenn die
   Änderung vollständig gespeichert ist.
 - **FR-018**: Users MUST be able to ein Kleidungsstück löschen; vor dem Löschen MUST eine
