@@ -25,6 +25,14 @@ Voraussetzung für F01."
   „Keine Verbindung“ mit erneutem Versuch, auch für eingeloggte User; die Sitzung bleibt erhalten.
 - Q: Was erlebt der User bei abgelaufener oder ungültiger Sitzung? → A: Login mit Hinweis
   „Sitzung abgelaufen, bitte erneut einloggen“; nach dem Login landet er in der Garderobe.
+- Q (Planung): Wie lange gelten Bestätigungs- und Reset-Links, wenn nur eine gemeinsame
+  Ablaufzeit möglich ist? → A: Beide 1 Stunde.
+- Q (Planung): Wie werden Mail-Links technisch zugestellt? → A: Standard-Links des Auth-Anbieters.
+  Folge: Am Desktop geöffnet wird ein Bestätigungslink trotzdem wirksam, ein Reset-Link
+  verbraucht; ein Hinweis am Desktop ist nicht möglich. Ersetzt die Desktop-Antwort oben.
+- Q (Planung): Was zeigt ein ungültiger Bestätigungslink, wenn nicht unterscheidbar ist, ob er
+  abgelaufen oder die E-Mail schon bestätigt ist? → A: Kombinierte Meldung „Link ungültig oder
+  E-Mail bereits bestätigt“ mit den Aktionen Einloggen und Neue Mail anfordern.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -50,11 +58,9 @@ nach Antippen des Links ist der User bestätigt und kann sich einloggen.
    wird der Login verweigert und er kann die Bestätigungsmail erneut anfordern.
 4. **Given** die Bestätigungsmail, **When** der User den Link auf seinem Gerät antippt, **Then**
    öffnet sich die App, die Adresse ist bestätigt und er ist eingeloggt.
-5. **Given** ein abgelaufener oder durch eine neuere Mail ersetzter Bestätigungslink, **When**
-   der User ihn öffnet, **Then** erhält er einen verständlichen Hinweis und kann eine neue Mail
-   anfordern.
-6. **Given** eine bereits bestätigte E-Mail, **When** der User den Bestätigungslink erneut
-   öffnet, **Then** sieht er „E-Mail bereits bestätigt“ und gelangt zum Login.
+5. **Given** ein abgelaufener, durch eine neuere Mail ersetzter oder bereits verwendeter
+   Bestätigungslink, **When** der User ihn öffnet, **Then** sieht er „Link ungültig oder E-Mail
+   bereits bestätigt“ und kann sich einloggen oder eine neue Mail anfordern.
 
 ---
 
@@ -139,7 +145,9 @@ einer Adresse, die bereits als E-Mail/Passwort-Account existiert, zeigt dessen D
 - Mehrfaches Anfordern der Bestätigungs- oder Reset-Mail: Erneutes Senden ist erst nach einer
   kurzen Wartezeit möglich; die verbleibende Zeit wird angezeigt.
 - Bestätigungs- oder Reset-Link wird am Desktop oder auf einem Gerät ohne App geöffnet: Siehe
-  FR-013a; der Link bleibt danach weiterhin gültig.
+  FR-013a.
+- Bestätigungslink wird auf einem anderen Handy als bei der Registrierung geöffnet: Die E-Mail
+  ist bestätigt; der User sieht „E-Mail bestätigt, bitte einloggen“ und landet im Login.
 - Google-Login mit einer E-Mail, deren E-Mail/Passwort-Registrierung noch unbestätigt ist: Der
   User landet in diesem Account; die Adresse gilt als bestätigt.
 - App-Start ohne Internetverbindung: Siehe FR-010a; nach Wiederherstellung der Verbindung landet
@@ -209,14 +217,15 @@ einer Adresse, die bereits als E-Mail/Passwort-Account existiert, zeigt dessen D
 
 - **FR-013**: Bestätigungs- und Reset-Links MUST die App öffnen und direkt zum passenden
   Schritt führen.
-- **FR-013a**: Bestätigung und Passwort-Reset MUST ausschließlich in der App möglich sein. Wird
-  ein Link am Desktop oder auf einem Gerät ohne App geöffnet, MUST nur ein Hinweis erscheinen,
-  den Link auf dem Gerät mit der App zu öffnen; der Link wird dadurch nicht verbraucht.
-- **FR-014**: Links MUST nur einmal verwendbar sein und ablaufen (Bestätigung nach 24 Stunden,
-  Reset nach 1 Stunde). Ein neu angeforderter Link MUST alle älteren Links derselben Art
-  entwerten. Ungültige Links führen zu einem Hinweis mit der Möglichkeit, einen neuen Link
-  anzufordern; ein Bestätigungslink für eine bereits bestätigte E-Mail zeigt stattdessen
-  „E-Mail bereits bestätigt“ und führt zum Login.
+- **FR-013a**: Das Festlegen eines neuen Passworts MUST ausschließlich in der App möglich sein.
+  Wird ein Link am Desktop geöffnet, wird ein Bestätigungslink trotzdem wirksam (der User loggt
+  sich danach in der App ein) und ein Reset-Link verbraucht (der User fordert in der App einen
+  neuen an). Eine eigene Hinweisseite für den Desktop gibt es nicht.
+- **FR-014**: Links MUST nur einmal verwendbar sein und nach 1 Stunde ablaufen. Ein neu
+  angeforderter Link MUST alle älteren Links derselben Art entwerten. Ein ungültiger Reset-Link
+  führt zu einem Hinweis mit der Möglichkeit, einen neuen Link anzufordern; ein ungültiger
+  Bestätigungslink zeigt „Link ungültig oder E-Mail bereits bestätigt“ mit den Aktionen
+  Einloggen und Neue Mail anfordern.
 - **FR-015**: System MUST das erneute Senden von Mails zeitlich begrenzen (höchstens eine Mail
   pro Minute und Adresse).
 
@@ -255,10 +264,9 @@ einer Adresse, die bereits als E-Mail/Passwort-Account existiert, zeigt dessen D
 
 ## Assumptions
 
-- Die Offline-Regel FR-010a ersetzt das Offline-Lesen aus F01 (FR-014a, FR-014b); die F01-Spec
-  muss in einem separaten Spec-PR angepasst werden.
-- Linkgültigkeit (24 h / 1 h) und Wartezeit fürs erneute Senden (1 Minute) folgen gängigen
-  Standards und können im Plan angepasst werden.
+- Die Offline-Regel FR-010a gilt app-weit. F01 (noch in Arbeit) sieht bisher Offline-Lesen vor
+  (FR-014a, FR-014b) und muss FR-010a bei der weiteren Ausarbeitung übernehmen.
+- Die Wartezeit fürs erneute Senden (1 Minute) folgt gängigen Standards.
 - Google-User ohne Passwort können über „Passwort vergessen“ nachträglich ein Passwort setzen.
 - Ein Passwort-Reset beendet bestehende Sitzungen auf anderen Geräten.
 - Beim Logout werden lokal vorgehaltene Daten (z. B. die zuletzt geladene Garderobe aus F01)
