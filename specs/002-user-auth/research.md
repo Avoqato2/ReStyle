@@ -19,13 +19,13 @@ in [quickstart.md](quickstart.md) gegen die echte Supabase-Instanz geprüft.
 
 - **Decision**: Alle Redirects zeigen auf `restyle://auth/callback?flow=<signup|recovery|google>`.
   `App.addListener('appUrlOpen')` übergibt die URL an `handleCallbackUrl(url)`:
-  1. `error`/`error_code` in Query oder Fragment → `link_invalid` (je nach `flow`).
+  1. error/error_code in Query oder Fragment → bei signup oder recovery link_invalid, bei google oauth_failed mit error: AuthError und deutscher Meldung. Ein Google-Abbruch führt ohne Fehlermeldung zum Login.
   2. `code` vorhanden → `exchangeCodeForSession(code)`.
      - Erfolg: `signup` → `email_confirmed`, `recovery` → `password_recovery`,
        `google` → `oauth_signed_in`.
      - Fehlschlag bei `flow=signup` (z. B. fehlender PKCE-Verifier, weil Link auf anderem Gerät):
        `email_confirmed_login_required`; die E-Mail ist zu diesem Zeitpunkt bereits bestätigt.
-     - Fehlschlag sonst → `link_invalid`.
+     - Fehlschlag bei flow=recovery → link_invalid; bei flow=google → oauth_failed mit error: AuthError und deutscher Meldung.
   Im Web-Build ruft die Route `/auth/callback` denselben Handler mit `window.location.href` auf.
   Eine bereits eingelöste URL wird ignoriert (Schutz gegen doppeltes `appUrlOpen`).
 - **Rationale**: Ein Mechanismus für drei Flows, wie vorgegeben; der `flow`-Parameter ist nötig,
@@ -50,8 +50,8 @@ in [quickstart.md](quickstart.md) gegen die echte Supabase-Instanz geprüft.
 - **Decision**: `signInWithOAuth({ provider: 'google', options: { redirectTo:
   'restyle://auth/callback?flow=google', skipBrowserRedirect: true } })`, URL mit
   `Browser.open()` öffnen. Callback schließt den Browser (`Browser.close()`). Endet der Browser
-  (`browserFinished`) ohne Callback, gilt die Anmeldung als abgebrochen → `oauth_cancelled`, keine
-  Fehlermeldung (FR-017a).
+  Endet der Browser (`browserFinished`) ohne Callback, liefert die Anmeldung
+  das Contract-Ergebnis `'cancelled'`. Es erscheint keine Fehlermeldung (FR-017a).
 - **Rationale**: Kein natives SDK, Custom Tabs/SFSafariViewController sind von Google erlaubt
   (kein eingebettetes WebView).
 - **Alternatives**: Natives Google-SDK mit `signInWithIdToken` (ausgeschlossen laut Vorgabe).
