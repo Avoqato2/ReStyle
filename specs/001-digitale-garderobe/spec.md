@@ -142,6 +142,21 @@ Foto und betroffenes Outfit nicht mehr vorhanden.
    dessen Layer ändern und speichern will, **Then** wird er gewarnt, wie viele Outfits
    mitgelöscht werden, und erst nach ausdrücklicher Bestätigung werden die Änderung gespeichert
    und diese Outfits gelöscht; bei Abbruch bleiben Kleidungsstück und Outfits unverändert.
+8. **Given** ein Kleidungsstück mit Foto, das in zwei gespeicherten Outfits
+   enthalten ist, **When** der User das Löschen bestätigt und nach einem
+   bereits ausgeführten Teilschritt ein weiterer erforderlicher
+   Löschschritt fehlschlägt, **Then** bleiben Kleidungsstück, Foto und
+   beide Outfits im gespeicherten Zustand vor dem Vorgang erhalten.
+   Der User sieht eine Fehlermeldung und kann den Vorgang erneut versuchen.
+
+9. **Given** ein Kleidungsstück, das in zwei gespeicherten Outfits
+   enthalten ist, **When** der User eine Layer-Änderung samt Outfit-Löschung
+   bestätigt und nach einem bereits ausgeführten Teilschritt ein weiterer
+   erforderlicher Schreib- oder Löschschritt fehlschlägt, **Then** bleiben
+   der bisherige Layer, das bisherige Foto und beide Outfits im
+   gespeicherten Zustand vor dem Vorgang erhalten.
+   Der Dialog zeigt eine Fehlermeldung und behält die Eingaben
+   für einen erneuten Versuch.
 
 ---
 
@@ -261,6 +276,15 @@ Foto und betroffenes Outfit nicht mehr vorhanden.
   nach ausdrücklicher Bestätigung werden die Änderung gespeichert und alle betroffenen Outfits
   gelöscht. Bei Abbruch bleiben Kleidungsstück und Outfits unverändert. Änderungen an Foto oder
   Kategorie lösen keine Warnung aus.
+- **FR-022a**: System MUST das Löschen nach FR-020 und die Layer-Änderung
+  nach FR-022 einschließlich aller betroffenen Outfits jeweils vollständig
+  oder gar nicht ausführen. Schlägt ein erforderlicher Schreib- oder
+  Löschschritt fehl, MUST der gespeicherte Zustand von Kleidungsstück,
+  Foto und allen betroffenen Outfits dem Zustand vor dem Vorgang entsprechen.
+  Es dürfen keine Teiländerungen oder verwaisten Fotos zurückbleiben.
+  Das System MUST eine verständliche Fehlermeldung anzeigen und einen
+  erneuten Versuch ermöglichen. Bei einer fehlgeschlagenen Layer-Änderung
+  bleiben die Eingaben im Dialog erhalten.
 
 **Datenhoheit**
 
