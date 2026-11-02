@@ -105,6 +105,15 @@ User genau seine eigenen Teile im Grid sieht und eine leere Garderobe den Hinwei
 8. **Given** die Garderobe wurde auf dem Gerät schon einmal geladen, **When** der User sie
    erneut öffnet, **Then** sieht er sofort die zuletzt geladenen Teile, und Änderungen aus der
    Aktualisierung erscheinen ohne manuelles Neuladen.
+9. **Given** ein eingeloggter User sieht seine zuletzt geladene Garderobe
+   ohne Internetverbindung und Anlegen, Bearbeiten und Löschen sind deaktiviert,
+   **When** die Internetverbindung wiederhergestellt wird,
+   **Then** aktualisiert die App die Garderobe und gibt Anlegen, Bearbeiten
+   und Löschen wieder frei.
+10. **Given** ein User ist nicht eingeloggt,
+    **When** er die Garderobe oder die Detailansicht eines Kleidungsstücks
+    direkt aufruft,
+    **Then** verweigert die App den Zugriff und zeigt keine Garderobendaten an.
 
 ---
 
@@ -142,6 +151,21 @@ Foto und betroffenes Outfit nicht mehr vorhanden.
    dessen Layer ändern und speichern will, **Then** wird er gewarnt, wie viele Outfits
    mitgelöscht werden, und erst nach ausdrücklicher Bestätigung werden die Änderung gespeichert
    und diese Outfits gelöscht; bei Abbruch bleiben Kleidungsstück und Outfits unverändert.
+8. **Given** ein Kleidungsstück mit Foto, das in zwei gespeicherten Outfits
+   enthalten ist, **When** der User das Löschen bestätigt und nach einem
+   bereits ausgeführten Teilschritt ein weiterer erforderlicher
+   Löschschritt fehlschlägt, **Then** bleiben Kleidungsstück, Foto und
+   beide Outfits im gespeicherten Zustand vor dem Vorgang erhalten.
+   Der User sieht eine Fehlermeldung und kann den Vorgang erneut versuchen.
+
+9. **Given** ein Kleidungsstück, das in zwei gespeicherten Outfits
+   enthalten ist, **When** der User eine Layer-Änderung samt Outfit-Löschung
+   bestätigt und nach einem bereits ausgeführten Teilschritt ein weiterer
+   erforderlicher Schreib- oder Löschschritt fehlschlägt, **Then** bleiben
+   der bisherige Layer, das bisherige Foto und beide Outfits im
+   gespeicherten Zustand vor dem Vorgang erhalten.
+   Der Dialog zeigt eine Fehlermeldung und behält die Eingaben
+   für einen erneuten Versuch.
 
 ---
 
@@ -241,6 +265,10 @@ Foto und betroffenes Outfit nicht mehr vorhanden.
   Foto, Layer und Kategorie öffnen.
 - **FR-016**: Users MUST be able to Foto, Layer und Kategorie eines Kleidungsstücks ändern; für
   die Bearbeitung gelten dieselben Pflicht-, Format- und Größenregeln wie beim Erfassen.
+- **FR-016a**: Nach einer Layer-Änderung MUST das System prüfen, ob die
+  gewählte Kategorie zum neuen Layer gehört oder „Sonstiges“ ist.
+  Bei einer ungültigen Kategorie MUST das System eine neue Auswahl verlangen
+  und das Speichern bis zur Auswahl einer gültigen Kategorie verhindern.
 - **FR-017**: System MUST beim Ersetzen eines Fotos das alte Foto erst entfernen, wenn die
   Änderung vollständig gespeichert ist.
 - **FR-018**: Users MUST be able to ein Kleidungsstück löschen; vor dem Löschen MUST eine
@@ -257,6 +285,15 @@ Foto und betroffenes Outfit nicht mehr vorhanden.
   nach ausdrücklicher Bestätigung werden die Änderung gespeichert und alle betroffenen Outfits
   gelöscht. Bei Abbruch bleiben Kleidungsstück und Outfits unverändert. Änderungen an Foto oder
   Kategorie lösen keine Warnung aus.
+- **FR-022a**: System MUST das Löschen nach FR-020 und die Layer-Änderung
+  nach FR-022 einschließlich aller betroffenen Outfits jeweils vollständig
+  oder gar nicht ausführen. Schlägt ein erforderlicher Schreib- oder
+  Löschschritt fehl, MUST der gespeicherte Zustand von Kleidungsstück,
+  Foto und allen betroffenen Outfits dem Zustand vor dem Vorgang entsprechen.
+  Es dürfen keine Teiländerungen oder verwaisten Fotos zurückbleiben.
+  Das System MUST eine verständliche Fehlermeldung anzeigen und einen
+  erneuten Versuch ermöglichen. Bei einer fehlgeschlagenen Layer-Änderung
+  bleiben die Eingaben im Dialog erhalten.
 
 **Datenhoheit**
 
@@ -320,5 +357,7 @@ Foto und betroffenes Outfit nicht mehr vorhanden.
 - Ein Kleidungsstück hat genau ein Foto; mehrere Fotos pro Teil sind nicht vorgesehen.
 - Das Grid zeigt bei großen Garderoben alle Teile, ggf. schrittweise nachgeladen; eine
   Obergrenze für die Anzahl der Kleidungsstücke gibt es in F01 nicht.
-- Nicht Teil von F01: optionale Merkmale und automatische Layer-Vorbelegung (F02), Filter (F03),
-  Outfits erstellen und verwalten (F04/F05), Hintergrund freistellen und KI-Erkennung (F12).
+- Als Eingabeformate aus Kamera und Galerie sind ausschließlich JPEG, PNG und
+  WebP erlaubt. Andere Eingabeformate, etwa HEIC, werden auch dann abgelehnt,
+  wenn eine Konvertierung möglich wäre. Gespeicherte Fotos liegen ebenfalls
+  in JPEG, PNG oder WebP vor und sind nach der Verkleinerung höchstens 5 MB groß.
