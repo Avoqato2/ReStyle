@@ -7,7 +7,15 @@ import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 
 export default defineConfig(
   {
-    ignores: ['www/**', 'dist/**', 'coverage/**', '.angular/**', 'node_modules', '**/*.d.ts'],
+    ignores: [
+      'www/**',
+      'dist/**',
+      'coverage/**',
+      '.angular/**',
+      'node_modules',
+      '**/*.d.ts',
+      'src/app/supabase/supabase.types.ts',
+    ],
   },
   {
     files: ['**/*.ts'],
