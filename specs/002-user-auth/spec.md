@@ -274,3 +274,56 @@ einer Adresse, die bereits als E-Mail/Passwort-Account existiert, zeigt dessen D
 - Der Versand der Mails erfolgt in deutscher Sprache.
 - Nicht Teil dieses Features: Apple-Login und weitere Social Logins, Profil bearbeiten,
   E-Mail ändern, Account löschen, Zwei-Faktor-Authentifizierung.
+
+## Screens
+
+### Welcome Screen
+
+- Figma: [Welcome Screen](https://www.figma.com/design/nc8gZSTJKSS08Z5O6joX3l/Digital-Wardrobe---UI-Design.?node-id=619-12965&m=dev)
+- Status: Design vorhanden
+
+### Login
+
+- Figma: [Login - Default](https://www.figma.com/design/nc8gZSTJKSS08Z5O6joX3l/Digital-Wardrobe---UI-Design.?node-id=619-12525&m=dev)
+- Status: Design vorhanden
+
+### Registrieren
+
+- Figma: [Registrieren - Default](https://www.figma.com/design/nc8gZSTJKSS08Z5O6joX3l/Digital-Wardrobe---UI-Design.?node-id=619-12729&m=dev)
+- Status: Design vorhanden
+
+### Passwort vergessen
+
+- Figma: [Passwort vergessen](https://www.figma.com/design/nc8gZSTJKSS08Z5O6joX3l/Digital-Wardrobe---UI-Design.?node-id=619-13008&m=dev)
+- Status: Design vorhanden
+
+### Neues Passwort
+
+- Figma: [Neues Passwort - Default](https://www.figma.com/design/nc8gZSTJKSS08Z5O6joX3l/Digital-Wardrobe---UI-Design.?node-id=619-13185&m=dev)
+- Status: Design vorhanden
+
+### Neues Passwort geändert
+
+- Figma: [Neues Passwort - Success State](https://www.figma.com/design/nc8gZSTJKSS08Z5O6joX3l/Digital-Wardrobe---UI-Design.?node-id=619-13130&m=dev)
+- Status: Design vorhanden
+
+### Keine Verbindung
+
+- Figma: TODO
+- Status: Design ausstehend
+- Zweck: Zeigt ohne Internetverbindung eine Seite „Keine Verbindung“ mit der Möglichkeit zum erneuten Versuch.
+- Details: [NEEDS DESIGN]
+
+### E-Mail-Bestätigung
+
+- Figma: TODO
+- Status: Design ausstehend
+- Zweck: Bestätigt die E-Mail-Adresse über den Link und ermöglicht anschließend die Anmeldung.
+- Details: [NEEDS DESIGN]
+
+### Ungültiger oder abgelaufener Link
+
+- Figma: TODO
+- Status: Design ausstehend
+- Zweck: Informiert über einen ungültigen oder abgelaufenen Bestätigungs- oder Reset-Link und ermöglicht die in FR-014 beschriebenen nächsten Schritte.
+- Details: [NEEDS DESIGN]
