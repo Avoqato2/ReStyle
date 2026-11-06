@@ -4,7 +4,7 @@ import { AuthService } from './services/auth.service';
 import { GarmentService } from './services/garment.service';
 import { OutfitService } from './services/outfit.service';
 
-describe('Supabase integration', () => {
+describe.skipIf(process.env['CI'])('Supabase integration', () => {
   let authService: AuthService;
   let garmentService: GarmentService;
   let outfitService: OutfitService;
