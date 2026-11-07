@@ -126,7 +126,7 @@ ist eingeloggt; andere Geräte werden abgemeldet.
 **Independent Test**: Reset anfordern → Link im Emulator öffnen → neues Passwort → eingeloggt;
 altes Passwort ungültig.
 
-- [ ] T038 [US3] [BE] `requestPasswordReset(email)` mit `redirectTo: 'restyle://auth/callback?flow=recovery'`; unbekannte E-Mail → `ok: true` (FR-011); setzt `recoveryResend` mit der normalisierten Adresse und dem frühesten Sendezeitpunkt (+60 s) bei Erfolg und bei `rate_limited`; verändert `signupResend` nicht in auth.service.ts + auth.service.spec.ts
+- [x] T038 [US3] [BE] `requestPasswordReset(email)` mit `redirectTo: 'restyle://auth/callback?flow=recovery'`; unbekannte E-Mail → `ok: true` (FR-011); setzt `recoveryResend` mit der normalisierten Adresse und dem frühesten Sendezeitpunkt (+60 s) bei Erfolg und bei `rate_limited`; verändert `signupResend` nicht in auth.service.ts + auth.service.spec.ts
 - [ ] T039 [US3] [BE] `updatePassword(newPassword)` mit `updateUser({ password })`, danach `signOut({ scope: 'others' })` in auth.service.ts + auth.service.spec.ts
 - [ ] T040 [US3] [BE] `recoveryGuard`: `/auth/reset-password` nur nach Event `password_recovery`, sonst `/auth/login` in frontend/src/app/auth/guards.ts + guards.spec.ts
 - [ ] T041 [US3] [BE] Routen `/auth/forgot-password` (`guestGuard`) und `/auth/reset-password` (`recoveryGuard`) in frontend/src/app/app.routes.ts

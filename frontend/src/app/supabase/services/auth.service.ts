@@ -207,6 +207,22 @@ export class AuthService {
     });
   }
 
+  // Fordert einen Reset-Link an. Unbekannte Adressen und alle anderen Fehler außer
+  // Netzwerk und Rate-Limit liefern Erfolg, damit nichts über Accounts verraten wird (FR-011).
+  requestPasswordReset(email: string): Promise<AuthResult> {
+    return this.once('requestPasswordReset', async () => {
+      const result = await this.call(() =>
+        this.supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: RECOVERY_REDIRECT }),
+      );
+      if (!result.ok && result.error.code === 'network') {
+        return result;
+      }
+      // Auch bei verschluckten Fehlern startet der Countdown, sonst wäre der Unterschied sichtbar.
+      this._recoveryResend.set(nextResend(email));
+      return result.ok || result.error.code === 'rate_limited' ? result : OK;
+    });
+  }
+
   // Führt einen Supabase-Auth-Aufruf aus und wandelt Fehler (zurückgegeben oder geworfen) in AuthResult.
   private async call(run: () => Promise<{ error: unknown }>): Promise<AuthResult> {
     try {
@@ -291,6 +307,7 @@ export class AuthService {
 
 const CALLBACK_URL = 'restyle://auth/callback';
 export const SIGNUP_REDIRECT = `${CALLBACK_URL}?flow=signup`;
+export const RECOVERY_REDIRECT = `${CALLBACK_URL}?flow=recovery`;
 
 const OK: AuthResult = { ok: true, data: undefined };
 
