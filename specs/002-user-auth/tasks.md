@@ -61,7 +61,7 @@ Deep Links, Guards
 - [x] T017 [BE] `handleCallbackUrl(url)` und `callbackEvents` nach research R2 (Callback-Fehler bei `signup`/`recovery` → `link_invalid`, bei `google` → `oauth_failed` mit `error: AuthError`; Google-Abbruch ohne Fehlermeldung zum Login, `exchangeCodeForSession`, Fehlschlag bei `signup` → `email_confirmed_login_required`, doppelte URL ignorieren) in frontend/src/app/supabase/services/auth.service.ts + Tests aller Zweige in auth.service.spec.ts
 - [x] T018 [BE] `App.addListener('appUrlOpen')` ausschließlich in `AppComponent` registrieren und die empfangene URL an `AuthService.handleCallbackUrl(url)` weitergeben; keinen `appUrlOpen`-Listener im AuthService registrieren. Die Navigation nach `callbackEvents` bleibt in `AppComponent`. Zugehörige Tests mit gemocktem `@capacitor/app` in `app.component.spec.ts` ergänzen.
 - [x] T019 [BE] `authGuard` (wartet bis `status !== 'initializing'`, sonst `/auth/login`) und `guestGuard` (mit Sitzung → `/home`) in frontend/src/app/auth/guards.ts + frontend/src/app/auth/guards.spec.ts
-- [ ] T020 [BE] Navigation nach `callbackEvents` gemäß Contract-Tabelle „Navigation nach Callback-Events“ in frontend/src/app/app.component.ts + frontend/src/app/app.component.spec.ts
+- [x] T020 [BE] Navigation nach `callbackEvents` gemäß Contract-Tabelle „Navigation nach Callback-Events“ in frontend/src/app/app.component.ts + frontend/src/app/app.component.spec.ts
 
 ### Native Deep Links
 

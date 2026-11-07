@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { App } from '@capacitor/app';
 import { Subject } from 'rxjs';
 
@@ -68,5 +68,48 @@ describe('AppComponent', () => {
     await Promise.resolve();
 
     expect(removeListener).toHaveBeenCalled();
+  });
+
+  describe('navigation after callback events', () => {
+    const oauthError = { code: 'oauth_failed', message: 'Google fehlgeschlagen' } as const;
+
+    it.each<[AuthCallbackEvent, string, object | undefined]>([
+      [{ type: 'email_confirmed' }, '/home', undefined],
+      [{ type: 'email_confirmed_login_required' }, '/auth/login?hint=confirmed', undefined],
+      [{ type: 'password_recovery' }, '/auth/reset-password', { state: { passwordRecovery: true } }],
+      [{ type: 'oauth_signed_in' }, '/home', undefined],
+      [{ type: 'oauth_cancelled' }, '/auth/login', undefined],
+      [{ type: 'oauth_failed', error: oauthError }, '/auth/login', { state: { authError: oauthError } }],
+      [{ type: 'link_invalid', flow: 'signup' }, '/auth/login?hint=link_invalid', undefined],
+      [{ type: 'link_invalid', flow: 'recovery' }, '/auth/forgot-password?hint=link_invalid', undefined],
+    ])('%o → %s', (event, url, extras) => {
+      const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+      TestBed.createComponent(AppComponent);
+
+      authService.callbackEvents.next(event);
+
+      expect(navigate).toHaveBeenCalledWith(url, extras);
+    });
+
+    it('stops navigating after destroy', () => {
+      const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+      TestBed.createComponent(AppComponent).destroy();
+
+      authService.callbackEvents.next({ type: 'email_confirmed' });
+
+      expect(navigate).not.toHaveBeenCalled();
+    });
+
+    it('logs instead of throwing when the target route is missing', async () => {
+      const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockRejectedValue(new Error('no route'));
+      TestBed.createComponent(AppComponent);
+
+      authService.callbackEvents.next({ type: 'email_confirmed' });
+      await Promise.resolve();
+
+      expect(error).toHaveBeenCalled();
+      error.mockRestore();
+    });
   });
 });
