@@ -76,6 +76,7 @@ export class AuthService {
 
   // Wartet auf Google-Callback oder Schließen des In-App-Browsers.
   private pendingGoogle: ((result: AuthResult<GoogleSignInOutcome>) => void) | null = null;
+  private googleCallbackArrived = false;
 
   constructor() {
     this.supabase.auth.onAuthStateChange((event, session) => this.onAuthStateChange(event, session));
@@ -122,6 +123,10 @@ export class AuthService {
     }
 
     const callback = parseCallbackUrl(url);
+    if (callback?.flow === 'google') {
+      // Ab hier darf ein gleichzeitiges browserFinished nicht mehr als Abbruch zählen.
+      this.googleCallbackArrived = true;
+    }
     const result = this.resolveCallback(callback).then(async (event) => {
       if (callback?.flow === 'google') {
         await this.finishGoogle(event);
@@ -151,10 +156,16 @@ export class AuthService {
         return { ok: false, error: googleError(error) };
       }
 
+      this.googleCallbackArrived = false;
       const outcome = new Promise<AuthResult<GoogleSignInOutcome>>((resolve) => (this.pendingGoogle = resolve));
       const finished = await Browser.addListener('browserFinished', () => {
-        // Kam vorher ein Callback, ist pendingGoogle schon erledigt und das hier ein No-op.
-        this.settleGoogle({ ok: true, data: 'cancelled' });
+        // Auf Android kann browserFinished vor appUrlOpen ankommen, wenn der Redirect
+        // die App nach vorne holt. Deshalb kurz auf einen Callback warten.
+        setTimeout(() => {
+          if (!this.googleCallbackArrived) {
+            this.settleGoogle({ ok: true, data: 'cancelled' });
+          }
+        }, GOOGLE_CANCEL_GRACE_MS);
       });
 
       try {
@@ -169,13 +180,9 @@ export class AuthService {
     });
   }
 
+  // Erst das Ergebnis festlegen, dann den Browser schließen: close() kann selbst
+  // browserFinished auslösen.
   private async finishGoogle(event: AuthCallbackEvent): Promise<void> {
-    try {
-      await Browser.close();
-    } catch {
-      // Auf manchen Plattformen ist der Browser schon geschlossen.
-    }
-
     switch (event.type) {
       case 'oauth_signed_in':
         this.settleGoogle({ ok: true, data: 'signed_in' });
@@ -186,6 +193,12 @@ export class AuthService {
       case 'oauth_failed':
         this.settleGoogle({ ok: false, error: event.error });
         break;
+    }
+
+    try {
+      await Browser.close();
+    } catch {
+      // Auf manchen Plattformen ist der Browser schon geschlossen.
     }
   }
 
@@ -399,6 +412,9 @@ const CALLBACK_URL = 'restyle://auth/callback';
 export const SIGNUP_REDIRECT = `${CALLBACK_URL}?flow=signup`;
 export const RECOVERY_REDIRECT = `${CALLBACK_URL}?flow=recovery`;
 export const GOOGLE_REDIRECT = `${CALLBACK_URL}?flow=google`;
+
+// Wartezeit nach browserFinished, bevor die Google-Anmeldung als abgebrochen gilt.
+export const GOOGLE_CANCEL_GRACE_MS = 1000;
 
 function googleError(error: unknown): AuthError {
   const mapped = mapAuthError(error);
