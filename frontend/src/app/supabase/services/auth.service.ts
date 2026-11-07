@@ -1,143 +1,102 @@
-import { Injectable, inject } from '@angular/core';
-import type { AuthResponse, Session } from '@supabase/supabase-js';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import type { AuthChangeEvent, AuthResponse, Session, User } from '@supabase/supabase-js';
 
+import { mapAuthError, type AuthError, type AuthResult } from '../../auth/auth-errors';
 import { SUPABASE_CLIENT } from '../supabase.client';
 
-// Einheitliche Fehlercodes für die UI. Weitere Fälle aus dem Auth-Spec
-// können später ergänzt werden, ohne dass Komponenten Supabase-Fehler kennen.
-export type AuthErrorCode =
-  | 'invalid_credentials'
-  | 'email_not_confirmed'
-  | 'weak_password'
-  | 'rate_limited'
-  | 'network'
-  | 'unknown';
+export type { AuthError, AuthErrorCode, AuthResult } from '../../auth/auth-errors';
 
-export interface AuthError {
-  code: AuthErrorCode;
-  message: string;
+export type AuthStatus = 'initializing' | 'authenticated' | 'unauthenticated';
+
+export type SignOutReason = 'user' | 'expired';
+
+export interface AuthUser {
+  id: string;
+  email: string;
 }
 
-// Erfolgreiche und fehlgeschlagene Auth-Aufrufe haben immer dieselbe Struktur.
-export type AuthResult<T = void> = { ok: true; data: T } | { ok: false; error: AuthError };
+export interface ResendState {
+  email: string;
+  availableAt: Date;
+}
+
+// Service und UI vergleichen Adressen für den Countdown mit derselben Normalisierung.
+export function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase();
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  // Alle Auth-Aufrufe laufen über denselben zentral erstellten Supabase-Client.
   private readonly supabase = inject(SUPABASE_CLIENT);
 
-  // Ordnet einen Supabase-Fehler einem einfachen UI-Fehler zu.
-  private mapError(error: { message: string; code?: string }): AuthError {
-    if (error.code === 'invalid_credentials') {
-      return { code: 'invalid_credentials', message: 'E-Mail-Adresse oder Passwort ist falsch.' };
-    }
+  private readonly _status = signal<AuthStatus>('initializing');
+  private readonly _user = signal<AuthUser | null>(null);
+  private readonly _signOutReason = signal<SignOutReason | null>(null);
+  private readonly _signupResend = signal<ResendState | null>(null);
+  private readonly _recoveryResend = signal<ResendState | null>(null);
 
-    if (error.code === 'email_not_confirmed') {
-      return { code: 'email_not_confirmed', message: 'Bitte bestätige zuerst deine E-Mail-Adresse.' };
-    }
+  readonly status = this._status.asReadonly();
+  readonly user = this._user.asReadonly();
+  readonly isAuthenticated = computed(() => this._status() === 'authenticated');
+  readonly signOutReason = this._signOutReason.asReadonly();
+  readonly signupResend = this._signupResend.asReadonly();
+  readonly recoveryResend = this._recoveryResend.asReadonly();
 
-    if (error.code === 'over_email_send_rate_limit') {
-      return { code: 'rate_limited', message: 'Zu viele Versuche. Bitte warte kurz.' };
-    }
-
-    if (error.message.toLowerCase().includes('password')) {
-      return { code: 'weak_password', message: 'Das Passwort erfüllt die Anforderungen nicht.' };
-    }
-
-    if (error.message.toLowerCase().includes('fetch')) {
-      return { code: 'network', message: 'Keine Verbindung zum Backend.' };
-    }
-
-    return { code: 'unknown', message: 'Die Anmeldung konnte nicht verarbeitet werden.' };
+  constructor() {
+    this.supabase.auth.onAuthStateChange((event, session) => this.onAuthStateChange(event, session));
+    void this.loadStoredSession();
   }
 
-  // Eine vorhandene E-Mail darf bei der Registrierung nicht erkennbar sein.
-  private isAlreadyRegisteredError(error: { message: string; code?: string }): boolean {
-    const message = error.message.toLowerCase();
-
-    return (
-      error.code === 'user_already_exists' ||
-      message.includes('already registered') ||
-      message.includes('already been registered') ||
-      message.includes('user already exists')
-    );
+  // Liest die gespeicherte Sitzung beim App-Start. Bis dahin bleibt der Status
+  // `initializing`, damit Guards warten und kein Login aufblitzt (FR-009b).
+  private async loadStoredSession(): Promise<void> {
+    try {
+      const { data, error } = await this.supabase.auth.getSession();
+      this.applySession(error ? null : data.session);
+    } catch {
+      this.applySession(null);
+    }
   }
 
-  // Registriert einen neuen Benutzer und gibt Fehler als AuthResult zurück.
+  // Wichtig: Hier keine weiteren Supabase-Aufrufe awaiten, sonst blockiert supabase-js.
+  private onAuthStateChange(_event: AuthChangeEvent, session: Session | null): void {
+    this.applySession(session);
+  }
+
+  private applySession(session: Session | null): void {
+    this._user.set(session ? toAuthUser(session.user) : null);
+    this._status.set(session ? 'authenticated' : 'unauthenticated');
+  }
+
+  // --- Übergang: Die folgenden Methoden werden in T024, T029 und T030 durch die
+  // Contract-Methoden ersetzt und nur noch vom Integrationstest genutzt. ---
+
   async signUp(email: string, password: string, displayName?: string): Promise<AuthResult<AuthResponse['data']>> {
-    // Supabase erstellt den Benutzer und liefert bei aktivierter Bestätigung
-    // zunächst eventuell noch keine aktive Session zurück.
     const response = await this.supabase.auth.signUp({
       email,
       password,
-      options: {
-        // Der Datenbank-Trigger übernimmt diesen Wert in public.profiles.
-        data: displayName ? { display_name: displayName } : undefined,
-      },
+      options: { data: displayName ? { display_name: displayName } : undefined },
     });
 
     if (response.error) {
-      // Laut Auth-Spec wird eine bereits registrierte E-Mail absichtlich
-      // genauso behandelt wie eine erfolgreiche Registrierung.
-      if (this.isAlreadyRegisteredError(response.error)) {
-        return {
-          ok: true,
-          data: {
-            user: null,
-            session: null,
-          },
-        };
-      }
-
-      return { ok: false, error: this.mapError(response.error) };
+      return { ok: false, error: this.toError(response.error) };
     }
 
     return { ok: true, data: response.data };
   }
 
-  // Meldet einen bestehenden Benutzer an und gibt Fehler als AuthResult zurück.
   async signIn(email: string, password: string): Promise<AuthResult<AuthResponse['data']>> {
-    // Der Supabase-Client speichert die Session lokal und erneuert sie bei Bedarf.
-    const response = await this.supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const response = await this.supabase.auth.signInWithPassword({ email, password });
 
     if (response.error) {
-      return { ok: false, error: this.mapError(response.error) };
+      return { ok: false, error: this.toError(response.error) };
     }
 
     return { ok: true, data: response.data };
   }
 
-  // Übergangsmethode für bereits vorhandene Aufrufer.
-  // Zukünftig soll die UI direkt signUp() verwenden.
-  async register(email: string, password: string, displayName?: string): Promise<AuthResponse> {
-    const result = await this.signUp(email, password, displayName);
-
-    if (!result.ok) {
-      throw new Error(result.error.message);
-    }
-
-    return { data: result.data, error: null };
-  }
-
-  // Übergangsmethode für bereits vorhandene Aufrufer.
-  // Zukünftig soll die UI direkt signIn() verwenden.
-  async login(email: string, password: string): Promise<AuthResponse> {
-    const result = await this.signIn(email, password);
-
-    if (!result.ok) {
-      throw new Error(result.error.message);
-    }
-
-    return { data: result.data, error: null };
-  }
-
-  // Prüft, ob noch ein Benutzer eingeloggt ist, zum Beispiel nach einem
-  // Seiten-Reload oder bevor ein geschützter Bereich angezeigt wird.
   async getSession(): Promise<Session | null> {
     const response = await this.supabase.auth.getSession();
 
@@ -148,7 +107,6 @@ export class AuthService {
     return response.data.session;
   }
 
-  // Meldet den aktuell angemeldeten Benutzer ab und entfernt die lokale Session.
   async logout(): Promise<void> {
     const response = await this.supabase.auth.signOut();
 
@@ -156,4 +114,12 @@ export class AuthService {
       throw response.error;
     }
   }
+
+  private toError(error: unknown): AuthError {
+    return mapAuthError(error);
+  }
+}
+
+function toAuthUser(user: User): AuthUser {
+  return { id: user.id, email: user.email ?? '' };
 }
