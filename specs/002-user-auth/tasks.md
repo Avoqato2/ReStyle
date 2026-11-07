@@ -29,9 +29,9 @@ gemockt. Test und Implementierung stehen in einer Task, damit jede Task ein grü
 
 **Purpose**: Abhängigkeiten, Typen, Umgebung, native Plattformen
 
-- [ ] T001 [BE] `@supabase/supabase-js@^2`, `@capacitor/browser@^8`, `@capacitor/network@^8` installieren in frontend/package.json
-- [ ] T002 [BE] frontend/src/supabase.types.ts nach frontend/src/app/supabase/supabase.types.ts verschieben (keine Importe vorhanden)
-- [ ] T003 [P] [BE] `supabaseUrl` und `supabaseAnonKey` (publishable) ergänzen in frontend/src/environments/environment.ts und frontend/src/environments/environment.prod.ts
+- [x] T001 [BE] `@supabase/supabase-js@^2`, `@capacitor/browser@^8`, `@capacitor/network@^8` installieren in frontend/package.json
+- [x] T002 [BE] frontend/src/supabase.types.ts nach frontend/src/app/supabase/supabase.types.ts verschieben (keine Importe vorhanden)
+- [x] T003 [P] [BE] `supabaseUrl` und `supabaseAnonKey` (publishable) ergänzen in frontend/src/environments/environment.ts und frontend/src/environments/environment.prod.ts
 - [ ] T004 [P] [FE] `appId` von `io.ionic.starter` auf die vom Team bestätigte ID (Vorschlag `com.restyle.app`, research R12) ändern in frontend/capacitor.config.ts
 - [ ] T005 [FE] Android-Plattform anlegen mit `npx cap add android` → frontend/android/ (nach T004)
 - [ ] T006 [P] [FE] iOS-Plattform anlegen mit `npx cap add ios` → frontend/ios/ (nach T004, macOS nötig)
