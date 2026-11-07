@@ -42,6 +42,7 @@ function createAuthMock() {
       error: null,
     }),
     signOut: vi.fn().mockResolvedValue({ error: null }),
+    resetPasswordForEmail: vi.fn().mockResolvedValue({ data: {}, error: null }),
   };
 
   return {
@@ -581,6 +582,82 @@ describe('AuthService', () => {
       await service.signIn('anna@example.com', 'abcd1234');
 
       expect(service.signOutReason()).toBeNull();
+    });
+  });
+
+  describe('requestPasswordReset', () => {
+    const now = new Date('2026-11-07T12:00:00Z');
+
+    beforeEach(() => {
+      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.setSystemTime(now);
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('requests the reset link with the recovery redirect', async () => {
+      const service = createService();
+
+      expect(await service.requestPasswordReset(' anna@example.com ')).toEqual({ ok: true, data: undefined });
+      expect(mock.auth.resetPasswordForEmail).toHaveBeenCalledWith('anna@example.com', {
+        redirectTo: 'restyle://auth/callback?flow=recovery',
+      });
+    });
+
+    it('starts the recovery countdown for the normalized address', async () => {
+      const service = createService();
+
+      await service.requestPasswordReset('Anna@Example.com');
+
+      expect(service.recoveryResend()).toEqual({
+        email: 'anna@example.com',
+        availableAt: new Date(now.getTime() + 60_000),
+      });
+      expect(service.signupResend()).toBeNull();
+    });
+
+    it('reports rate_limited and starts the countdown', async () => {
+      mock.auth.resetPasswordForEmail.mockResolvedValue({
+        data: null,
+        error: new AuthApiError('limit', 429, 'over_email_send_rate_limit'),
+      });
+      const service = createService();
+
+      expect(await service.requestPasswordReset('anna@example.com')).toEqual({
+        ok: false,
+        error: authError('rate_limited'),
+      });
+      expect(service.recoveryResend()?.email).toBe('anna@example.com');
+    });
+
+    it('reports a network error without countdown', async () => {
+      mock.auth.resetPasswordForEmail.mockRejectedValue(new TypeError('Failed to fetch'));
+      const service = createService();
+
+      expect(await service.requestPasswordReset('anna@example.com')).toEqual({
+        ok: false,
+        error: authError('network'),
+      });
+      expect(service.recoveryResend()).toBeNull();
+    });
+
+    it('reports success for any other error, e.g. an unknown address (FR-011)', async () => {
+      mock.auth.resetPasswordForEmail.mockResolvedValue({
+        data: null,
+        error: new AuthApiError('User not found', 400, 'user_not_found'),
+      });
+      const service = createService();
+
+      expect(await service.requestPasswordReset('unknown@example.com')).toEqual({ ok: true, data: undefined });
+      expect(service.recoveryResend()?.email).toBe('unknown@example.com');
+    });
+
+    it('reuses the running promise for repeated calls', () => {
+      const service = createService();
+
+      expect(service.requestPasswordReset('a@example.com')).toBe(service.requestPasswordReset('a@example.com'));
     });
   });
 
