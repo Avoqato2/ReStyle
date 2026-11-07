@@ -2,9 +2,10 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { isAuthError, type AuthChangeEvent, type Session, type User } from '@supabase/supabase-js';
 import { Router } from '@angular/router';
 import { Browser } from '@capacitor/browser';
+import { Capacitor } from '@capacitor/core';
 import { Subject, type Observable } from 'rxjs';
 
-import { parseCallbackUrl, type ParsedCallback } from './auth-callback';
+import { parseCallbackUrl, type CallbackFlow, type ParsedCallback } from './auth-callback';
 import { authError, mapAuthError, type AuthError, type AuthResult } from './auth-errors';
 import { LOGIN_URL } from './auth-urls';
 import { SUPABASE_CLIENT } from '../../supabase.client';
@@ -146,7 +147,7 @@ export class AuthService {
       try {
         const { data, error } = await this.supabase.auth.signInWithOAuth({
           provider: 'google',
-          options: { redirectTo: GOOGLE_REDIRECT, skipBrowserRedirect: true },
+          options: { redirectTo: callbackUrl('google'), skipBrowserRedirect: true },
         });
         if (error || !data.url) {
           return { ok: false, error: googleError(error) };
@@ -277,7 +278,7 @@ export class AuthService {
         const response = await this.supabase.auth.signUp({
           email: email.trim(),
           password,
-          options: { emailRedirectTo: SIGNUP_REDIRECT },
+          options: { emailRedirectTo: callbackUrl('signup') },
         });
         return isAlreadyRegistered(response.error) ? { error: null } : response;
       }),
@@ -289,7 +290,7 @@ export class AuthService {
   resendConfirmation(email: string): Promise<AuthResult> {
     return this.once('resendConfirmation', async () => {
       const result = await this.call(() =>
-        this.supabase.auth.resend({ type: 'signup', email: email.trim(), options: { emailRedirectTo: SIGNUP_REDIRECT } }),
+        this.supabase.auth.resend({ type: 'signup', email: email.trim(), options: { emailRedirectTo: callbackUrl('signup') } }),
       );
       if (result.ok || result.error.code === 'rate_limited') {
         this._signupResend.set(nextResend(email));
@@ -303,7 +304,7 @@ export class AuthService {
   requestPasswordReset(email: string): Promise<AuthResult> {
     return this.once('requestPasswordReset', async () => {
       const result = await this.call(() =>
-        this.supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: RECOVERY_REDIRECT }),
+        this.supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: callbackUrl('recovery') }),
       );
       if (!result.ok && result.error.code === 'network') {
         return result;
@@ -414,10 +415,15 @@ export class AuthService {
   }
 }
 
-const CALLBACK_URL = 'restyle://auth/callback';
-export const SIGNUP_REDIRECT = `${CALLBACK_URL}?flow=signup`;
-export const RECOVERY_REDIRECT = `${CALLBACK_URL}?flow=recovery`;
-export const GOOGLE_REDIRECT = `${CALLBACK_URL}?flow=google`;
+// Native App: Deep Link über das eigene Scheme. Browser: Web-Route `/auth/callback` unter
+// der aktuellen Adresse inkl. Base-Href (lokal http://localhost:8100/, Prod GitHub Pages /ReStyle/).
+// Alle Ziele müssen bei Supabase als Redirect-URL erlaubt sein (config.toml bzw. Dashboard).
+export const NATIVE_CALLBACK_URL = 'restyle://auth/callback';
+
+export function callbackUrl(flow: CallbackFlow): string {
+  const base = Capacitor.isNativePlatform() ? NATIVE_CALLBACK_URL : new URL('auth/callback', document.baseURI).href;
+  return `${base}?flow=${flow}`;
+}
 
 // Wartezeit nach browserFinished, bevor die Google-Anmeldung als abgebrochen gilt.
 export const GOOGLE_CANCEL_GRACE_MS = 1000;

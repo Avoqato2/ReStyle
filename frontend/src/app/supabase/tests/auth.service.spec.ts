@@ -8,11 +8,18 @@ import {
   type Session,
 } from '@supabase/supabase-js';
 import { Browser } from '@capacitor/browser';
+import { Capacitor } from '@capacitor/core';
 import type { MockInstance } from 'vitest';
 
 import { authError } from '../services/auth/auth-errors';
 import { SUPABASE_CLIENT } from '../supabase.client';
-import { AuthService, GOOGLE_CANCEL_GRACE_MS, normalizeEmail, type AuthCallbackEvent } from '../services/auth/auth.service';
+import {
+  AuthService,
+  GOOGLE_CANCEL_GRACE_MS,
+  callbackUrl,
+  normalizeEmail,
+  type AuthCallbackEvent,
+} from '../services/auth/auth.service';
 
 vi.mock('@capacitor/browser', () => ({
   Browser: { open: vi.fn(), close: vi.fn(), addListener: vi.fn() },
@@ -284,7 +291,7 @@ describe('AuthService', () => {
       expect(mock.auth.signUp).toHaveBeenCalledWith({
         email: 'anna@example.com',
         password: 'abcd1234',
-        options: { emailRedirectTo: 'restyle://auth/callback?flow=signup' },
+        options: { emailRedirectTo: callbackUrl('signup') },
       });
     });
 
@@ -375,7 +382,7 @@ describe('AuthService', () => {
       expect(mock.auth.resend).toHaveBeenCalledWith({
         type: 'signup',
         email: 'anna@example.com',
-        options: { emailRedirectTo: 'restyle://auth/callback?flow=signup' },
+        options: { emailRedirectTo: callbackUrl('signup') },
       });
     });
 
@@ -625,7 +632,7 @@ describe('AuthService', () => {
 
       expect(await service.requestPasswordReset(' anna@example.com ')).toEqual({ ok: true, data: undefined });
       expect(mock.auth.resetPasswordForEmail).toHaveBeenCalledWith('anna@example.com', {
-        redirectTo: 'restyle://auth/callback?flow=recovery',
+        redirectTo: callbackUrl('recovery'),
       });
     });
 
@@ -770,7 +777,7 @@ describe('AuthService', () => {
 
       expect(mock.auth.signInWithOAuth).toHaveBeenCalledWith({
         provider: 'google',
-        options: { redirectTo: 'restyle://auth/callback?flow=google', skipBrowserRedirect: true },
+        options: { redirectTo: callbackUrl('google'), skipBrowserRedirect: true },
       });
       expect(Browser.open).toHaveBeenCalledWith({ url: 'https://supabase.test/auth/v1/authorize?provider=google' });
     });
@@ -901,6 +908,35 @@ describe('AuthService', () => {
   describe('normalizeEmail', () => {
     it('trims and lower-cases', () => {
       expect(normalizeEmail('  Anna@Example.COM ')).toBe('anna@example.com');
+    });
+  });
+
+  describe('callbackUrl', () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+      document.head.querySelector('base[data-test]')?.remove();
+    });
+
+    it.each(['signup', 'recovery', 'google'] as const)('uses the restyle:// deep link in the native app (%s)', (flow) => {
+      vi.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true);
+
+      expect(callbackUrl(flow)).toBe(`restyle://auth/callback?flow=${flow}`);
+    });
+
+    it('uses the web route under the current origin in the browser', () => {
+      vi.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(false);
+
+      expect(callbackUrl('signup')).toBe(`${window.location.origin}/auth/callback?flow=signup`);
+    });
+
+    it('respects the base href of the GitHub Pages build', () => {
+      vi.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(false);
+      const base = document.createElement('base');
+      base.href = '/ReStyle/';
+      base.setAttribute('data-test', '');
+      document.head.prepend(base);
+
+      expect(callbackUrl('recovery')).toBe(`${window.location.origin}/ReStyle/auth/callback?flow=recovery`);
     });
   });
 });
