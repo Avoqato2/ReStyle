@@ -12,7 +12,7 @@ import type { MockInstance } from 'vitest';
 
 import { authError } from '../../auth/auth-errors';
 import { SUPABASE_CLIENT } from '../supabase.client';
-import { AuthService, normalizeEmail, type AuthCallbackEvent } from './auth.service';
+import { AuthService, GOOGLE_CANCEL_GRACE_MS, normalizeEmail, type AuthCallbackEvent } from './auth.service';
 
 vi.mock('@capacitor/browser', () => ({
   Browser: { open: vi.fn(), close: vi.fn(), addListener: vi.fn() },
@@ -728,6 +728,7 @@ describe('AuthService', () => {
     let removeFinished: ReturnType<typeof vi.fn>;
 
     beforeEach(() => {
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
       removeFinished = vi.fn().mockResolvedValue(undefined);
       vi.mocked(Browser.open).mockResolvedValue(undefined);
       vi.mocked(Browser.close).mockResolvedValue(undefined);
@@ -738,6 +739,7 @@ describe('AuthService', () => {
     });
 
     afterEach(() => {
+      vi.useRealTimers();
       vi.mocked(Browser.open).mockReset();
       vi.mocked(Browser.close).mockReset();
       vi.mocked(Browser.addListener).mockReset();
@@ -778,9 +780,35 @@ describe('AuthService', () => {
       await vi.waitFor(() => expect(browserFinished).toBeDefined());
 
       browserFinished?.();
+      await vi.advanceTimersByTimeAsync(GOOGLE_CANCEL_GRACE_MS);
 
       expect(await result).toEqual({ ok: true, data: 'cancelled' });
       expect(removeFinished).toHaveBeenCalled();
+    });
+
+    it('stays signed_in when browserFinished arrives just before the callback (Android)', async () => {
+      const service = createService();
+      const result = startGoogle(service);
+      await vi.waitFor(() => expect(browserFinished).toBeDefined());
+
+      browserFinished?.();
+      const callback = service.handleCallbackUrl('restyle://auth/callback?flow=google&code=abc');
+      await vi.advanceTimersByTimeAsync(GOOGLE_CANCEL_GRACE_MS);
+      await callback;
+
+      expect(await result).toEqual({ ok: true, data: 'signed_in' });
+    });
+
+    it('stays signed_in when closing the browser fires browserFinished (iOS)', async () => {
+      vi.mocked(Browser.close).mockImplementation(async () => browserFinished?.());
+      const service = createService();
+      const result = startGoogle(service);
+      await vi.waitFor(() => expect(browserFinished).toBeDefined());
+
+      await service.handleCallbackUrl('restyle://auth/callback?flow=google&code=abc');
+      await vi.advanceTimersByTimeAsync(GOOGLE_CANCEL_GRACE_MS);
+
+      expect(await result).toEqual({ ok: true, data: 'signed_in' });
     });
 
     it('resolves cancelled for an access_denied callback', async () => {
@@ -851,6 +879,7 @@ describe('AuthService', () => {
       expect(service.signInWithGoogle()).toBe(first);
       await vi.waitFor(() => expect(browserFinished).toBeDefined());
       browserFinished?.();
+      await vi.advanceTimersByTimeAsync(GOOGLE_CANCEL_GRACE_MS);
       await first;
       expect(Browser.open).toHaveBeenCalledTimes(1);
     });
