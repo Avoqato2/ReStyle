@@ -43,6 +43,7 @@ function createAuthMock() {
     }),
     signOut: vi.fn().mockResolvedValue({ error: null }),
     resetPasswordForEmail: vi.fn().mockResolvedValue({ data: {}, error: null }),
+    updateUser: vi.fn().mockResolvedValue({ data: { user: fakeSession().user }, error: null }),
   };
 
   return {
@@ -658,6 +659,58 @@ describe('AuthService', () => {
       const service = createService();
 
       expect(service.requestPasswordReset('a@example.com')).toBe(service.requestPasswordReset('a@example.com'));
+    });
+  });
+
+  describe('updatePassword', () => {
+    it('updates the password and signs out other devices', async () => {
+      const service = createService();
+
+      expect(await service.updatePassword('neu12345')).toEqual({ ok: true, data: undefined });
+      expect(mock.auth.updateUser).toHaveBeenCalledWith({ password: 'neu12345' });
+      expect(mock.auth.signOut).toHaveBeenCalledWith({ scope: 'others' });
+    });
+
+    it('keeps the local session', async () => {
+      mock.auth.getSession.mockResolvedValue({ data: { session: fakeSession() }, error: null });
+      const service = createService();
+      await flush();
+
+      await service.updatePassword('neu12345');
+
+      expect(service.status()).toBe('authenticated');
+      expect(navigate).not.toHaveBeenCalled();
+    });
+
+    it('maps a weak password and does not sign out other devices', async () => {
+      mock.auth.updateUser.mockResolvedValue({
+        data: { user: null },
+        error: new AuthWeakPasswordError('weak', 422, ['length']),
+      });
+      const service = createService();
+
+      expect(await service.updatePassword('kurz')).toEqual({ ok: false, error: authError('weak_password') });
+      expect(mock.auth.signOut).not.toHaveBeenCalled();
+    });
+
+    it('maps a network error', async () => {
+      mock.auth.updateUser.mockRejectedValue(new TypeError('Failed to fetch'));
+      const service = createService();
+
+      expect(await service.updatePassword('neu12345')).toEqual({ ok: false, error: authError('network') });
+    });
+
+    it('still succeeds when signing out other devices fails', async () => {
+      mock.auth.signOut.mockRejectedValue(new TypeError('Failed to fetch'));
+      const service = createService();
+
+      expect(await service.updatePassword('neu12345')).toEqual({ ok: true, data: undefined });
+    });
+
+    it('reuses the running promise for repeated calls', () => {
+      const service = createService();
+
+      expect(service.updatePassword('neu12345')).toBe(service.updatePassword('neu12345'));
     });
   });
 
