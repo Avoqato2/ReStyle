@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 
-import { AuthService } from './services/auth.service';
+import { AuthService } from './services/auth/auth.service';
+import { SUPABASE_CLIENT } from './supabase.client';
 import { GarmentService } from './services/garment.service';
 import { OutfitService } from './services/outfit.service';
 
@@ -13,9 +15,10 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
   const testUser = {
     email: `integration-${Date.now()}@test.local`,
     password: 'password123',
-    displayName: 'Integration Test User',
   };
   const passwordPlaceholder = '<password>';
+  // Lokales Testpostfach der Supabase-CLI
+  const MAILPIT_URL = 'http://127.0.0.1:54324';
 
   // Diese IDs werden während der Testvorbereitung erzeugt und danach verwendet.
   let testGarmentId: string;
@@ -24,38 +27,24 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
   beforeAll(async () => {
     // TestBed erstellt die Services wie Angular sie auch in der App
     // per Dependency Injection erstellen würde.
-    TestBed.configureTestingModule({});
+    // signOut() navigiert zum Login; die Route fängt das ab, bis es die Auth-Screens gibt.
+    TestBed.configureTestingModule({ providers: [provideRouter([{ path: '**', children: [] }])] });
     authService = TestBed.inject(AuthService);
     garmentService = TestBed.inject(GarmentService);
     outfitService = TestBed.inject(OutfitService);
 
     // Der Test startet mit einem echten neuen Benutzer statt mit einem
     // fest im seed.sql angelegten Benutzer.
-    const registration = await authService.signUp(testUser.email, testUser.password, testUser.displayName);
-    logCall(
-      'AuthService.signUp',
-      {
-        email: testUser.email,
-        password: passwordPlaceholder,
-        options: { data: { display_name: testUser.displayName } },
-      },
-      {
-        userId: registration.ok ? registration.data.user?.id : undefined,
-        email: registration.ok ? registration.data.user?.email : undefined,
-        hasSession: registration.ok ? Boolean(registration.data.session) : false,
-        error: registration.ok ? undefined : registration.error,
-      },
-    );
+    const registration = await authService.signUp(testUser.email, testUser.password);
+    logCall('AuthService.signUp', { email: testUser.email, password: passwordPlaceholder }, registration);
 
     if (!registration.ok) {
       throw new Error(`Testbenutzer konnte nicht registriert werden: ${registration.error.message}`);
     }
 
-    // Falls die lokale Supabase-Konfiguration keine Session direkt nach der
-    // Registrierung ausgibt, wird der gerade erstellte Benutzer eingeloggt.
-    if (!registration.data.session) {
-      await loginAsTestUser();
-    }
+    // Mit aktiver E-Mail-Bestätigung bestätigt loginAsTestUser() die Adresse
+    // vorher über das lokale Testpostfach.
+    await loginAsTestUser();
 
     // Für die Lese- und Update-Tests werden eigene Testdaten angelegt.
     const garment = await garmentService.create({
@@ -125,17 +114,46 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
       email: testUser.email,
       password: passwordPlaceholder,
     };
-    const result = await authService.signIn(testUser.email, testUser.password);
+    let result = await authService.signIn(testUser.email, testUser.password);
     logCall('AuthService.signIn', request, result);
+
+    if (!result.ok && result.error.code === 'email_not_confirmed') {
+      await confirmEmailViaMailpit(testUser.email);
+      result = await authService.signIn(testUser.email, testUser.password);
+      logCall('AuthService.signIn', request, result);
+    }
 
     if (!result.ok) {
       throw new Error(`Testbenutzer konnte nicht angemeldet werden: ${result.error.message}`);
     }
   }
 
+  // Öffnet den Bestätigungslink aus dem lokalen Testpostfach (Mailpit, `[local_smtp]`
+  // in config.toml). Der Verify-Endpoint bestätigt die Adresse schon beim Aufruf;
+  // die Weiterleitung auf restyle://… wird nicht verfolgt.
+  async function confirmEmailViaMailpit(email: string): Promise<void> {
+    const search = await fetch(`${MAILPIT_URL}/api/v1/search?query=${encodeURIComponent(`to:"${email}"`)}`);
+    const { messages } = (await search.json()) as { messages: { ID: string }[] };
+    if (!messages.length) {
+      throw new Error(`Keine Bestätigungsmail für ${email} in Mailpit gefunden`);
+    }
+
+    const message = (await (await fetch(`${MAILPIT_URL}/api/v1/message/${messages[0].ID}`)).json()) as {
+      HTML: string;
+      Text: string;
+    };
+    const link = `${message.HTML} ${message.Text}`.match(/https?:\/\/[^\s"'<>]+\/auth\/v1\/verify[^\s"'<>]*/)?.[0];
+    if (!link) {
+      throw new Error('Kein Bestätigungslink in der Mail gefunden');
+    }
+
+    await fetch(link.replaceAll('&amp;', '&'), { redirect: 'manual' });
+    logCall('Mailpit: Bestätigungslink öffnen', { email }, { confirmed: true });
+  }
+
   async function logout(): Promise<void> {
-    await authService.logout();
-    logCall('AuthService.logout', undefined, { success: true });
+    await authService.signOut();
+    logCall('AuthService.signOut', undefined, { success: true });
   }
 
   function logCall(operation: string, request?: unknown, result?: unknown): void {
@@ -143,8 +161,8 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
     // Anfrage und das Ergebnis gemeinsam, damit der Ablauf nachvollziehbar ist.
     const taskTitles: Record<string, string> = {
       'AuthService.signIn': 'Melde Testbenutzer an',
-      'AuthService.logout': 'Melde Testbenutzer ab',
-      'AuthService.getSession': 'Prüfe aktuelle Session',
+      'AuthService.signOut': 'Melde Testbenutzer ab',
+      'AuthService.status': 'Prüfe aktuelle Session',
       'AuthService.signUp': 'Registriere neuen Testbenutzer',
       'GarmentService.getAll': 'Lade alle Test-Garments',
       'GarmentService.getById': 'Lade ein Test-Garment',
@@ -174,26 +192,30 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
     it('registers a new user and reads the session', async () => {
       // Der neue Benutzer wurde in beforeAll registriert. Hier wird geprüft,
       // ob Supabase die Session für diesen Benutzer bereitstellt.
-      const session = await authService.getSession();
-      logCall('AuthService.getSession', undefined, {
-        userId: session?.user.id,
-        email: session?.user.email,
-        hasAccessToken: Boolean(session?.access_token),
+      const { data } = await TestBed.inject(SUPABASE_CLIENT).auth.getSession();
+      logCall('AuthService.status', undefined, {
+        status: authService.status(),
+        user: authService.user(),
+        hasAccessToken: Boolean(data.session?.access_token),
       });
 
-      expect(session?.user.email).toBe(testUser.email);
+      expect(authService.status()).toBe('authenticated');
+      expect(authService.user()?.email).toBe(testUser.email);
+      expect(data.session?.user.email).toBe(testUser.email);
     });
 
     it('logs out and removes the local session', async () => {
-      await authService.logout();
-      const session = await authService.getSession();
-      logCall('AuthService.logout + AuthService.getSession', undefined, session);
+      await authService.signOut();
+      const { data } = await TestBed.inject(SUPABASE_CLIENT).auth.getSession();
+      logCall('AuthService.signOut + getSession', undefined, data.session);
 
-      expect(session).toBeNull();
+      expect(authService.status()).toBe('unauthenticated');
+      expect(authService.signOutReason()).toBe('user');
+      expect(data.session).toBeNull();
     });
 
     it('rejects invalid login data', async () => {
-      await authService.logout();
+      await authService.signOut();
       const result = await authService.signIn(testUser.email, 'wrong-password');
       logCall(
         'AuthService.signIn',
