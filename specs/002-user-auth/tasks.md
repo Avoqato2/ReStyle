@@ -85,7 +85,7 @@ und ist nach Antippen des Links eingeloggt.
 Link im Emulator öffnen → eingeloggt.
 
 - [x] T023 [P] [US1] [BE] `checkPasswordRules()` und `isPasswordValid()` („mindestens 8 Zeichen, mindestens ein Buchstabe und eine Ziffer“) in frontend/src/app/auth/password-rules.ts + frontend/src/app/auth/password-rules.spec.ts
-- [ ] T024 [US1] [BE] `signUp(email, password)` mit `emailRedirectTo: 'restyle://auth/callback?flow=signup'`; bereits registrierte E-Mail (leere Identities) liefert `ok: true` (FR-006); In-Flight-Promise wiederverwenden in auth.service.ts + auth.service.spec.ts
+- [x] T024 [US1] [BE] `signUp(email, password)` mit `emailRedirectTo: 'restyle://auth/callback?flow=signup'`; bereits registrierte E-Mail (leere Identities) liefert `ok: true` (FR-006); In-Flight-Promise wiederverwenden in auth.service.ts + auth.service.spec.ts
 - [ ] T025 [US1] [BE] `resendConfirmation(email)` mit `resend({ type: 'signup' })`; setzt `signupResend` mit der normalisierten Adresse und dem frühesten Sendezeitpunkt (+60 s) bei Erfolg und bei `rate_limited`; verändert `recoveryResend` nicht in auth.service.ts + auth.service.spec.ts
 - [ ] T026 [US1] [BE] Routen `/auth/register` und `/auth/check-email` mit `guestGuard` in frontend/src/app/app.routes.ts
 - [ ] T027 [P] [US1] [FE] Registrierungs-Screen nach Figma: E-Mail, Passwort mit Live-Regelanzeige (`checkPasswordRules`), Feldfehler, Ladeanzeige und gesperrtes Formular während `signUp`, Link zum Login in frontend/src/app/auth/pages/register/register.page.ts|html|scss

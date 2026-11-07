@@ -13,9 +13,10 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
   const testUser = {
     email: `integration-${Date.now()}@test.local`,
     password: 'password123',
-    displayName: 'Integration Test User',
   };
   const passwordPlaceholder = '<password>';
+  // Lokales Testpostfach der Supabase-CLI
+  const MAILPIT_URL = 'http://127.0.0.1:54324';
 
   // Diese IDs werden während der Testvorbereitung erzeugt und danach verwendet.
   let testGarmentId: string;
@@ -31,31 +32,16 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
 
     // Der Test startet mit einem echten neuen Benutzer statt mit einem
     // fest im seed.sql angelegten Benutzer.
-    const registration = await authService.signUp(testUser.email, testUser.password, testUser.displayName);
-    logCall(
-      'AuthService.signUp',
-      {
-        email: testUser.email,
-        password: passwordPlaceholder,
-        options: { data: { display_name: testUser.displayName } },
-      },
-      {
-        userId: registration.ok ? registration.data.user?.id : undefined,
-        email: registration.ok ? registration.data.user?.email : undefined,
-        hasSession: registration.ok ? Boolean(registration.data.session) : false,
-        error: registration.ok ? undefined : registration.error,
-      },
-    );
+    const registration = await authService.signUp(testUser.email, testUser.password);
+    logCall('AuthService.signUp', { email: testUser.email, password: passwordPlaceholder }, registration);
 
     if (!registration.ok) {
       throw new Error(`Testbenutzer konnte nicht registriert werden: ${registration.error.message}`);
     }
 
-    // Falls die lokale Supabase-Konfiguration keine Session direkt nach der
-    // Registrierung ausgibt, wird der gerade erstellte Benutzer eingeloggt.
-    if (!registration.data.session) {
-      await loginAsTestUser();
-    }
+    // Mit aktiver E-Mail-Bestätigung bestätigt loginAsTestUser() die Adresse
+    // vorher über das lokale Testpostfach.
+    await loginAsTestUser();
 
     // Für die Lese- und Update-Tests werden eigene Testdaten angelegt.
     const garment = await garmentService.create({
@@ -125,12 +111,41 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
       email: testUser.email,
       password: passwordPlaceholder,
     };
-    const result = await authService.signIn(testUser.email, testUser.password);
+    let result = await authService.signIn(testUser.email, testUser.password);
     logCall('AuthService.signIn', request, result);
+
+    if (!result.ok && result.error.code === 'email_not_confirmed') {
+      await confirmEmailViaMailpit(testUser.email);
+      result = await authService.signIn(testUser.email, testUser.password);
+      logCall('AuthService.signIn', request, result);
+    }
 
     if (!result.ok) {
       throw new Error(`Testbenutzer konnte nicht angemeldet werden: ${result.error.message}`);
     }
+  }
+
+  // Öffnet den Bestätigungslink aus dem lokalen Testpostfach (Mailpit, `[local_smtp]`
+  // in config.toml). Der Verify-Endpoint bestätigt die Adresse schon beim Aufruf;
+  // die Weiterleitung auf restyle://… wird nicht verfolgt.
+  async function confirmEmailViaMailpit(email: string): Promise<void> {
+    const search = await fetch(`${MAILPIT_URL}/api/v1/search?query=${encodeURIComponent(`to:"${email}"`)}`);
+    const { messages } = (await search.json()) as { messages: { ID: string }[] };
+    if (!messages.length) {
+      throw new Error(`Keine Bestätigungsmail für ${email} in Mailpit gefunden`);
+    }
+
+    const message = (await (await fetch(`${MAILPIT_URL}/api/v1/message/${messages[0].ID}`)).json()) as {
+      HTML: string;
+      Text: string;
+    };
+    const link = `${message.HTML} ${message.Text}`.match(/https?:\/\/[^\s"'<>]+\/auth\/v1\/verify[^\s"'<>]*/)?.[0];
+    if (!link) {
+      throw new Error('Kein Bestätigungslink in der Mail gefunden');
+    }
+
+    await fetch(link.replaceAll('&amp;', '&'), { redirect: 'manual' });
+    logCall('Mailpit: Bestätigungslink öffnen', { email }, { confirmed: true });
   }
 
   async function logout(): Promise<void> {

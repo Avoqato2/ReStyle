@@ -62,6 +62,8 @@ export class AuthService {
   // `appUrlOpen` kann dieselbe URL mehrfach liefern; der Code ist aber nur einmal einlösbar.
   private readonly handledCallbacks = new Map<string, Promise<AuthCallbackEvent>>();
 
+  private readonly inFlight = new Map<string, Promise<unknown>>();
+
   constructor() {
     this.supabase.auth.onAuthStateChange((event, session) => this.onAuthStateChange(event, session));
     void this.loadStoredSession();
@@ -164,22 +166,39 @@ export class AuthService {
     }
   }
 
-  // --- Übergang: Die folgenden Methoden werden in T024, T029 und T030 durch die
-  // Contract-Methoden ersetzt und nur noch vom Integrationstest genutzt. ---
-
-  async signUp(email: string, password: string, displayName?: string): Promise<AuthResult<AuthResponse['data']>> {
-    const response = await this.supabase.auth.signUp({
-      email,
-      password,
-      options: { data: displayName ? { display_name: displayName } : undefined },
+  // Registriert mit E-Mail und Passwort und verschickt die Bestätigungsmail.
+  // Eine bereits registrierte Adresse liefert denselben Erfolg (FR-006, research R7):
+  // Supabase gibt dann einen User ohne Identities und keinen Fehler zurück.
+  signUp(email: string, password: string): Promise<AuthResult> {
+    return this.once('signUp', async () => {
+      try {
+        const { error } = await this.supabase.auth.signUp({
+          email: email.trim(),
+          password,
+          options: { emailRedirectTo: SIGNUP_REDIRECT },
+        });
+        return error ? fail(error) : OK;
+      } catch (error) {
+        return fail(error);
+      }
     });
+  }
 
-    if (response.error) {
-      return { ok: false, error: this.toError(response.error) };
+  // Mehrfachaufrufe derselben Methode während eines laufenden Aufrufs teilen sich
+  // ein Promise (contracts/auth-service.md, FR-009b).
+  private once<T>(method: string, run: () => Promise<T>): Promise<T> {
+    const running = this.inFlight.get(method) as Promise<T> | undefined;
+    if (running) {
+      return running;
     }
 
-    return { ok: true, data: response.data };
+    const promise = run().finally(() => this.inFlight.delete(method));
+    this.inFlight.set(method, promise);
+    return promise;
   }
+
+  // --- Übergang: Die folgenden Methoden werden in T029 und T030 durch die
+  // Contract-Methoden ersetzt und nur noch vom Integrationstest genutzt. ---
 
   async signIn(email: string, password: string): Promise<AuthResult<AuthResponse['data']>> {
     const response = await this.supabase.auth.signInWithPassword({ email, password });
@@ -212,6 +231,15 @@ export class AuthService {
   private toError(error: unknown): AuthError {
     return mapAuthError(error);
   }
+}
+
+const CALLBACK_URL = 'restyle://auth/callback';
+export const SIGNUP_REDIRECT = `${CALLBACK_URL}?flow=signup`;
+
+const OK: AuthResult = { ok: true, data: undefined };
+
+function fail(error: unknown): { ok: false; error: AuthError } {
+  return { ok: false, error: mapAuthError(error) };
 }
 
 function toAuthUser(user: User): AuthUser {

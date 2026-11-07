@@ -1,5 +1,11 @@
 import { TestBed } from '@angular/core/testing';
-import { AuthPKCECodeVerifierMissingError, type AuthChangeEvent, type Session } from '@supabase/supabase-js';
+import {
+  AuthApiError,
+  AuthPKCECodeVerifierMissingError,
+  AuthWeakPasswordError,
+  type AuthChangeEvent,
+  type Session,
+} from '@supabase/supabase-js';
 
 import { authError } from '../../auth/auth-errors';
 import { SUPABASE_CLIENT } from '../supabase.client';
@@ -27,6 +33,7 @@ function createAuthMock() {
     }),
     getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
     exchangeCodeForSession: vi.fn().mockResolvedValue({ data: { session: fakeSession(), user: null }, error: null }),
+    signUp: vi.fn().mockResolvedValue({ data: { user: fakeSession().user, session: null }, error: null }),
   };
 
   return {
@@ -242,6 +249,75 @@ describe('AuthService', () => {
       expect(second).toEqual(first);
       expect(mock.auth.exchangeCodeForSession).toHaveBeenCalledTimes(1);
       expect(events).toHaveLength(1);
+    });
+  });
+
+  describe('signUp', () => {
+    it('registers with the signup redirect', async () => {
+      const service = createService();
+
+      const result = await service.signUp(' anna@example.com ', 'abcd1234');
+
+      expect(result).toEqual({ ok: true, data: undefined });
+      expect(mock.auth.signUp).toHaveBeenCalledWith({
+        email: 'anna@example.com',
+        password: 'abcd1234',
+        options: { emailRedirectTo: 'restyle://auth/callback?flow=signup' },
+      });
+    });
+
+    it('reports success for an already registered email (FR-006)', async () => {
+      mock.auth.signUp.mockResolvedValue({
+        data: { user: { ...fakeSession().user, identities: [] }, session: null },
+        error: null,
+      });
+      const service = createService();
+
+      expect(await service.signUp('anna@example.com', 'abcd1234')).toEqual({ ok: true, data: undefined });
+    });
+
+    it('maps a weak password', async () => {
+      mock.auth.signUp.mockResolvedValue({
+        data: { user: null, session: null },
+        error: new AuthWeakPasswordError('weak', 422, ['characters']),
+      });
+      const service = createService();
+
+      expect(await service.signUp('anna@example.com', 'abc')).toEqual({ ok: false, error: authError('weak_password') });
+    });
+
+    it('maps a rate limit', async () => {
+      mock.auth.signUp.mockResolvedValue({
+        data: { user: null, session: null },
+        error: new AuthApiError('limit', 429, 'over_email_send_rate_limit'),
+      });
+      const service = createService();
+
+      expect(await service.signUp('anna@example.com', 'abcd1234')).toEqual({
+        ok: false,
+        error: authError('rate_limited'),
+      });
+    });
+
+    it('maps a thrown network error', async () => {
+      mock.auth.signUp.mockRejectedValue(new TypeError('Failed to fetch'));
+      const service = createService();
+
+      expect(await service.signUp('anna@example.com', 'abcd1234')).toEqual({ ok: false, error: authError('network') });
+    });
+
+    it('reuses the running promise for repeated calls', async () => {
+      const service = createService();
+
+      const first = service.signUp('anna@example.com', 'abcd1234');
+      const second = service.signUp('anna@example.com', 'abcd1234');
+
+      expect(second).toBe(first);
+      await first;
+      expect(mock.auth.signUp).toHaveBeenCalledTimes(1);
+
+      await service.signUp('anna@example.com', 'abcd1234');
+      expect(mock.auth.signUp).toHaveBeenCalledTimes(2);
     });
   });
 
