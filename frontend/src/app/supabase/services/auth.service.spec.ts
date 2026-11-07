@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { Router, provideRouter } from '@angular/router';
 import {
   AuthApiError,
   AuthPKCECodeVerifierMissingError,
@@ -6,6 +7,7 @@ import {
   type AuthChangeEvent,
   type Session,
 } from '@supabase/supabase-js';
+import type { MockInstance } from 'vitest';
 
 import { authError } from '../../auth/auth-errors';
 import { SUPABASE_CLIENT } from '../supabase.client';
@@ -39,6 +41,7 @@ function createAuthMock() {
       data: { user: fakeSession().user, session: fakeSession() },
       error: null,
     }),
+    signOut: vi.fn().mockResolvedValue({ error: null }),
   };
 
   return {
@@ -52,10 +55,13 @@ const flush = () => new Promise<void>((resolve) => setTimeout(resolve));
 describe('AuthService', () => {
   let mock: ReturnType<typeof createAuthMock>;
 
+  let navigate: MockInstance<Router['navigateByUrl']>;
+
   function createService(): AuthService {
     TestBed.configureTestingModule({
-      providers: [{ provide: SUPABASE_CLIENT, useValue: { auth: mock.auth } }],
+      providers: [provideRouter([]), { provide: SUPABASE_CLIENT, useValue: { auth: mock.auth } }],
     });
+    navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
     return TestBed.inject(AuthService);
   }
 
@@ -441,6 +447,81 @@ describe('AuthService', () => {
       const service = createService();
 
       expect(service.signIn('a@example.com', 'abcd1234')).toBe(service.signIn('a@example.com', 'abcd1234'));
+    });
+  });
+
+  describe('signOut', () => {
+    async function signedInService(): Promise<AuthService> {
+      mock.auth.getSession.mockResolvedValue({ data: { session: fakeSession() }, error: null });
+      const service = createService();
+      await flush();
+      return service;
+    }
+
+    it('signs out locally, clears the user and navigates to the login', async () => {
+      const service = await signedInService();
+
+      await service.signOut();
+
+      expect(mock.auth.signOut).toHaveBeenCalledWith({ scope: 'local' });
+      expect(service.status()).toBe('unauthenticated');
+      expect(service.user()).toBeNull();
+      expect(service.signOutReason()).toBe('user');
+      expect(navigate).toHaveBeenCalledWith('/auth/login');
+    });
+
+    it('runs registered cleanup hooks after the logout, in order', async () => {
+      const service = await signedInService();
+      const calls: string[] = [];
+      mock.auth.signOut.mockImplementation(async () => {
+        calls.push('signOut');
+        return { error: null };
+      });
+      service.registerSignOutCleanup(() => {
+        calls.push('sync');
+      });
+      service.registerSignOutCleanup(async () => {
+        calls.push('async');
+      });
+
+      await service.signOut();
+
+      expect(calls).toEqual(['signOut', 'sync', 'async']);
+    });
+
+    it('keeps running cleanups when one fails', async () => {
+      const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      const service = await signedInService();
+      const second = vi.fn();
+      service.registerSignOutCleanup(() => {
+        throw new Error('cache broken');
+      });
+      service.registerSignOutCleanup(second);
+
+      await service.signOut();
+
+      expect(second).toHaveBeenCalled();
+      expect(navigate).toHaveBeenCalledWith('/auth/login');
+      error.mockRestore();
+    });
+
+    it('still signs out locally when supabase throws', async () => {
+      mock.auth.signOut.mockRejectedValue(new TypeError('Failed to fetch'));
+      const service = await signedInService();
+
+      await service.signOut();
+
+      expect(service.status()).toBe('unauthenticated');
+      expect(navigate).toHaveBeenCalledWith('/auth/login');
+    });
+
+    it('reuses the running promise for repeated calls', async () => {
+      const service = await signedInService();
+
+      const first = service.signOut();
+      expect(service.signOut()).toBe(first);
+      await first;
+      expect(mock.auth.signOut).toHaveBeenCalledTimes(1);
     });
   });
 

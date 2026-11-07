@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 
 import { AuthService } from './services/auth.service';
+import { SUPABASE_CLIENT } from './supabase.client';
 import { GarmentService } from './services/garment.service';
 import { OutfitService } from './services/outfit.service';
 
@@ -25,7 +27,8 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
   beforeAll(async () => {
     // TestBed erstellt die Services wie Angular sie auch in der App
     // per Dependency Injection erstellen würde.
-    TestBed.configureTestingModule({});
+    // signOut() navigiert zum Login; die Route fängt das ab, bis es die Auth-Screens gibt.
+    TestBed.configureTestingModule({ providers: [provideRouter([{ path: '**', children: [] }])] });
     authService = TestBed.inject(AuthService);
     garmentService = TestBed.inject(GarmentService);
     outfitService = TestBed.inject(OutfitService);
@@ -149,8 +152,8 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
   }
 
   async function logout(): Promise<void> {
-    await authService.logout();
-    logCall('AuthService.logout', undefined, { success: true });
+    await authService.signOut();
+    logCall('AuthService.signOut', undefined, { success: true });
   }
 
   function logCall(operation: string, request?: unknown, result?: unknown): void {
@@ -158,8 +161,8 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
     // Anfrage und das Ergebnis gemeinsam, damit der Ablauf nachvollziehbar ist.
     const taskTitles: Record<string, string> = {
       'AuthService.signIn': 'Melde Testbenutzer an',
-      'AuthService.logout': 'Melde Testbenutzer ab',
-      'AuthService.getSession': 'Prüfe aktuelle Session',
+      'AuthService.signOut': 'Melde Testbenutzer ab',
+      'AuthService.status': 'Prüfe aktuelle Session',
       'AuthService.signUp': 'Registriere neuen Testbenutzer',
       'GarmentService.getAll': 'Lade alle Test-Garments',
       'GarmentService.getById': 'Lade ein Test-Garment',
@@ -189,26 +192,30 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
     it('registers a new user and reads the session', async () => {
       // Der neue Benutzer wurde in beforeAll registriert. Hier wird geprüft,
       // ob Supabase die Session für diesen Benutzer bereitstellt.
-      const session = await authService.getSession();
-      logCall('AuthService.getSession', undefined, {
-        userId: session?.user.id,
-        email: session?.user.email,
-        hasAccessToken: Boolean(session?.access_token),
+      const { data } = await TestBed.inject(SUPABASE_CLIENT).auth.getSession();
+      logCall('AuthService.status', undefined, {
+        status: authService.status(),
+        user: authService.user(),
+        hasAccessToken: Boolean(data.session?.access_token),
       });
 
-      expect(session?.user.email).toBe(testUser.email);
+      expect(authService.status()).toBe('authenticated');
+      expect(authService.user()?.email).toBe(testUser.email);
+      expect(data.session?.user.email).toBe(testUser.email);
     });
 
     it('logs out and removes the local session', async () => {
-      await authService.logout();
-      const session = await authService.getSession();
-      logCall('AuthService.logout + AuthService.getSession', undefined, session);
+      await authService.signOut();
+      const { data } = await TestBed.inject(SUPABASE_CLIENT).auth.getSession();
+      logCall('AuthService.signOut + getSession', undefined, data.session);
 
-      expect(session).toBeNull();
+      expect(authService.status()).toBe('unauthenticated');
+      expect(authService.signOutReason()).toBe('user');
+      expect(data.session).toBeNull();
     });
 
     it('rejects invalid login data', async () => {
-      await authService.logout();
+      await authService.signOut();
       const result = await authService.signIn(testUser.email, 'wrong-password');
       logCall(
         'AuthService.signIn',
