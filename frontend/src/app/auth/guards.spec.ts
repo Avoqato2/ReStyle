@@ -11,7 +11,7 @@ import {
 import { Observable } from 'rxjs';
 
 import { AuthService, type AuthStatus } from '../supabase/services/auth.service';
-import { authGuard, guestGuard } from './guards';
+import { authGuard, guestGuard, recoveryGuard } from './guards';
 
 describe('guards', () => {
   let status: ReturnType<typeof signal<AuthStatus>>;
@@ -66,6 +66,47 @@ describe('guards', () => {
       TestBed.tick();
 
       expect(url(guard.result())).toBe('/auth/login');
+    });
+  });
+
+  describe('recoveryGuard', () => {
+    beforeEach(() => {
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({
+        providers: [
+          provideRouter([
+            { path: 'auth/reset-password', canActivate: [recoveryGuard], children: [] },
+            { path: 'auth/login', children: [] },
+          ]),
+          { provide: AuthService, useValue: { status: status.asReadonly() } },
+        ],
+      });
+    });
+
+    async function navigate(state?: Record<string, unknown>): Promise<string> {
+      const router = TestBed.inject(Router);
+      const navigation = router.navigateByUrl('/auth/reset-password', state ? { state } : undefined);
+      TestBed.tick();
+      await navigation;
+      return router.url;
+    }
+
+    it('allows the reset page right after password_recovery', async () => {
+      status.set('authenticated');
+
+      expect(await navigate({ passwordRecovery: true })).toBe('/auth/reset-password');
+    });
+
+    it('redirects to the login without the recovery state', async () => {
+      status.set('authenticated');
+
+      expect(await navigate()).toBe('/auth/login');
+    });
+
+    it('redirects to the login without a session', async () => {
+      status.set('unauthenticated');
+
+      expect(await navigate({ passwordRecovery: true })).toBe('/auth/login');
     });
   });
 

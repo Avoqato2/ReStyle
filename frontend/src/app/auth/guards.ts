@@ -23,6 +23,18 @@ export const authGuard: CanActivateFn = () => {
   return settledStatus(auth).pipe(map((status) => (status === 'authenticated' ? true : router.parseUrl(LOGIN_URL))));
 };
 
+// `/auth/reset-password`: nur direkt nach dem Event `password_recovery`. AppComponent
+// navigiert dann mit State `passwordRecovery`; Reload, Zurück oder direkter Aufruf → Login.
+export const recoveryGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+  const fromRecovery = router.currentNavigation()?.extras.state?.['passwordRecovery'] === true;
+
+  return settledStatus(auth).pipe(
+    map((status) => (fromRecovery && status === 'authenticated' ? true : router.parseUrl(LOGIN_URL))),
+  );
+};
+
 // Login, Registrierung, Passwort vergessen: mit Sitzung → Garderobe.
 export const guestGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
