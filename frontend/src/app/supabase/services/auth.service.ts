@@ -88,8 +88,17 @@ export class AuthService {
   }
 
   // Wichtig: Hier keine weiteren Supabase-Aufrufe awaiten, sonst blockiert supabase-js.
-  private onAuthStateChange(_event: AuthChangeEvent, session: Session | null): void {
+  private onAuthStateChange(event: AuthChangeEvent, session: Session | null): void {
+    // SIGNED_OUT ohne eigenen signOut(): Refresh fehlgeschlagen oder Sitzung serverseitig
+    // beendet (z. B. Passwort-Reset auf anderem Gerät) → Login mit Hinweis (FR-009a).
+    const expired = event === 'SIGNED_OUT' && !this.ownSignOut && this._status() !== 'unauthenticated';
+
     this.applySession(session);
+
+    if (expired) {
+      this._signOutReason.set('expired');
+      this.navigate(LOGIN_URL);
+    }
   }
 
   private applySession(session: Session | null): void {
