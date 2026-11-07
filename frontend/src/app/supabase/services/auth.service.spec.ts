@@ -1,8 +1,9 @@
 import { TestBed } from '@angular/core/testing';
-import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
+import { AuthPKCECodeVerifierMissingError, type AuthChangeEvent, type Session } from '@supabase/supabase-js';
 
+import { authError } from '../../auth/auth-errors';
 import { SUPABASE_CLIENT } from '../supabase.client';
-import { AuthService, normalizeEmail } from './auth.service';
+import { AuthService, normalizeEmail, type AuthCallbackEvent } from './auth.service';
 
 type AuthListener = (event: AuthChangeEvent, session: Session | null) => void;
 
@@ -25,6 +26,7 @@ function createAuthMock() {
       return { data: { subscription: { unsubscribe: vi.fn() } } };
     }),
     getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
+    exchangeCodeForSession: vi.fn().mockResolvedValue({ data: { session: fakeSession(), user: null }, error: null }),
   };
 
   return {
@@ -108,6 +110,138 @@ describe('AuthService', () => {
 
       mock.emit('TOKEN_REFRESHED', fakeSession('user-2', 'ben@example.com'));
       expect(service.status()).toBe('authenticated');
+    });
+  });
+
+  describe('handleCallbackUrl', () => {
+    const exchangeFails = () =>
+      mock.auth.exchangeCodeForSession.mockResolvedValue({
+        data: { session: null, user: null },
+        error: new AuthPKCECodeVerifierMissingError(),
+      });
+
+    it.each([
+      ['signup', { type: 'email_confirmed' }],
+      ['recovery', { type: 'password_recovery' }],
+      ['google', { type: 'oauth_signed_in' }],
+    ] as const)('exchanges the code for flow %s', async (flow, expected) => {
+      const service = createService();
+      await flush();
+
+      const event = await service.handleCallbackUrl(`restyle://auth/callback?flow=${flow}&code=abc`);
+
+      expect(mock.auth.exchangeCodeForSession).toHaveBeenCalledWith('abc');
+      expect(event).toEqual(expected);
+      expect(service.status()).toBe('authenticated');
+    });
+
+    it('emits the event on callbackEvents', async () => {
+      const service = createService();
+      const events: AuthCallbackEvent[] = [];
+      service.callbackEvents.subscribe((event) => events.push(event));
+
+      await service.handleCallbackUrl('restyle://auth/callback?flow=signup&code=abc');
+
+      expect(events).toEqual([{ type: 'email_confirmed' }]);
+    });
+
+    it.each(['signup', 'recovery'] as const)('maps a callback error for %s to link_invalid', async (flow) => {
+      const service = createService();
+
+      const event = await service.handleCallbackUrl(`restyle://auth/callback?flow=${flow}&error_code=otp_expired`);
+
+      expect(event).toEqual({ type: 'link_invalid', flow });
+      expect(mock.auth.exchangeCodeForSession).not.toHaveBeenCalled();
+    });
+
+    it('maps a Google access_denied to oauth_cancelled', async () => {
+      const service = createService();
+
+      expect(await service.handleCallbackUrl('restyle://auth/callback?flow=google&error=access_denied')).toEqual({
+        type: 'oauth_cancelled',
+      });
+    });
+
+    it('maps other Google errors to oauth_failed with a German message', async () => {
+      const service = createService();
+
+      const event = await service.handleCallbackUrl('restyle://auth/callback?flow=google&error=server_error');
+
+      expect(event).toEqual({ type: 'oauth_failed', error: authError('oauth_failed') });
+    });
+
+    it('asks for login when the signup code cannot be exchanged on this device', async () => {
+      exchangeFails();
+      const service = createService();
+      await flush();
+
+      expect(await service.handleCallbackUrl('restyle://auth/callback?flow=signup&code=abc')).toEqual({
+        type: 'email_confirmed_login_required',
+      });
+      expect(service.status()).toBe('unauthenticated');
+    });
+
+    it('maps a failed recovery exchange to link_invalid', async () => {
+      exchangeFails();
+      const service = createService();
+
+      expect(await service.handleCallbackUrl('restyle://auth/callback?flow=recovery&code=abc')).toEqual({
+        type: 'link_invalid',
+        flow: 'recovery',
+      });
+    });
+
+    it('maps a failed Google exchange to oauth_failed', async () => {
+      exchangeFails();
+      const service = createService();
+
+      expect(await service.handleCallbackUrl('restyle://auth/callback?flow=google&code=abc')).toEqual({
+        type: 'oauth_failed',
+        error: authError('oauth_failed'),
+      });
+    });
+
+    it('keeps a network error for a failed Google exchange', async () => {
+      mock.auth.exchangeCodeForSession.mockRejectedValue(new TypeError('Failed to fetch'));
+      const service = createService();
+
+      expect(await service.handleCallbackUrl('restyle://auth/callback?flow=google&code=abc')).toEqual({
+        type: 'oauth_failed',
+        error: authError('network'),
+      });
+    });
+
+    it.each([
+      ['signup', { type: 'link_invalid', flow: 'signup' }],
+      ['recovery', { type: 'link_invalid', flow: 'recovery' }],
+      ['google', { type: 'oauth_failed', error: authError('oauth_failed') }],
+    ] as const)('treats flow %s without code and error as invalid', async (flow, expected) => {
+      const service = createService();
+
+      expect(await service.handleCallbackUrl(`restyle://auth/callback?flow=${flow}`)).toEqual(expected);
+    });
+
+    it('treats an unparseable callback as an invalid signup link', async () => {
+      const service = createService();
+
+      expect(await service.handleCallbackUrl('restyle://auth/callback?code=abc')).toEqual({
+        type: 'link_invalid',
+        flow: 'signup',
+      });
+    });
+
+    it('ignores the same URL a second time', async () => {
+      const service = createService();
+      const events: AuthCallbackEvent[] = [];
+      service.callbackEvents.subscribe((event) => events.push(event));
+      const url = 'restyle://auth/callback?flow=signup&code=abc';
+
+      const first = await service.handleCallbackUrl(url);
+      const second = await service.handleCallbackUrl(url);
+
+      expect(second).toEqual(first);
+      expect(mock.auth.exchangeCodeForSession).toHaveBeenCalledTimes(1);
+      expect(events).toHaveLength(1);
     });
   });
 
