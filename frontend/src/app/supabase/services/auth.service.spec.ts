@@ -298,6 +298,19 @@ describe('AuthService', () => {
       expect(await service.signUp('anna@example.com', 'abcd1234')).toEqual({ ok: true, data: undefined });
     });
 
+    it.each(['user_already_exists', 'email_exists'])(
+      'reports success for %s without email confirmation (FR-006)',
+      async (code) => {
+        mock.auth.signUp.mockResolvedValue({
+          data: { user: null, session: null },
+          error: new AuthApiError('User already registered', 422, code),
+        });
+        const service = createService();
+
+        expect(await service.signUp('anna@example.com', 'abcd1234')).toEqual({ ok: true, data: undefined });
+      },
+    );
+
     it('maps a weak password', async () => {
       mock.auth.signUp.mockResolvedValue({
         data: { user: null, session: null },

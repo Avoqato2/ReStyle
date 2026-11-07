@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import type { AuthChangeEvent, Session, User } from '@supabase/supabase-js';
+import { isAuthError, type AuthChangeEvent, type Session, type User } from '@supabase/supabase-js';
 import { Router } from '@angular/router';
 import { Browser } from '@capacitor/browser';
 import { Subject, type Observable } from 'rxjs';
@@ -269,12 +269,18 @@ export class AuthService {
 
   // Registriert mit E-Mail und Passwort und verschickt die Bestätigungsmail.
   // Eine bereits registrierte Adresse liefert denselben Erfolg (FR-006, research R7):
-  // Supabase gibt dann einen User ohne Identities und keinen Fehler zurück.
+  // Supabase gibt dann einen User ohne Identities und keinen Fehler zurück. Ohne aktive
+  // Bestätigung (z. B. lokal) kommt stattdessen `user_already_exists`, das ebenfalls als Erfolg gilt.
   signUp(email: string, password: string): Promise<AuthResult> {
     return this.once('signUp', () =>
-      this.call(() =>
-        this.supabase.auth.signUp({ email: email.trim(), password, options: { emailRedirectTo: SIGNUP_REDIRECT } }),
-      ),
+      this.call(async () => {
+        const response = await this.supabase.auth.signUp({
+          email: email.trim(),
+          password,
+          options: { emailRedirectTo: SIGNUP_REDIRECT },
+        });
+        return isAlreadyRegistered(response.error) ? { error: null } : response;
+      }),
     );
   }
 
@@ -415,6 +421,10 @@ export const GOOGLE_REDIRECT = `${CALLBACK_URL}?flow=google`;
 
 // Wartezeit nach browserFinished, bevor die Google-Anmeldung als abgebrochen gilt.
 export const GOOGLE_CANCEL_GRACE_MS = 1000;
+
+function isAlreadyRegistered(error: unknown): boolean {
+  return isAuthError(error) && (error.code === 'user_already_exists' || error.code === 'email_exists');
+}
 
 function googleError(error: unknown): AuthError {
   const mapped = mapAuthError(error);
