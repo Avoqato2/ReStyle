@@ -54,7 +54,7 @@ Deep Links, Guards
 
 ### Supabase-Client und AuthService-Grundgerüst
 
-- [ ] T013 [BE] `SUPABASE_CLIENT`-InjectionToken und `createClient<Database>` mit `flowType: 'pkce'`, `persistSession: true`, `autoRefreshToken: true`, `detectSessionInUrl: false` und Storage-Adapter auf `@capacitor/preferences` in frontend/src/app/supabase/supabase.client.ts; Provider in frontend/src/main.ts registrieren
+- [x] T013 [BE] `SUPABASE_CLIENT`-InjectionToken und `createClient<Database>` mit `flowType: 'pkce'`, `persistSession: true`, `autoRefreshToken: true`, `detectSessionInUrl: false` und Storage-Adapter auf `@capacitor/preferences` in frontend/src/app/supabase/supabase.client.ts; Provider in frontend/src/main.ts registrieren
 - [ ] T014 [P] [BE] `AuthErrorCode`, `AuthError`, `AuthResult` aus dem Contract und `mapAuthError()` (Supabase-Codes `invalid_credentials`, `email_not_confirmed`, `weak_password`, `over_email_send_rate_limit`, Netzwerkfehler → Contract-Codes, deutsche Meldungen) in frontend/src/app/auth/auth-errors.ts + frontend/src/app/auth/auth-errors.spec.ts
 - [ ] T015 [P] [BE] Reine Funktion `parseCallbackUrl(url)` → `{ flow, code?, error? }` (Query und Fragment, `flow` = `signup|recovery|google`) in frontend/src/app/auth/auth-callback.ts + frontend/src/app/auth/auth-callback.spec.ts
 - [ ] T016 [BE] `AuthService` mit Signals `status` (Start `initializing`), `user`, `isAuthenticated`, `signOutReason`, `signupResend`, `recoveryResend` (jeweils Adresse und frühester Sendezeitpunkt, initial `null`); Init über `getSession()` und `onAuthStateChange` in frontend/src/app/supabase/services/auth.service.ts + frontend/src/app/supabase/services/auth.service.spec.ts

@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 
-import { supabaseClient } from '../supabase.client';
+import { SUPABASE_CLIENT } from '../supabase.client';
 import type { Tables, TablesInsert, TablesUpdate } from '../supabase.types';
 
 // Dieser Typ beschreibt ein Outfit, wie es aus der Datenbank gelesen wird.
@@ -26,7 +26,7 @@ type OutfitItemInput = {
 })
 export class OutfitService {
   // Auch die Outfit-Abfragen verwenden denselben zentralen Client.
-  private readonly supabase = supabaseClient;
+  private readonly supabase = inject(SUPABASE_CLIENT);
 
   // Lädt alle Outfits des aktuell berechtigten Benutzers.
   async getAll(): Promise<Outfit[]> {

@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 
-import { supabaseClient } from '../supabase.client';
+import { SUPABASE_CLIENT } from '../supabase.client';
 import type { Tables, TablesInsert, TablesUpdate } from '../supabase.types';
 
 // Dieser Typ beschreibt ein Kleidungsstück, wie es aus der Datenbank gelesen wird.
@@ -17,7 +17,7 @@ type GarmentUpdate = TablesUpdate<'garments'>;
 })
 export class GarmentService {
   // Die UI kennt nur diesen Service und muss den Supabase-Client nicht direkt verwenden.
-  private readonly supabase = supabaseClient;
+  private readonly supabase = inject(SUPABASE_CLIENT);
 
   // Lädt alle Kleidungsstücke des aktuell berechtigten Benutzers.
   async getAll(): Promise<Garment[]> {
