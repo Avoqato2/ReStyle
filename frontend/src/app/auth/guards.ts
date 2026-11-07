@@ -4,9 +4,7 @@ import { Router, type CanActivateFn } from '@angular/router';
 import { filter, map, take, type Observable } from 'rxjs';
 
 import { AuthService, type AuthStatus } from '../supabase/services/auth.service';
-
-export const LOGIN_URL = '/auth/login';
-export const HOME_URL = '/home';
+import { HOME_URL, LOGIN_URL } from './auth-urls';
 
 // Wartet, bis die gespeicherte Sitzung geladen ist (FR-009b). Muss im
 // Injection-Context laufen, was in Guards gegeben ist.

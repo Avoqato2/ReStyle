@@ -1,9 +1,11 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import type { AuthChangeEvent, Session, User } from '@supabase/supabase-js';
+import { Router } from '@angular/router';
 import { Subject, type Observable } from 'rxjs';
 
 import { parseCallbackUrl, type ParsedCallback } from '../../auth/auth-callback';
 import { authError, mapAuthError, type AuthError, type AuthResult } from '../../auth/auth-errors';
+import { LOGIN_URL } from '../../auth/auth-urls';
 import { SUPABASE_CLIENT } from '../supabase.client';
 
 export type { AuthError, AuthErrorCode, AuthResult } from '../../auth/auth-errors';
@@ -41,6 +43,7 @@ export function normalizeEmail(email: string): string {
 })
 export class AuthService {
   private readonly supabase = inject(SUPABASE_CLIENT);
+  private readonly router = inject(Router);
 
   private readonly _status = signal<AuthStatus>('initializing');
   private readonly _user = signal<AuthUser | null>(null);
@@ -63,6 +66,10 @@ export class AuthService {
   private readonly handledCallbacks = new Map<string, Promise<AuthCallbackEvent>>();
 
   private readonly inFlight = new Map<string, Promise<unknown>>();
+
+  private readonly signOutCleanups: (() => void | Promise<void>)[] = [];
+  // Unterscheidet den eigenen Logout von einem SIGNED_OUT durch abgelaufene Sitzung.
+  private ownSignOut = false;
 
   constructor() {
     this.supabase.auth.onAuthStateChange((event, session) => this.onAuthStateChange(event, session));
@@ -232,25 +239,44 @@ export class AuthService {
     });
   }
 
-  // --- Übergang: Die folgenden Methoden werden in T030 durch signOut() ersetzt
-  // und nur noch vom Integrationstest genutzt. ---
+  // Logout nur auf diesem Gerät, danach Cleanup-Hooks und Login (FR-010, research R9).
+  signOut(): Promise<void> {
+    return this.once('signOut', async () => {
+      this.ownSignOut = true;
+      try {
+        await this.supabase.auth.signOut({ scope: 'local' });
+      } catch {
+        // Lokal trotzdem abmelden; der Server-Logout ist für scope 'local' nicht entscheidend.
+      } finally {
+        this.ownSignOut = false;
+      }
 
-  async getSession(): Promise<Session | null> {
-    const response = await this.supabase.auth.getSession();
-
-    if (response.error) {
-      throw response.error;
-    }
-
-    return response.data.session;
+      this.applySession(null);
+      this._signOutReason.set('user');
+      await this.runSignOutCleanups();
+      this.navigate(LOGIN_URL);
+    });
   }
 
-  async logout(): Promise<void> {
-    const response = await this.supabase.auth.signOut();
+  // Features mit lokalen Daten (z. B. F01-Garderobe-Cache) räumen nach dem Logout auf.
+  registerSignOutCleanup(fn: () => void | Promise<void>): void {
+    this.signOutCleanups.push(fn);
+  }
 
-    if (response.error) {
-      throw response.error;
+  private async runSignOutCleanups(): Promise<void> {
+    for (const cleanup of this.signOutCleanups) {
+      try {
+        await cleanup();
+      } catch (error) {
+        console.error('Sign-out-Cleanup fehlgeschlagen', error);
+      }
     }
+  }
+
+  private navigate(url: string): void {
+    this.router.navigateByUrl(url).catch((error: unknown) => {
+      console.error(`Navigation nach ${url} fehlgeschlagen`, error);
+    });
   }
 }
 

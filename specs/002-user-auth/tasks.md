@@ -105,7 +105,7 @@ abgelaufene Sitzung und fehlende Verbindung werden sauber behandelt.
 Daten) → Flugmodus (Seite „Keine Verbindung“).
 
 - [x] T029 [US2] [BE] `signIn(email, password)`: `invalid_credentials` neutral (FR-008), `email_not_confirmed`, setzt `signOutReason` auf `null` in auth.service.ts + auth.service.spec.ts
-- [ ] T030 [US2] [BE] `signOut()` mit `scope: 'local'`, `registerSignOutCleanup(fn)`, Cleanup-Hooks nach Logout ausführen, Navigation `/auth/login` in auth.service.ts + auth.service.spec.ts
+- [x] T030 [US2] [BE] `signOut()` mit `scope: 'local'`, `registerSignOutCleanup(fn)`, Cleanup-Hooks nach Logout ausführen, Navigation `/auth/login` in auth.service.ts + auth.service.spec.ts
 - [ ] T031 [US2] [BE] `SIGNED_OUT` ohne eigenen `signOut()` → `signOutReason = 'expired'` und Navigation `/auth/login` (FR-009a) in auth.service.ts + auth.service.spec.ts
 - [ ] T032 [P] [US2] [BE] `NetworkService` mit Signal `online` aus `@capacitor/network` in frontend/src/app/core/network.service.ts + frontend/src/app/core/network.service.spec.ts
 - [ ] T033 [US2] [BE] Routen: `/auth/login` mit `guestGuard`, `/home` mit `authGuard`, Default-Redirect `''` → `/home` in frontend/src/app/app.routes.ts
