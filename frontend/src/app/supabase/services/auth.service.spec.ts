@@ -7,11 +7,16 @@ import {
   type AuthChangeEvent,
   type Session,
 } from '@supabase/supabase-js';
+import { Browser } from '@capacitor/browser';
 import type { MockInstance } from 'vitest';
 
 import { authError } from '../../auth/auth-errors';
 import { SUPABASE_CLIENT } from '../supabase.client';
 import { AuthService, normalizeEmail, type AuthCallbackEvent } from './auth.service';
+
+vi.mock('@capacitor/browser', () => ({
+  Browser: { open: vi.fn(), close: vi.fn(), addListener: vi.fn() },
+}));
 
 type AuthListener = (event: AuthChangeEvent, session: Session | null) => void;
 
@@ -44,6 +49,10 @@ function createAuthMock() {
     signOut: vi.fn().mockResolvedValue({ error: null }),
     resetPasswordForEmail: vi.fn().mockResolvedValue({ data: {}, error: null }),
     updateUser: vi.fn().mockResolvedValue({ data: { user: fakeSession().user }, error: null }),
+    signInWithOAuth: vi.fn().mockResolvedValue({
+      data: { provider: 'google', url: 'https://supabase.test/auth/v1/authorize?provider=google' },
+      error: null,
+    }),
   };
 
   return {
@@ -711,6 +720,139 @@ describe('AuthService', () => {
       const service = createService();
 
       expect(service.updatePassword('neu12345')).toBe(service.updatePassword('neu12345'));
+    });
+  });
+
+  describe('signInWithGoogle', () => {
+    let browserFinished: (() => void) | undefined;
+    let removeFinished: ReturnType<typeof vi.fn>;
+
+    beforeEach(() => {
+      removeFinished = vi.fn().mockResolvedValue(undefined);
+      vi.mocked(Browser.open).mockResolvedValue(undefined);
+      vi.mocked(Browser.close).mockResolvedValue(undefined);
+      vi.mocked(Browser.addListener).mockImplementation((async (_event: string, listener: () => void) => {
+        browserFinished = listener;
+        return { remove: removeFinished };
+      }) as unknown as typeof Browser.addListener);
+    });
+
+    afterEach(() => {
+      vi.mocked(Browser.open).mockReset();
+      vi.mocked(Browser.close).mockReset();
+      vi.mocked(Browser.addListener).mockReset();
+      browserFinished = undefined;
+    });
+
+    // Startet den Google-Login; das Ergebnis bleibt offen, bis Callback oder browserFinished kommt.
+    const startGoogle = (service: AuthService) => service.signInWithGoogle();
+
+    it('opens the OAuth URL in the in-app browser', async () => {
+      const service = createService();
+
+      void startGoogle(service);
+      await vi.waitFor(() => expect(Browser.open).toHaveBeenCalled());
+
+      expect(mock.auth.signInWithOAuth).toHaveBeenCalledWith({
+        provider: 'google',
+        options: { redirectTo: 'restyle://auth/callback?flow=google', skipBrowserRedirect: true },
+      });
+      expect(Browser.open).toHaveBeenCalledWith({ url: 'https://supabase.test/auth/v1/authorize?provider=google' });
+    });
+
+    it('resolves signed_in after the callback and closes the browser', async () => {
+      const service = createService();
+      const result = startGoogle(service);
+      await vi.waitFor(() => expect(Browser.open).toHaveBeenCalled());
+
+      await service.handleCallbackUrl('restyle://auth/callback?flow=google&code=abc');
+
+      expect(await result).toEqual({ ok: true, data: 'signed_in' });
+      expect(Browser.close).toHaveBeenCalled();
+      expect(removeFinished).toHaveBeenCalled();
+    });
+
+    it('resolves cancelled when the browser is closed without callback (FR-017a)', async () => {
+      const service = createService();
+      const result = startGoogle(service);
+      await vi.waitFor(() => expect(browserFinished).toBeDefined());
+
+      browserFinished?.();
+
+      expect(await result).toEqual({ ok: true, data: 'cancelled' });
+      expect(removeFinished).toHaveBeenCalled();
+    });
+
+    it('resolves cancelled for an access_denied callback', async () => {
+      const service = createService();
+      const result = startGoogle(service);
+      await vi.waitFor(() => expect(Browser.open).toHaveBeenCalled());
+
+      await service.handleCallbackUrl('restyle://auth/callback?flow=google&error=access_denied');
+
+      expect(await result).toEqual({ ok: true, data: 'cancelled' });
+    });
+
+    it('reports oauth_failed when the callback fails', async () => {
+      mock.auth.exchangeCodeForSession.mockResolvedValue({
+        data: { session: null, user: null },
+        error: new AuthPKCECodeVerifierMissingError(),
+      });
+      const service = createService();
+      const result = startGoogle(service);
+      await vi.waitFor(() => expect(Browser.open).toHaveBeenCalled());
+
+      await service.handleCallbackUrl('restyle://auth/callback?flow=google&code=abc');
+
+      expect(await result).toEqual({ ok: false, error: authError('oauth_failed') });
+    });
+
+    it('ignores browserFinished after the callback was handled', async () => {
+      const service = createService();
+      const result = startGoogle(service);
+      await vi.waitFor(() => expect(browserFinished).toBeDefined());
+
+      await service.handleCallbackUrl('restyle://auth/callback?flow=google&code=abc');
+      browserFinished?.();
+
+      expect(await result).toEqual({ ok: true, data: 'signed_in' });
+    });
+
+    it('reports oauth_failed when supabase cannot build the OAuth URL', async () => {
+      mock.auth.signInWithOAuth.mockResolvedValue({
+        data: { provider: 'google', url: null },
+        error: new AuthApiError('Unsupported provider', 400, 'provider_disabled'),
+      });
+      const service = createService();
+
+      expect(await service.signInWithGoogle()).toEqual({ ok: false, error: authError('oauth_failed') });
+      expect(Browser.open).not.toHaveBeenCalled();
+    });
+
+    it('reports network when offline', async () => {
+      mock.auth.signInWithOAuth.mockRejectedValue(new TypeError('Failed to fetch'));
+      const service = createService();
+
+      expect(await service.signInWithGoogle()).toEqual({ ok: false, error: authError('network') });
+    });
+
+    it('reports oauth_failed when the browser cannot be opened', async () => {
+      vi.mocked(Browser.open).mockRejectedValue(new Error('no browser'));
+      const service = createService();
+
+      expect(await service.signInWithGoogle()).toEqual({ ok: false, error: authError('oauth_failed') });
+      expect(removeFinished).toHaveBeenCalled();
+    });
+
+    it('reuses the running promise for repeated calls', async () => {
+      const service = createService();
+
+      const first = service.signInWithGoogle();
+      expect(service.signInWithGoogle()).toBe(first);
+      await vi.waitFor(() => expect(browserFinished).toBeDefined());
+      browserFinished?.();
+      await first;
+      expect(Browser.open).toHaveBeenCalledTimes(1);
     });
   });
 
