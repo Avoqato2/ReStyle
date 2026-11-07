@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import type { AuthResponse, Session } from '@supabase/supabase-js';
 
-import { supabaseClient } from '../supabase.client';
+import { SUPABASE_CLIENT } from '../supabase.client';
 
 // Einheitliche Fehlercodes für die UI. Weitere Fälle aus dem Auth-Spec
 // können später ergänzt werden, ohne dass Komponenten Supabase-Fehler kennen.
@@ -26,7 +26,7 @@ export type AuthResult<T = void> = { ok: true; data: T } | { ok: false; error: A
 })
 export class AuthService {
   // Alle Auth-Aufrufe laufen über denselben zentral erstellten Supabase-Client.
-  private readonly supabase = supabaseClient;
+  private readonly supabase = inject(SUPABASE_CLIENT);
 
   // Ordnet einen Supabase-Fehler einem einfachen UI-Fehler zu.
   private mapError(error: { message: string; code?: string }): AuthError {
