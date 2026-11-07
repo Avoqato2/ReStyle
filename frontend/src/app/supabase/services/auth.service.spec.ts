@@ -525,6 +525,65 @@ describe('AuthService', () => {
     });
   });
 
+  describe('expired session (SIGNED_OUT without signOut)', () => {
+    it('sets signOutReason expired and navigates to the login', async () => {
+      mock.auth.getSession.mockResolvedValue({ data: { session: fakeSession() }, error: null });
+      const service = createService();
+      await flush();
+
+      mock.emit('SIGNED_OUT', null);
+
+      expect(service.status()).toBe('unauthenticated');
+      expect(service.signOutReason()).toBe('expired');
+      expect(navigate).toHaveBeenCalledWith('/auth/login');
+    });
+
+    it('treats an invalid stored session during start-up as expired', () => {
+      mock.auth.getSession.mockReturnValue(new Promise(() => undefined));
+      const service = createService();
+
+      mock.emit('SIGNED_OUT', null);
+
+      expect(service.signOutReason()).toBe('expired');
+    });
+
+    it('ignores SIGNED_OUT while already signed out', async () => {
+      const service = createService();
+      await flush();
+
+      mock.emit('SIGNED_OUT', null);
+
+      expect(service.signOutReason()).toBeNull();
+      expect(navigate).not.toHaveBeenCalled();
+    });
+
+    it('does not report expired for the own signOut()', async () => {
+      mock.auth.getSession.mockResolvedValue({ data: { session: fakeSession() }, error: null });
+      const service = createService();
+      await flush();
+      mock.auth.signOut.mockImplementation(async () => {
+        mock.emit('SIGNED_OUT', null);
+        return { error: null };
+      });
+
+      await service.signOut();
+
+      expect(service.signOutReason()).toBe('user');
+      expect(navigate).toHaveBeenCalledTimes(1);
+    });
+
+    it('resets signOutReason after the next successful login', async () => {
+      mock.auth.getSession.mockResolvedValue({ data: { session: fakeSession() }, error: null });
+      const service = createService();
+      await flush();
+      mock.emit('SIGNED_OUT', null);
+
+      await service.signIn('anna@example.com', 'abcd1234');
+
+      expect(service.signOutReason()).toBeNull();
+    });
+  });
+
   describe('normalizeEmail', () => {
     it('trims and lower-cases', () => {
       expect(normalizeEmail('  Anna@Example.COM ')).toBe('anna@example.com');
