@@ -4,7 +4,7 @@ import { Router, type NavigationBehaviorOptions } from '@angular/router';
 import { App } from '@capacitor/app';
 import { IonApp, IonRouterOutlet } from '@ionic/angular';
 
-import { AuthService, type AuthCallbackEvent } from './supabase/services/auth.service';
+import { AuthService, type AuthCallbackEvent } from './supabase/services/auth/auth.service';
 
 interface CallbackTarget {
   url: string;

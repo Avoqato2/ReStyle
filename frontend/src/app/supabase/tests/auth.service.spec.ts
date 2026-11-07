@@ -10,9 +10,9 @@ import {
 import { Browser } from '@capacitor/browser';
 import type { MockInstance } from 'vitest';
 
-import { authError } from '../../auth/auth-errors';
+import { authError } from '../services/auth/auth-errors';
 import { SUPABASE_CLIENT } from '../supabase.client';
-import { AuthService, GOOGLE_CANCEL_GRACE_MS, normalizeEmail, type AuthCallbackEvent } from './auth.service';
+import { AuthService, GOOGLE_CANCEL_GRACE_MS, normalizeEmail, type AuthCallbackEvent } from '../services/auth/auth.service';
 
 vi.mock('@capacitor/browser', () => ({
   Browser: { open: vi.fn(), close: vi.fn(), addListener: vi.fn() },

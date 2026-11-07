@@ -1,4 +1,4 @@
-import { checkPasswordRules, isPasswordValid } from './password-rules';
+import { checkPasswordRules, isPasswordValid } from '../services/auth/password-rules';
 
 describe('checkPasswordRules', () => {
   it('reports every rule as failed for an empty password', () => {

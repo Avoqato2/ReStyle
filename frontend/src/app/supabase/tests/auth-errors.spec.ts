@@ -1,6 +1,6 @@
 import { AuthApiError, AuthRetryableFetchError, AuthWeakPasswordError } from '@supabase/supabase-js';
 
-import { AUTH_ERROR_MESSAGES, authError, mapAuthError } from './auth-errors';
+import { AUTH_ERROR_MESSAGES, authError, mapAuthError } from '../services/auth/auth-errors';
 
 describe('mapAuthError', () => {
   it.each([

@@ -4,12 +4,12 @@ import { Router } from '@angular/router';
 import { Browser } from '@capacitor/browser';
 import { Subject, type Observable } from 'rxjs';
 
-import { parseCallbackUrl, type ParsedCallback } from '../../auth/auth-callback';
-import { authError, mapAuthError, type AuthError, type AuthResult } from '../../auth/auth-errors';
-import { LOGIN_URL } from '../../auth/auth-urls';
-import { SUPABASE_CLIENT } from '../supabase.client';
+import { parseCallbackUrl, type ParsedCallback } from './auth-callback';
+import { authError, mapAuthError, type AuthError, type AuthResult } from './auth-errors';
+import { LOGIN_URL } from './auth-urls';
+import { SUPABASE_CLIENT } from '../../supabase.client';
 
-export type { AuthError, AuthErrorCode, AuthResult } from '../../auth/auth-errors';
+export type { AuthError, AuthErrorCode, AuthResult } from './auth-errors';
 
 export type AuthStatus = 'initializing' | 'authenticated' | 'unauthenticated';
 

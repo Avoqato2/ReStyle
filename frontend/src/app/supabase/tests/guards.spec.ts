@@ -10,8 +10,8 @@ import {
 } from '@angular/router';
 import { Observable } from 'rxjs';
 
-import { AuthService, type AuthStatus } from '../supabase/services/auth.service';
-import { authGuard, guestGuard, recoveryGuard } from './guards';
+import { AuthService, type AuthStatus } from '../services/auth/auth.service';
+import { authGuard, guestGuard, recoveryGuard } from '../services/auth/guards';
 
 describe('guards', () => {
   let status: ReturnType<typeof signal<AuthStatus>>;

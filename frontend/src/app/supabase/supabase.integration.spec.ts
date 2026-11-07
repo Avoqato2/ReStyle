@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
-import { AuthService } from './services/auth.service';
+import { AuthService } from './services/auth/auth.service';
 import { SUPABASE_CLIENT } from './supabase.client';
 import { GarmentService } from './services/garment.service';
 import { OutfitService } from './services/outfit.service';

@@ -4,7 +4,7 @@ import { App } from '@capacitor/app';
 import { Subject } from 'rxjs';
 
 import { AppComponent } from './app.component';
-import { AuthService, type AuthCallbackEvent } from './supabase/services/auth.service';
+import { AuthService, type AuthCallbackEvent } from './supabase/services/auth/auth.service';
 
 vi.mock('@capacitor/app', () => ({
   App: { addListener: vi.fn() },

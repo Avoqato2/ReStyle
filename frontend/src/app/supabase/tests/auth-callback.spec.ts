@@ -1,4 +1,4 @@
-import { parseCallbackUrl } from './auth-callback';
+import { parseCallbackUrl } from '../services/auth/auth-callback';
 
 describe('parseCallbackUrl', () => {
   it.each(['signup', 'recovery', 'google'] as const)('reads flow %s and code from the custom scheme', (flow) => {
