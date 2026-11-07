@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import type { AuthChangeEvent, AuthResponse, Session, User } from '@supabase/supabase-js';
+import type { AuthChangeEvent, Session, User } from '@supabase/supabase-js';
 import { Subject, type Observable } from 'rxjs';
 
 import { parseCallbackUrl, type ParsedCallback } from '../../auth/auth-callback';
@@ -214,18 +214,26 @@ export class AuthService {
     return promise;
   }
 
-  // --- Übergang: Die folgenden Methoden werden in T029 und T030 durch die
-  // Contract-Methoden ersetzt und nur noch vom Integrationstest genutzt. ---
-
-  async signIn(email: string, password: string): Promise<AuthResult<AuthResponse['data']>> {
-    const response = await this.supabase.auth.signInWithPassword({ email, password });
-
-    if (response.error) {
-      return { ok: false, error: this.toError(response.error) };
-    }
-
-    return { ok: true, data: response.data };
+  // Login mit E-Mail und Passwort. Falsche Daten und unbekannte Adresse liefern
+  // dieselbe neutrale Meldung (FR-008).
+  signIn(email: string, password: string): Promise<AuthResult> {
+    return this.once('signIn', async () => {
+      try {
+        const { data, error } = await this.supabase.auth.signInWithPassword({ email: email.trim(), password });
+        if (error) {
+          return fail(error);
+        }
+        this.applySession(data.session);
+        this._signOutReason.set(null);
+        return OK;
+      } catch (error) {
+        return fail(error);
+      }
+    });
   }
+
+  // --- Übergang: Die folgenden Methoden werden in T030 durch signOut() ersetzt
+  // und nur noch vom Integrationstest genutzt. ---
 
   async getSession(): Promise<Session | null> {
     const response = await this.supabase.auth.getSession();
@@ -243,10 +251,6 @@ export class AuthService {
     if (response.error) {
       throw response.error;
     }
-  }
-
-  private toError(error: unknown): AuthError {
-    return mapAuthError(error);
   }
 }
 

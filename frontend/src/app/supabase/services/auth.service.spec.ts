@@ -35,6 +35,10 @@ function createAuthMock() {
     exchangeCodeForSession: vi.fn().mockResolvedValue({ data: { session: fakeSession(), user: null }, error: null }),
     signUp: vi.fn().mockResolvedValue({ data: { user: fakeSession().user, session: null }, error: null }),
     resend: vi.fn().mockResolvedValue({ data: {}, error: null }),
+    signInWithPassword: vi.fn().mockResolvedValue({
+      data: { user: fakeSession().user, session: fakeSession() },
+      error: null,
+    }),
   };
 
   return {
@@ -390,6 +394,53 @@ describe('AuthService', () => {
       const service = createService();
 
       expect(service.resendConfirmation('anna@example.com')).toBe(service.resendConfirmation('anna@example.com'));
+    });
+  });
+
+  describe('signIn', () => {
+    const rejectWith = (error: Error) =>
+      mock.auth.signInWithPassword.mockResolvedValue({ data: { user: null, session: null }, error });
+
+    it('signs in and becomes authenticated', async () => {
+      const service = createService();
+      await flush();
+
+      expect(await service.signIn(' anna@example.com', 'abcd1234')).toEqual({ ok: true, data: undefined });
+      expect(mock.auth.signInWithPassword).toHaveBeenCalledWith({ email: 'anna@example.com', password: 'abcd1234' });
+      expect(service.status()).toBe('authenticated');
+      expect(service.user()?.id).toBe('user-1');
+    });
+
+    it('returns the same neutral error for wrong password and unknown email (FR-008)', async () => {
+      rejectWith(new AuthApiError('Invalid login credentials', 400, 'invalid_credentials'));
+      const service = createService();
+
+      const result = await service.signIn('unknown@example.com', 'abcd1234');
+
+      expect(result).toEqual({ ok: false, error: authError('invalid_credentials') });
+    });
+
+    it('reports an unconfirmed email', async () => {
+      rejectWith(new AuthApiError('Email not confirmed', 400, 'email_not_confirmed'));
+      const service = createService();
+
+      expect(await service.signIn('anna@example.com', 'abcd1234')).toEqual({
+        ok: false,
+        error: authError('email_not_confirmed'),
+      });
+    });
+
+    it('maps a thrown network error', async () => {
+      mock.auth.signInWithPassword.mockRejectedValue(new TypeError('Failed to fetch'));
+      const service = createService();
+
+      expect(await service.signIn('anna@example.com', 'abcd1234')).toEqual({ ok: false, error: authError('network') });
+    });
+
+    it('reuses the running promise for repeated calls', () => {
+      const service = createService();
+
+      expect(service.signIn('a@example.com', 'abcd1234')).toBe(service.signIn('a@example.com', 'abcd1234'));
     });
   });
 
