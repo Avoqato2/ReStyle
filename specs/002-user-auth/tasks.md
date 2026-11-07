@@ -84,7 +84,7 @@ und ist nach Antippen des Links eingeloggt.
 **Independent Test**: Registrierung → Hinweis „Mail unterwegs“ → erneut senden mit Countdown →
 Link im Emulator öffnen → eingeloggt.
 
-- [ ] T023 [P] [US1] [BE] `checkPasswordRules()` und `isPasswordValid()` („mindestens 8 Zeichen, mindestens ein Buchstabe und eine Ziffer“) in frontend/src/app/auth/password-rules.ts + frontend/src/app/auth/password-rules.spec.ts
+- [x] T023 [P] [US1] [BE] `checkPasswordRules()` und `isPasswordValid()` („mindestens 8 Zeichen, mindestens ein Buchstabe und eine Ziffer“) in frontend/src/app/auth/password-rules.ts + frontend/src/app/auth/password-rules.spec.ts
 - [ ] T024 [US1] [BE] `signUp(email, password)` mit `emailRedirectTo: 'restyle://auth/callback?flow=signup'`; bereits registrierte E-Mail (leere Identities) liefert `ok: true` (FR-006); In-Flight-Promise wiederverwenden in auth.service.ts + auth.service.spec.ts
 - [ ] T025 [US1] [BE] `resendConfirmation(email)` mit `resend({ type: 'signup' })`; setzt `signupResend` mit der normalisierten Adresse und dem frühesten Sendezeitpunkt (+60 s) bei Erfolg und bei `rate_limited`; verändert `recoveryResend` nicht in auth.service.ts + auth.service.spec.ts
 - [ ] T026 [US1] [BE] Routen `/auth/register` und `/auth/check-email` mit `guestGuard` in frontend/src/app/app.routes.ts
