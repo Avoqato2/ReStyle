@@ -223,6 +223,24 @@ export class AuthService {
     });
   }
 
+  // Setzt nach `password_recovery` ein neues Passwort und meldet andere Geräte ab
+  // (FR-012, research R9). Die Sitzung auf diesem Gerät bleibt bestehen.
+  updatePassword(newPassword: string): Promise<AuthResult> {
+    return this.once('updatePassword', async () => {
+      const result = await this.call(() => this.supabase.auth.updateUser({ password: newPassword }));
+      if (!result.ok) {
+        return result;
+      }
+
+      try {
+        await this.supabase.auth.signOut({ scope: 'others' });
+      } catch {
+        // Das neue Passwort gilt bereits; andere Sitzungen laufen spätestens beim nächsten Refresh ab.
+      }
+      return OK;
+    });
+  }
+
   // Führt einen Supabase-Auth-Aufruf aus und wandelt Fehler (zurückgegeben oder geworfen) in AuthResult.
   private async call(run: () => Promise<{ error: unknown }>): Promise<AuthResult> {
     try {
