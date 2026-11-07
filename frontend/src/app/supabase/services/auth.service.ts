@@ -1,6 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import type { AuthChangeEvent, Session, User } from '@supabase/supabase-js';
 import { Router } from '@angular/router';
+import { Browser } from '@capacitor/browser';
 import { Subject, type Observable } from 'rxjs';
 
 import { parseCallbackUrl, type ParsedCallback } from '../../auth/auth-callback';
@@ -18,6 +19,8 @@ export interface AuthUser {
   id: string;
   email: string;
 }
+
+export type GoogleSignInOutcome = 'signed_in' | 'cancelled';
 
 export interface ResendState {
   email: string;
@@ -71,6 +74,9 @@ export class AuthService {
   // Unterscheidet den eigenen Logout von einem SIGNED_OUT durch abgelaufene Sitzung.
   private ownSignOut = false;
 
+  // Wartet auf Google-Callback oder Schließen des In-App-Browsers.
+  private pendingGoogle: ((result: AuthResult<GoogleSignInOutcome>) => void) | null = null;
+
   constructor() {
     this.supabase.auth.onAuthStateChange((event, session) => this.onAuthStateChange(event, session));
     void this.loadStoredSession();
@@ -115,12 +121,78 @@ export class AuthService {
       return handled;
     }
 
-    const result = this.resolveCallback(parseCallbackUrl(url)).then((event) => {
+    const callback = parseCallbackUrl(url);
+    const result = this.resolveCallback(callback).then(async (event) => {
+      if (callback?.flow === 'google') {
+        await this.finishGoogle(event);
+      }
       this.callbackSubject.next(event);
       return event;
     });
     this.handledCallbacks.set(url, result);
     return result;
+  }
+
+  // Google-Login im In-App-Browser (research R4). Resolved erst nach dem Callback
+  // (`signed_in`, Fehler) oder wenn der User den Browser schließt (`cancelled`, FR-017a).
+  signInWithGoogle(): Promise<AuthResult<GoogleSignInOutcome>> {
+    return this.once('signInWithGoogle', async () => {
+      let url: string;
+      try {
+        const { data, error } = await this.supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: { redirectTo: GOOGLE_REDIRECT, skipBrowserRedirect: true },
+        });
+        if (error || !data.url) {
+          return { ok: false, error: googleError(error) };
+        }
+        url = data.url;
+      } catch (error) {
+        return { ok: false, error: googleError(error) };
+      }
+
+      const outcome = new Promise<AuthResult<GoogleSignInOutcome>>((resolve) => (this.pendingGoogle = resolve));
+      const finished = await Browser.addListener('browserFinished', () => {
+        // Kam vorher ein Callback, ist pendingGoogle schon erledigt und das hier ein No-op.
+        this.settleGoogle({ ok: true, data: 'cancelled' });
+      });
+
+      try {
+        await Browser.open({ url });
+      } catch (error) {
+        this.settleGoogle({ ok: false, error: googleError(error) });
+      }
+
+      const result = await outcome;
+      await finished.remove();
+      return result;
+    });
+  }
+
+  private async finishGoogle(event: AuthCallbackEvent): Promise<void> {
+    try {
+      await Browser.close();
+    } catch {
+      // Auf manchen Plattformen ist der Browser schon geschlossen.
+    }
+
+    switch (event.type) {
+      case 'oauth_signed_in':
+        this.settleGoogle({ ok: true, data: 'signed_in' });
+        break;
+      case 'oauth_cancelled':
+        this.settleGoogle({ ok: true, data: 'cancelled' });
+        break;
+      case 'oauth_failed':
+        this.settleGoogle({ ok: false, error: event.error });
+        break;
+    }
+  }
+
+  private settleGoogle(result: AuthResult<GoogleSignInOutcome>): void {
+    const resolve = this.pendingGoogle;
+    this.pendingGoogle = null;
+    resolve?.(result);
   }
 
   private async resolveCallback(callback: ParsedCallback | null): Promise<AuthCallbackEvent> {
@@ -326,6 +398,12 @@ export class AuthService {
 const CALLBACK_URL = 'restyle://auth/callback';
 export const SIGNUP_REDIRECT = `${CALLBACK_URL}?flow=signup`;
 export const RECOVERY_REDIRECT = `${CALLBACK_URL}?flow=recovery`;
+export const GOOGLE_REDIRECT = `${CALLBACK_URL}?flow=google`;
+
+function googleError(error: unknown): AuthError {
+  const mapped = mapAuthError(error);
+  return mapped.code === 'network' ? mapped : authError('oauth_failed');
+}
 
 const OK: AuthResult = { ok: true, data: undefined };
 

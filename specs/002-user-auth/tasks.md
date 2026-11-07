@@ -148,7 +148,7 @@ Accounts → gleiche User-ID; Browser schließen → im Login ohne Meldung.
 
 - [ ] T044 [US4] [BE] `[auth.external.google]`: `enabled = true`, `client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"`, `secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)"`, `skip_nonce_check = false` in backend/supabase/config.toml
 - [ ] T045 [P] [US4] [BE] Einrichtung dokumentieren (Google-Cloud-OAuth-Client Typ „Web“, Redirect-URI `https://<project-ref>.supabase.co/auth/v1/callback`, Secrets im Dashboard, `supabase config push`, SMTP-Hinweis) in backend/supabase/AUTH.md
-- [ ] T046 [US4] [BE] `signInWithGoogle()`: `signInWithOAuth` mit `redirectTo: 'restyle://auth/callback?flow=google'` und `skipBrowserRedirect: true`, `Browser.open()`, bei Callback `Browser.close()` → `'signed_in'`, `browserFinished` ohne Callback → `'cancelled'`, sonst `oauth_failed` (`@capacitor/browser` gemockt) in auth.service.ts + auth.service.spec.ts
+- [x] T046 [US4] [BE] `signInWithGoogle()`: `signInWithOAuth` mit `redirectTo: 'restyle://auth/callback?flow=google'` und `skipBrowserRedirect: true`, `Browser.open()`, bei Callback `Browser.close()` → `'signed_in'`, `browserFinished` ohne Callback → `'cancelled'`, sonst `oauth_failed` (`@capacitor/browser` gemockt) in auth.service.ts + auth.service.spec.ts
 - [ ] T047 [US4] [FE] Google-Button nach Figma im Login-Screen: Ladeanzeige, bei `'cancelled'` keine Meldung, bei `oauth_failed` Fehleranzeige in frontend/src/app/auth/pages/login/login.page.ts|html|scss
 
 **Checkpoint US4 (Gerät mit Google-Konto)**: Quickstart-Szenarien 12 und 13 sowie Prüfpunkt R5
