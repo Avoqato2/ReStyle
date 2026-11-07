@@ -34,6 +34,7 @@ function createAuthMock() {
     getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
     exchangeCodeForSession: vi.fn().mockResolvedValue({ data: { session: fakeSession(), user: null }, error: null }),
     signUp: vi.fn().mockResolvedValue({ data: { user: fakeSession().user, session: null }, error: null }),
+    resend: vi.fn().mockResolvedValue({ data: {}, error: null }),
   };
 
   return {
@@ -318,6 +319,77 @@ describe('AuthService', () => {
 
       await service.signUp('anna@example.com', 'abcd1234');
       expect(mock.auth.signUp).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('resendConfirmation', () => {
+    const now = new Date('2026-11-07T12:00:00Z');
+
+    beforeEach(() => {
+      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.setSystemTime(now);
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('resends the signup mail with the signup redirect', async () => {
+      const service = createService();
+
+      expect(await service.resendConfirmation('anna@example.com')).toEqual({ ok: true, data: undefined });
+      expect(mock.auth.resend).toHaveBeenCalledWith({
+        type: 'signup',
+        email: 'anna@example.com',
+        options: { emailRedirectTo: 'restyle://auth/callback?flow=signup' },
+      });
+    });
+
+    it('starts the countdown for the normalized address on success', async () => {
+      const service = createService();
+
+      await service.resendConfirmation(' Anna@Example.com ');
+
+      expect(service.signupResend()).toEqual({
+        email: 'anna@example.com',
+        availableAt: new Date(now.getTime() + 60_000),
+      });
+    });
+
+    it('starts the countdown on rate_limited too', async () => {
+      mock.auth.resend.mockResolvedValue({
+        data: {},
+        error: new AuthApiError('limit', 429, 'over_email_send_rate_limit'),
+      });
+      const service = createService();
+
+      expect(await service.resendConfirmation('anna@example.com')).toEqual({
+        ok: false,
+        error: authError('rate_limited'),
+      });
+      expect(service.signupResend()?.email).toBe('anna@example.com');
+    });
+
+    it('does not start the countdown on a network error', async () => {
+      mock.auth.resend.mockRejectedValue(new TypeError('Failed to fetch'));
+      const service = createService();
+
+      expect(await service.resendConfirmation('anna@example.com')).toEqual({ ok: false, error: authError('network') });
+      expect(service.signupResend()).toBeNull();
+    });
+
+    it('does not touch recoveryResend', async () => {
+      const service = createService();
+
+      await service.resendConfirmation('anna@example.com');
+
+      expect(service.recoveryResend()).toBeNull();
+    });
+
+    it('reuses the running promise for repeated calls', () => {
+      const service = createService();
+
+      expect(service.resendConfirmation('anna@example.com')).toBe(service.resendConfirmation('anna@example.com'));
     });
   });
 

@@ -170,18 +170,35 @@ export class AuthService {
   // Eine bereits registrierte Adresse liefert denselben Erfolg (FR-006, research R7):
   // Supabase gibt dann einen User ohne Identities und keinen Fehler zurück.
   signUp(email: string, password: string): Promise<AuthResult> {
-    return this.once('signUp', async () => {
-      try {
-        const { error } = await this.supabase.auth.signUp({
-          email: email.trim(),
-          password,
-          options: { emailRedirectTo: SIGNUP_REDIRECT },
-        });
-        return error ? fail(error) : OK;
-      } catch (error) {
-        return fail(error);
+    return this.once('signUp', () =>
+      this.call(() =>
+        this.supabase.auth.signUp({ email: email.trim(), password, options: { emailRedirectTo: SIGNUP_REDIRECT } }),
+      ),
+    );
+  }
+
+  // Sendet die Bestätigungsmail erneut. `signupResend` startet bei Erfolg und bei
+  // `rate_limited` den Countdown für diese Adresse (FR-015, research R8).
+  resendConfirmation(email: string): Promise<AuthResult> {
+    return this.once('resendConfirmation', async () => {
+      const result = await this.call(() =>
+        this.supabase.auth.resend({ type: 'signup', email: email.trim(), options: { emailRedirectTo: SIGNUP_REDIRECT } }),
+      );
+      if (result.ok || result.error.code === 'rate_limited') {
+        this._signupResend.set(nextResend(email));
       }
+      return result;
     });
+  }
+
+  // Führt einen Supabase-Auth-Aufruf aus und wandelt Fehler (zurückgegeben oder geworfen) in AuthResult.
+  private async call(run: () => Promise<{ error: unknown }>): Promise<AuthResult> {
+    try {
+      const { error } = await run();
+      return error ? fail(error) : OK;
+    } catch (error) {
+      return fail(error);
+    }
   }
 
   // Mehrfachaufrufe derselben Methode während eines laufenden Aufrufs teilen sich
@@ -237,6 +254,13 @@ const CALLBACK_URL = 'restyle://auth/callback';
 export const SIGNUP_REDIRECT = `${CALLBACK_URL}?flow=signup`;
 
 const OK: AuthResult = { ok: true, data: undefined };
+
+// Mindestabstand zwischen zwei Mails an dieselbe Adresse (`max_frequency = "60s"`).
+export const RESEND_COOLDOWN_MS = 60_000;
+
+function nextResend(email: string): ResendState {
+  return { email: normalizeEmail(email), availableAt: new Date(Date.now() + RESEND_COOLDOWN_MS) };
+}
 
 function fail(error: unknown): { ok: false; error: AuthError } {
   return { ok: false, error: mapAuthError(error) };
