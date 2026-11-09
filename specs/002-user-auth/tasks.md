@@ -45,7 +45,7 @@ Deep Links, Guards
 
 ### Backend-Konfiguration
 
-- [ ] T007 [BE] `[auth]`: `site_url = "restyle://auth/callback"`, `additional_redirect_urls = ["restyle://auth/callback**", "http://localhost:8100/**"]`, `minimum_password_length = 8`, `password_requirements = "letters_digits"` in backend/supabase/config.toml
+- [X] T007 [BE] `[auth]`: `site_url = "restyle://auth/callback"`, `additional_redirect_urls = ["restyle://auth/callback**", "http://localhost:8100/**"]`, `minimum_password_length = 8`, `password_requirements = "letters_digits"` in backend/supabase/config.toml
 - [ ] T008 [BE] `[auth.email]`: `enable_confirmations = true`, `max_frequency = "60s"`, `otp_expiry = 3600` in backend/supabase/config.toml
 - [ ] T009 [P] [BE] Deutsche Mail-Templates mit `{{ .ConfirmationURL }}` anlegen: backend/supabase/templates/confirmation.html, backend/supabase/templates/recovery.html
 - [ ] T010 [BE] `[auth.email.template.confirmation]` und `[auth.email.template.recovery]` mit deutschem Betreff und `content_path` auf die Templates aus T009 in backend/supabase/config.toml
@@ -65,8 +65,8 @@ Deep Links, Guards
 
 ### Native Deep Links
 
-- [ ] T021 [P] [FE] `intent-filter` (`VIEW`, `DEFAULT`, `BROWSABLE`, `scheme="restyle"`, `host="auth"`) und `launchMode="singleTask"` an der MainActivity in frontend/android/app/src/main/AndroidManifest.xml
-- [ ] T022 [P] [FE] URL Type mit Scheme `restyle` in frontend/ios/App/App/Info.plist
+- [x] T021 [P] [FE] `intent-filter` (`VIEW`, `DEFAULT`, `BROWSABLE`, `scheme="restyle"`, `host="auth"`) und `launchMode="singleTask"` an der MainActivity in frontend/android/app/src/main/AndroidManifest.xml
+- [x] T022 [P] [FE] URL Type mit Scheme `restyle` in frontend/ios/App/App/Info.plist
 
 **Checkpoint Fundament (Android-Emulator)**: `supabase start`, App mit `npx cap run android`
 starten, dann `adb shell am start -a android.intent.action.VIEW -d
