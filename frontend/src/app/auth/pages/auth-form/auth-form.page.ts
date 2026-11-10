@@ -5,7 +5,6 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../supabase/services/auth/auth.service';
 import { logIn } from 'ionicons/icons';
 import { FormsModule } from '@angular/forms';
-
 type AuthMode = 'login' | 'register';
 
 @Component({
