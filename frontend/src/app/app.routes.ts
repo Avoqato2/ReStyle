@@ -17,18 +17,16 @@ export const routes: Routes = [
     redirectTo: 'login',
     pathMatch: 'full',
   },
-{
-  path: 'login',
-  data: { mode: 'login' },
-  loadComponent: () =>
-    import('./auth/pages/auth-form/auth-form.page').then((m) => m.AuthPage),
-},
-{
-  path: 'register',
-  data: { mode: 'register' },
-  loadComponent: () =>
-    import('./auth/pages/auth-form/auth-form.page').then((m) => m.AuthPage),
-},
+  {
+    path: 'login',
+    data: { mode: 'login' },
+    loadComponent: () => import('./auth/pages/auth-form/auth-form.page').then((m) => m.AuthPage),
+  },
+  {
+    path: 'register',
+    data: { mode: 'register' },
+    loadComponent: () => import('./auth/pages/auth-form/auth-form.page').then((m) => m.AuthPage),
+  },
   {
     path: 'display-name',
     loadComponent: () => import('./auth/pages/display-name/display-name.page').then((m) => m.DisplayNamePage),
@@ -45,5 +43,10 @@ export const routes: Routes = [
     path: 'password-changed',
     loadComponent: () =>
       import('./auth/pages/password-changed/password-changed.page').then((m) => m.PasswordChangedPage),
+  },
+  {
+    path: 'confirmation-mail',
+    loadComponent: () =>
+      import('./auth/pages/confirmation-mail/confirmation-mail.page').then((m) => m.ConfirmationMailPage),
   },
 ];

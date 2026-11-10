@@ -24,10 +24,11 @@
             <span class="auth-field__label">E-Mail:</span>
             <input
               #emailInput
+              [(ngModel)]="email"
               type="email"
               name="email"
               autocomplete="email"
-              placeholder="z.B. anna@sup.com"
+              placeholder="z.B. anna@test.local"
               aria-label="E-Mail"
               required
             />
@@ -45,6 +46,7 @@
             <input
               [type]="passwordVisible ? 'text' : 'password'"
               name="password"
+              [(ngModel)]="password"
               [autocomplete]="mode === 'login' ? 'current-password' : 'new-password'"
               [placeholder]="mode === 'login' ? 'Passwort' : 'neues Passwort'"
               aria-label="Passwort"
@@ -73,6 +75,11 @@
         <button type="submit">
           {{ mode === 'login' ? 'Anmelden' : 'Registrieren' }}
         </button>
+        @if (toastVisible) {
+          <p class="auth-error" role="alert">
+            {{ toastMessage }}
+          </p>
+        }
       </form>
     </section>
 
@@ -80,7 +87,7 @@
       <button
         class="google-sign-in"
         type="button"
-        (click)="showUnavailable('Die Google-Anmeldung ist noch nicht eingerichtet.')"
+        (click)="AuthWithGoogle()"
       >
         <span>Oder anmelden mit</span>
         <img src="assets/brand/google.svg" alt="" width="24" height="24" />

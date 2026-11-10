@@ -13,8 +13,9 @@ Ziel: lauffähiges MVP in mind. einem App Store bis **19.01.2027**, Open Source 
 - Neue Dependencies, Schema-Änderungen und alles außerhalb des MVP nur nach Rückfrage.
 - Kommentare auf Deutsch, nur wo Logik nicht offensichtlich ist. Doku/Pläne Deutsch, Code-Identifier Englisch.
 - Fertig = Lint + Tests grün (Commands unten). Nie „fertig“ melden ohne Nachweis.
-- Verzichte auf gitworking-trees, arbeite auf den passenden Branches.
+- Keine Git-Worktrees, auch wenn ein Skill (z. B. `using-git-worktrees`) das vorsieht. Im bestehenden Checkout auf dem passenden Branch arbeiten. Passt der ausgecheckte Branch nicht zu Ticket/Bereich: nachfragen.
 - Niemals pushen, machen die developper selbst.
+- Abschluss (`finishing-a-development-branch`): nur Branch behalten. Kein lokaler Merge, kein Push, keine PR. Stattdessen PR-Titel + Beschreibung vorschlagen.
 
 ## Workflow-Skills
 

@@ -16,6 +16,14 @@ Basis für alles (ohne Login liefert RLS nichts). API-Contract: `specs/002-user-
 - Routen: nur `/home` und `/auth/callback` (Web). Guards noch nicht in den Routen.
 - Fehlen: Screens `/auth/login`, `/auth/register`, `/auth/check-email`, `/auth/forgot-password`, `/auth/reset-password`, Display-Name-Screen. Routen + Navigation nach Callback-Events: siehe Contract.
 
+## Auth-Mails (Templates, SMTP)
+- Templates: `backend/supabase/templates/confirmation.html` (Registrierung), `recovery.html` (Passwort vergessen). Lokal per `config.toml` `[auth.email.template.*]`, aktiv erst nach `supabase stop && supabase start`.
+- Link immer `{{ .ConfirmationURL }}` → `redirectTo` des AuthService (App `restyle://auth/callback`, Browser `<Adresse>/auth/callback`).
+- Gehostet: Dashboard › Authentication › Email Templates, Betreff + HTML 1:1 aus den Dateien. Änderungen an beiden Stellen.
+- Einstellungen lokal = Dashboard: Confirm email an, Passwort min. 8, Mail-Mindestabstand 60 s.
+- SMTP lokal: keiner nötig, Mails in Mailpit `http://127.0.0.1:54324`.
+- SMTP gehostet: Der eingebaute Mailer ist nur zum Testen (niedriges Stundenlimit, nur Team-Adressen). Für echte Nutzer eigenes SMTP unter Dashboard › Authentication › SMTP Settings, danach Rate Limits anpassen. Den Anbieter wählt das Team. Zugangsdaten nie ins Repo.
+
 ## Offen
 - Display-Name-Screen: Route und „nur einmal“-Logik nicht im Contract.
 - Confluence will Hinweis „Account existiert bereits“. `signUp` antwortet laut Contract bewusst neutral (`ok: true`).
