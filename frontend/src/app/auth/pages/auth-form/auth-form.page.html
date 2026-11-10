@@ -1,0 +1,102 @@
+<div class="ion-content">
+  <main class="auth-screen" [class.auth-screen--register]="mode === 'register'">
+    <section class="auth-content" aria-labelledby="auth-title">
+      <header class="auth-heading">
+        <h1 id="auth-title">
+          {{ mode === 'login' ? 'Willkommen!' : 'Konto erstellen' }}
+        </h1>
+        <p>
+          {{ mode === 'login' ? 'Bereit für deinen heutigen Look?' : 'Deine Garderobe beginnt hier!' }}
+        </p>
+      </header>
+
+      <img
+        class="restyle-logo"
+        src="../../../../assets/branding/restyle-logo.svg"
+        alt="ReStyle — style what you already own"
+        width="150"
+        height="150"
+      />
+
+      <form class="auth-form" (ngSubmit)="submit()">
+        <div class="auth-fields">
+          <label class="auth-field">
+            <span class="auth-field__label">E-Mail:</span>
+            <input
+              #emailInput
+              type="email"
+              name="email"
+              autocomplete="email"
+              placeholder="z.B. anna@sup.com"
+              aria-label="E-Mail"
+              required
+            />
+            <button
+              class="auth-field__icon"
+              type="button"
+              aria-label="E-Mail leeren"
+              (click)="clearEmail(emailInput)"
+            >
+            </button>
+          </label>
+
+          <label class="auth-field">
+            <span class="auth-field__label">Passwort:</span>
+            <input
+              [type]="passwordVisible ? 'text' : 'password'"
+              name="password"
+              [autocomplete]="mode === 'login' ? 'current-password' : 'new-password'"
+              [placeholder]="mode === 'login' ? 'Passwort' : 'neues Passwort'"
+              aria-label="Passwort"
+              required
+            />
+            <button
+              class="auth-field__icon auth-field__icon--visibility"
+              type="button"
+              [attr.aria-label]="passwordVisible ? 'Passwort verbergen' : 'Passwort anzeigen'"
+              [attr.aria-pressed]="passwordVisible"
+              (click)="togglePasswordVisibility()"
+            >
+            </button>
+          </label>
+        </div>
+
+        @if (mode === 'login') {
+          <button
+            class="auth-link auth-forgot"
+            type="button"
+            (click)="forgotPassword()"
+          >
+            Passwort vergessen?
+          </button>
+        }
+        <button type="submit">
+          {{ mode === 'login' ? 'Anmelden' : 'Registrieren' }}
+        </button>
+      </form>
+    </section>
+
+    <footer class="auth-footer">
+      <button
+        class="google-sign-in"
+        type="button"
+        (click)="showUnavailable('Die Google-Anmeldung ist noch nicht eingerichtet.')"
+      >
+        <span>Oder anmelden mit</span>
+        <img src="assets/brand/google.svg" alt="" width="24" height="24" />
+      </button>
+
+      @if (mode === 'login') {
+        <p class="auth-switch">
+          Noch kein Konto?
+          <a class="auth-link" routerLink="/register">Registrieren.</a>
+        </p>
+      } @else {
+        <p class="auth-switch">
+          Bereits ein Konto?
+          <a class="auth-link" routerLink="/login">Anmelden.</a>
+        </p>
+      }
+    </footer>
+  </main>
+</div>

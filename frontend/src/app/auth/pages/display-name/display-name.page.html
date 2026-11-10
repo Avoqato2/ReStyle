@@ -1,0 +1,44 @@
+<ion-content [fullscreen]="true">
+  <main class="display-name-screen">
+    <section class="display-name-content" aria-labelledby="display-name-title">
+      <header class="display-name-heading">
+        <h1 id="display-name-title">
+          Willkommen
+        </h1>
+        <p>
+          Du hast dich erfolgreich registriert.
+
+          Wie dürfen wir dich nennen?
+          Du kannst deinen Anzeigenamen
+          jederzeit ändern!
+        </p>
+      </header>
+
+      <img
+        class="restyle-logo"
+        src="assets/brand/restyle-logo.png"
+        alt="ReStyle — style what you already own"
+        width="150"
+        height="150"
+      />
+
+      <form class="display-name-form" (ngSubmit)="submit()">
+        <div class="auth-fields">
+          <label class="auth-field">
+            <span class="auth-field__label">Username:</span>
+            <input
+              #usernameInput
+              type="username"
+              name="username"
+              autocomplete="username"
+              placeholder="bANNAna"
+              aria-label="Username"
+              required
+            />
+          </label>
+        </div>
+        <button type="submit">Zur Startseite</button>
+      </form>
+    </section>
+  </main>
+</ion-content>
