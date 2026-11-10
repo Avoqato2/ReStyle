@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonNav } from '@ionic/angular';
-import { HeaderComponent } from '../../../components/header/header.component';
+import { AppHeaderComponent } from '../../../components/app-header/app-header.component';
 import { ResetPasswordPage } from '../reset-password/reset-password.page';
 import { Router } from '@angular/router';
 import { RouterLink } from '@angular/router';
@@ -12,7 +12,7 @@ import { AuthService } from '../../../supabase/services/auth/auth.service';
   selector: 'app-forgot-password',
   templateUrl: './forgot-password.page.html',
   styleUrls: ['./forgot-password.page.scss'],
-  imports: [RouterLink, IonNav, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, HeaderComponent, ResetPasswordPage],
+  imports: [RouterLink, IonNav, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, AppHeaderComponent, ResetPasswordPage],
 })
 export class ForgotPasswordPage {
   private readonly router = inject(Router);

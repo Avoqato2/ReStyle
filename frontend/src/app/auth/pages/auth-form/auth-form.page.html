@@ -64,13 +64,13 @@
         </div>
 
         @if (mode === 'login') {
-          <app-button
+          <button
             class="auth-link auth-forgot"
             type="button"
             (click)="forgotPassword()"
           >
             Passwort vergessen?
-          </app-button>
+        </button>
         }
         <button type="submit">
           {{ mode === 'login' ? 'Anmelden' : 'Registrieren' }}

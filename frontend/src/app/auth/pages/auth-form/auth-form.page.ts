@@ -1,7 +1,6 @@
 import { Component, DestroyRef, inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../supabase/services/auth/auth.service';
 import { logIn } from 'ionicons/icons';
 import { FormsModule } from '@angular/forms';
