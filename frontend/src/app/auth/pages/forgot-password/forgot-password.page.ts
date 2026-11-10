@@ -6,6 +6,7 @@ import { HeaderComponent } from '../../../components/header/header.component';
 import { ResetPasswordPage } from '../reset-password/reset-password.page';
 import { Router } from '@angular/router';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../../supabase/services/auth/auth.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -15,7 +16,22 @@ import { RouterLink } from '@angular/router';
 })
 export class ForgotPasswordPage {
   private readonly router = inject(Router);
-  async submit(): Promise<void> {
-    await this.router.navigateByUrl('/reset-password');
+  private auth = inject(AuthService);
+  email = '';
+  toastMessage = '';
+  toastVisible = false;
+
+   showMessage(message: string): void {
+    this.toastMessage = message;
+    this.toastVisible = true;
+    }
+
+  async passwordReset(): Promise<void> {
+    const result = await this.auth.requestPasswordReset(this.email);
+    if(!result.ok){
+      this.showMessage(result.error.message);
+      return;
+    }
+    await this.router.navigateByUrl('/confirmation-mail');
   }
 }
