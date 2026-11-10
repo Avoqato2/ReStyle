@@ -2,6 +2,7 @@ import { Component, DestroyRef, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
+import { AppButtonComponent } from '../../../components/app-button/app-button.component';
 
 type AuthMode = 'login' | 'register';
 
@@ -10,7 +11,7 @@ type AuthMode = 'login' | 'register';
   templateUrl: './auth-form.page.html',
   styleUrls: ['./auth-form.page.scss'],
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, AppButtonComponent],
 })
 export class AuthPage {
   mode: AuthMode = 'login';
@@ -48,9 +49,7 @@ export class AuthPage {
 
   private readonly router = inject(Router);
   async submit(): Promise<void> {
-    await this.router.navigateByUrl(
-      this.mode === 'register' ? '/display-name' : '/home',
-    );
+    await this.router.navigateByUrl(this.mode === 'register' ? '/display-name' : '/home');
   }
 
   async forgotPassword(): Promise<void> {
