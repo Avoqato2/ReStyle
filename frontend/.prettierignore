@@ -12,3 +12,4 @@ tsconfig*.json
 angular.json
 capacitor.config.ts
 src/app/supabase
+src/app/environments/environment.prod.ts
