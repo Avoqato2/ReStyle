@@ -41,9 +41,17 @@
         @if (mode === 'login') {
           <button class="auth-link auth-forgot" type="button" (click)="forgotPassword()">Passwort vergessen?</button>
         }
-        <button type="submit">
+
+        <ng-hcaptcha
+          (verify)="onCaptchaVerified($event)"
+          (expired)="onCaptchaExpired()"
+          (error)="onCaptchaError()">
+        </ng-hcaptcha>
+
+        <button type="submit" [disabled]="!captchaToken">
           {{ mode === 'login' ? 'Anmelden' : 'Registrieren' }}
         </button>
+
         @if (toastVisible) {
           <p class="auth-error" role="alert">
             {{ toastMessage }}

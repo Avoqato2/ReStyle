@@ -1,9 +1,12 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, inject, NgModule } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../../supabase/services/auth/auth.service';
 import { FormsModule } from '@angular/forms';
 import { AppInputComponent } from '../../../components/app-input/app-input.component';
+import { NgHcaptchaModule } from "ng-hcaptcha";
+
+
 type AuthMode = 'login' | 'register';
 
 @Component({
@@ -11,8 +14,9 @@ type AuthMode = 'login' | 'register';
   templateUrl: './auth-form.page.html',
   styleUrls: ['./auth-form.page.scss'],
   standalone: true,
-  imports: [RouterLink, FormsModule, AppInputComponent],
+  imports: [RouterLink, FormsModule, AppInputComponent, NgHcaptchaModule],
 })
+
 export class AuthPage {
   private auth = inject(AuthService);
   mode: AuthMode = 'login';
@@ -20,6 +24,8 @@ export class AuthPage {
   password = '';
   toastMessage = '';
   toastVisible = false;
+  captchaToken = '';
+  
 
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
@@ -52,8 +58,8 @@ export class AuthPage {
   async submit(): Promise<void> {
     const result =
       this.mode === 'register'
-        ? await this.auth.signUp(this.email, this.password)
-        : await this.auth.signIn(this.email, this.password);
+        ? await this.auth.signUp(this.email, this.password, this.captchaToken)
+        : await this.auth.signIn(this.email, this.password, this.captchaToken);
 
     if (!result.ok) {
       this.showMessage(result.error.message);
@@ -64,5 +70,18 @@ export class AuthPage {
 
   async forgotPassword(): Promise<void> {
     await this.router.navigateByUrl('/forgot-password');
+  }
+
+   onCaptchaVerified(token: string): void {
+    this.captchaToken = token;
+  }
+
+  onCaptchaExpired(): void {
+    this.captchaToken = '';
+  }
+
+  onCaptchaError(): void {
+    this.captchaToken = '';
+    this.showMessage('Captcha konnte nicht geladen werden.');
   }
 }
