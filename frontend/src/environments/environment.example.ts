@@ -6,6 +6,7 @@ export const environment = {
   production: false,
   supabaseUrl: 'http://127.0.0.1:54321', //Local Supabase URL
   supabase_publishable_key: 'YOUR_LOCAL_ANON_KEY', //Local Supabase Anon Key
+  hcaptchaSiteKey: 'Captcha Site Key', //Captcha Site Key
 };
 
 /*
