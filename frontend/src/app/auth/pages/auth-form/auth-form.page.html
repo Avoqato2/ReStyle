@@ -1,4 +1,4 @@
-<div class="ion-content">
+<ion-content>
   <main class="auth-screen" [class.auth-screen--register]="mode === 'register'">
     <section class="auth-content" aria-labelledby="auth-title">
       <header class="auth-heading">
@@ -33,7 +33,6 @@
             name="password"
             type="password"
             [(ngModel)]="password"
-            [autocomplete]="mode === 'login' ? 'current-password' : 'new-password'"
             [placeholder]="mode === 'login' ? 'Passwort' : 'neues Passwort'"
             [required]="true" />
         </div>
@@ -79,4 +78,4 @@
       }
     </footer>
   </main>
-</div>
+</ion-content>

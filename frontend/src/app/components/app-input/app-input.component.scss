@@ -1,38 +1,48 @@
 .app-input {
   display: block;
-  color: var(--app-input-label-color);
+  color: var(--app-input-border-color);
 
   &__field {
     display: flex;
-    flex-direction: column;
+    flex-direction: row; /* Ändert die Anordnung, sodass das Label links (am Start) steht */
+    align-items: center; /* Zentriert Label und Input vertikal auf einer Linie */
     gap: var(--app-input-label-gap);
+
+    /* Der Rahmen und Hintergrund liegen jetzt auf dem Container,
+       damit das Label innerhalb der Pill-Form ist */
+    background: var(--app-input-background);
+    border: var(--app-input-border-width) solid var(--app-input-border-color);
+    border-radius: var(--app-input-radius);
+    padding: 0 var(--app-input-padding);
+    min-height: var(--app-input-height);
   }
 
   &__label {
     color: var(--app-input-label-color);
     font-size: var(--app-input-label-size);
     font-weight: var(--app-input-label-weight);
+    white-space: nowrap; /* Verhindert, dass das Label bei wenig Platz umbricht */
   }
 
   &__control {
-    --background: var(--app-input-background);
-    --border-color: var(--app-input-border-color);
-    --border-radius: var(--app-input-radius);
-    --border-style: solid;
-    --border-width: var(--app-input-border-width);
+    flex: 1; /* Das Input-Feld nimmt den restlichen Platz ein */
+
+    /* Die Ionic-Variablen des Inputs werden zurückgesetzt,
+       da der Container bereits den Rahmen und das Padding übernimmt */
+    --background: transparent;
+    --border-width: 0px;
     --color: var(--app-input-color);
-    --highlight-color-focused: var(--app-input-border-color);
-    --padding-bottom: var(--app-input-padding);
-    --padding-end: var(--app-input-padding);
-    --padding-start: var(--app-input-padding);
-    --padding-top: var(--app-input-padding);
-    min-height: var(--app-input-height);
+    --highlight-color-focused: transparent;
+    --padding-bottom: 0;
+    --padding-end: 0;
+    --padding-start: 0;
+    --padding-top: 0;
   }
 }
 
 :host {
-  --app-input-background: var(--color-neutral-0);
-  --app-input-border-color: var(--color-brand-blue);
+  --app-input-background: transparent; /* Keine Hintergrundfarbe */
+  --app-input-border-color: var(--color-border-default);
   --app-input-border-width: var(--border-width-default);
   --app-input-color: var(--color-neutral-900);
   --app-input-height: var(--size-control-lg);
@@ -40,8 +50,8 @@
   --app-input-label-gap: var(--spacing-8);
   --app-input-label-size: var(--font-size-14);
   --app-input-label-weight: var(--font-weight-medium);
-  --app-input-padding: var(--spacing-12);
-  --app-input-radius: var(--radius-md);
+  --app-input-padding: var(--spacing-16); /* Bei Pill-Shapes ist seitlich oft minimal mehr Platz (16px) schöner als 12px */
+  --app-input-radius: var(--radius-full); /* Pill Shaped (vollständig abgerundet) */
 }
 
 :host(.app-input--secondary) {

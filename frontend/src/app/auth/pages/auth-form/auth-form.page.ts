@@ -1,11 +1,11 @@
-import { Component, DestroyRef, inject, NgModule } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../../supabase/services/auth/auth.service';
 import { FormsModule } from '@angular/forms';
 import { AppInputComponent } from '../../../components/app-input/app-input.component';
-import { NgHcaptchaModule } from "ng-hcaptcha";
-
+import { NgHcaptchaModule } from 'ng-hcaptcha';
+import { IonContent } from '@ionic/angular';
 
 type AuthMode = 'login' | 'register';
 
@@ -14,9 +14,8 @@ type AuthMode = 'login' | 'register';
   templateUrl: './auth-form.page.html',
   styleUrls: ['./auth-form.page.scss'],
   standalone: true,
-  imports: [RouterLink, FormsModule, AppInputComponent, NgHcaptchaModule],
+  imports: [RouterLink, FormsModule, AppInputComponent, NgHcaptchaModule, IonContent],
 })
-
 export class AuthPage {
   private auth = inject(AuthService);
   mode: AuthMode = 'login';
@@ -25,7 +24,6 @@ export class AuthPage {
   toastMessage = '';
   toastVisible = false;
   captchaToken = '';
-  
 
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
@@ -72,7 +70,7 @@ export class AuthPage {
     await this.router.navigateByUrl('/forgot-password');
   }
 
-   onCaptchaVerified(token: string): void {
+  onCaptchaVerified(token: string): void {
     this.captchaToken = token;
   }
 

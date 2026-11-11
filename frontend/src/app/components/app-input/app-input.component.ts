@@ -35,7 +35,6 @@ export class AppInputComponent implements ControlValueAccessor {
   type = input<'text' | 'email' | 'password' | 'number'>('text');
   name = input<string | undefined>();
   placeholder = input('');
-  autocomplete = input<string | undefined>();
   options = input<readonly AppInputOption[]>([]);
   disabled = input(false);
   required = input(false);

@@ -26,14 +26,13 @@
       [type]="type()"
       [value]="value"
       [placeholder]="placeholder()"
-      [autocomplete]="autocomplete()"
       [disabled]="isControlDisabled"
       [required]="required()"
       [clearInput]="showClearButton"
       (ionInput)="handleValueChange($event.detail.value ?? '')"
       (ionBlur)="handleBlur()">
       @if (isPassword) {
-        <ion-input-password-toggle slot="end" />
+        <ion-input-password-toggle color="medium" slot="end" />
       }
     </ion-input>
   }
