@@ -1,0 +1,49 @@
+.app-input {
+  display: block;
+  color: var(--app-input-label-color);
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--app-input-label-gap);
+  }
+
+  &__label {
+    color: var(--app-input-label-color);
+    font-size: var(--app-input-label-size);
+    font-weight: var(--app-input-label-weight);
+  }
+
+  &__control {
+    --background: var(--app-input-background);
+    --border-color: var(--app-input-border-color);
+    --border-radius: var(--app-input-radius);
+    --border-style: solid;
+    --border-width: var(--app-input-border-width);
+    --color: var(--app-input-color);
+    --highlight-color-focused: var(--app-input-border-color);
+    --padding-bottom: var(--app-input-padding);
+    --padding-end: var(--app-input-padding);
+    --padding-start: var(--app-input-padding);
+    --padding-top: var(--app-input-padding);
+    min-height: var(--app-input-height);
+  }
+}
+
+:host {
+  --app-input-background: var(--color-neutral-0);
+  --app-input-border-color: var(--color-brand-blue);
+  --app-input-border-width: var(--border-width-default);
+  --app-input-color: var(--color-neutral-900);
+  --app-input-height: var(--size-control-lg);
+  --app-input-label-color: var(--color-neutral-800);
+  --app-input-label-gap: var(--spacing-8);
+  --app-input-label-size: var(--font-size-14);
+  --app-input-label-weight: var(--font-weight-medium);
+  --app-input-padding: var(--spacing-12);
+  --app-input-radius: var(--radius-md);
+}
+
+:host(.app-input--secondary) {
+  --app-input-border-color: var(--color-brand-violet);
+}

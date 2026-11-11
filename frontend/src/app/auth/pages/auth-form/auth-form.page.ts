@@ -2,8 +2,8 @@ import { Component, DestroyRef, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../../supabase/services/auth/auth.service';
-import { logIn } from 'ionicons/icons';
 import { FormsModule } from '@angular/forms';
+import { AppInputComponent } from '../../../components/app-input/app-input.component';
 type AuthMode = 'login' | 'register';
 
 @Component({
@@ -11,14 +11,13 @@ type AuthMode = 'login' | 'register';
   templateUrl: './auth-form.page.html',
   styleUrls: ['./auth-form.page.scss'],
   standalone: true,
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, AppInputComponent],
 })
 export class AuthPage {
   private auth = inject(AuthService);
   mode: AuthMode = 'login';
   email = '';
   password = '';
-  passwordVisible = false;
   toastMessage = '';
   toastVisible = false;
 
@@ -30,17 +29,7 @@ export class AuthPage {
       this.mode = data['mode'] === 'register' ? 'register' : 'login';
       this.email = '';
       this.password = '';
-      this.passwordVisible = false;
     });
-  }
-
-  clearEmail(input: HTMLInputElement): void {
-    this.email = '';
-    input.focus();
-  }
-
-  togglePasswordVisibility(): void {
-    this.passwordVisible = !this.passwordVisible;
   }
 
   showMessage(message: string): void {
@@ -49,13 +38,12 @@ export class AuthPage {
   }
 
   private readonly router = inject(Router);
-  
-  async AuthWithGoogle(): Promise<void>{
+
+  async AuthWithGoogle(): Promise<void> {
     const result = await this.auth.signInWithGoogle();
 
     if (!result.ok) {
-      this.showMessage
-  (result.error.message);
+      this.showMessage(result.error.message);
       return;
     }
     await this.router.navigateByUrl('/home');
@@ -63,9 +51,9 @@ export class AuthPage {
 
   async submit(): Promise<void> {
     const result =
-    this.mode === 'register'
-      ? await this.auth.signUp(this.email, this.password)
-      : await this.auth.signIn(this.email, this.password);
+      this.mode === 'register'
+        ? await this.auth.signUp(this.email, this.password)
+        : await this.auth.signIn(this.email, this.password);
 
     if (!result.ok) {
       this.showMessage(result.error.message);
