@@ -15,62 +15,31 @@
         src="../../../../assets/branding/restyle-logo.svg"
         alt="ReStyle — style what you already own"
         width="150"
-        height="150"
-      />
+        height="150" />
 
       <form class="auth-form" (ngSubmit)="submit()">
         <div class="auth-fields">
-          <label class="auth-field">
-            <span class="auth-field__label">E-Mail:</span>
-            <input
-              #emailInput
-              [(ngModel)]="email"
-              type="email"
-              name="email"
-              autocomplete="email"
-              placeholder="z.B. anna@test.local"
-              aria-label="E-Mail"
-              required
-            />
-            <button
-              class="auth-field__icon"
-              type="button"
-              aria-label="E-Mail leeren"
-              (click)="clearEmail(emailInput)"
-            >
-            </button>
-          </label>
+          <app-input
+            label="E-Mail:"
+            name="email"
+            type="email"
+            [(ngModel)]="email"
+            autocomplete="email"
+            placeholder="z.B. anna@test.local"
+            [required]="true" />
 
-          <label class="auth-field">
-            <span class="auth-field__label">Passwort:</span>
-            <input
-              [type]="passwordVisible ? 'text' : 'password'"
-              name="password"
-              [(ngModel)]="password"
-              [autocomplete]="mode === 'login' ? 'current-password' : 'new-password'"
-              [placeholder]="mode === 'login' ? 'Passwort' : 'neues Passwort'"
-              aria-label="Passwort"
-              required
-            />
-            <button
-              class="auth-field__icon auth-field__icon--visibility"
-              type="button"
-              [attr.aria-label]="passwordVisible ? 'Passwort verbergen' : 'Passwort anzeigen'"
-              [attr.aria-pressed]="passwordVisible"
-              (click)="togglePasswordVisibility()"
-            >
-            </button>
-          </label>
+          <app-input
+            label="Passwort:"
+            name="password"
+            type="password"
+            [(ngModel)]="password"
+            [autocomplete]="mode === 'login' ? 'current-password' : 'new-password'"
+            [placeholder]="mode === 'login' ? 'Passwort' : 'neues Passwort'"
+            [required]="true" />
         </div>
 
         @if (mode === 'login') {
-          <button
-            class="auth-link auth-forgot"
-            type="button"
-            (click)="forgotPassword()"
-          >
-            Passwort vergessen?
-        </button>
+          <button class="auth-link auth-forgot" type="button" (click)="forgotPassword()">Passwort vergessen?</button>
         }
         <button type="submit">
           {{ mode === 'login' ? 'Anmelden' : 'Registrieren' }}
@@ -84,11 +53,7 @@
     </section>
 
     <footer class="auth-footer">
-      <button
-        class="google-sign-in"
-        type="button"
-        (click)="AuthWithGoogle()"
-      >
+      <button class="google-sign-in" type="button" (click)="AuthWithGoogle()">
         <span>Oder anmelden mit</span>
         <img src="assets/brand/google.svg" alt="" width="24" height="24" />
       </button>

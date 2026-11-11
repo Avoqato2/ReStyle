@@ -5,29 +5,15 @@ import { IonButton, IonIcon } from '@ionic/angular';
   selector: 'app-button',
   standalone: true,
   imports: [IonButton, IonIcon],
-  template: `
-    <ion-button
-      [color]="color()"
-      [size]="size()"
-      [expand]="expand()"
-      [disabled]="disabled()"
-      [type]="type()"
-      fill="solid"
-      shape="round">
-      @if (iconStart()) {
-        <ion-icon [name]="iconStart()" slot="start" />
-      }
-
-      <ng-content />
-
-      @if (iconEnd()) {
-        <ion-icon [name]="iconEnd()" slot="end" />
-      }
-    </ion-button>
-  `,
+  templateUrl: './app-button.component.html',
+  styleUrls: ['./app-button.component.scss'],
+  host: {
+    '[attr.variant]': 'variant()',
+    '[attr.expand]': 'expand()',
+  },
 })
 export class AppButtonComponent {
-  color = input<string>('primary');
+  variant = input<'primary' | 'secondary'>('primary');
   size = input<'small' | 'default' | 'large'>('default');
   expand = input<'block' | 'full' | undefined>(undefined);
 
