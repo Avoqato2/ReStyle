@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonIcon, IonButton, IonToast, IonNav } from '@ionic/angular';
 import { HomePage } from '../../../../home/home.page';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../supabase/services/auth/auth.service';
 
 @Component({
   selector: 'app-display-name',
@@ -12,7 +13,10 @@ import { Router } from '@angular/router';
   imports: [IonNav, IonToast, IonButton, IonIcon, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, HomePage],
 })
 export class DisplayNamePage{
+  username = '';
+
   private readonly router = inject(Router);
+
   async submit(): Promise<void> {
     await this.router.navigateByUrl('/home');
   }

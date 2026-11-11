@@ -75,13 +75,13 @@ describe('AppComponent', () => {
 
     it.each<[AuthCallbackEvent, string, object | undefined]>([
       [{ type: 'email_confirmed' }, '/home', undefined],
-      [{ type: 'email_confirmed_login_required' }, '/auth/login?hint=confirmed', undefined],
-      [{ type: 'password_recovery' }, '/auth/reset-password', { state: { passwordRecovery: true } }],
+      [{ type: 'email_confirmed_login_required' }, '/login?hint=confirmed', undefined],
+      [{ type: 'password_recovery' }, '/reset-password', { state: { passwordRecovery: true } }],
       [{ type: 'oauth_signed_in' }, '/home', undefined],
-      [{ type: 'oauth_cancelled' }, '/auth/login', undefined],
-      [{ type: 'oauth_failed', error: oauthError }, '/auth/login', { state: { authError: oauthError } }],
-      [{ type: 'link_invalid', flow: 'signup' }, '/auth/login?hint=link_invalid', undefined],
-      [{ type: 'link_invalid', flow: 'recovery' }, '/auth/forgot-password?hint=link_invalid', undefined],
+      [{ type: 'oauth_cancelled' }, '/login', undefined],
+      [{ type: 'oauth_failed', error: oauthError }, '/login', { state: { authError: oauthError } }],
+      [{ type: 'link_invalid', flow: 'signup' }, '/login?hint=link_invalid', undefined],
+      [{ type: 'link_invalid', flow: 'recovery' }, '/forgot-password?hint=link_invalid', undefined],
     ])('%o → %s', (event, url, extras) => {
       const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
       TestBed.createComponent(AppComponent);

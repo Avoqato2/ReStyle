@@ -20,16 +20,16 @@ export function callbackTarget(event: AuthCallbackEvent): CallbackTarget {
     case 'oauth_signed_in':
       return { url: '/home' };
     case 'email_confirmed_login_required':
-      return { url: '/auth/pages/login?hint=confirmed' };
+      return { url: '/login?hint=confirmed' };
     case 'password_recovery':
-      return { url: '/auth/pages/reset-password', extras: { state: { passwordRecovery: true } } };
+      return { url: '/reset-password', extras: { state: { passwordRecovery: true } } };
     case 'oauth_cancelled':
-      return { url: '/auth/pages/login' };
+      return { url: '/login' };
     case 'oauth_failed':
-      return { url: '/auth/pages/login', extras: { state: { authError: event.error } } };
+      return { url: '/login', extras: { state: { authError: event.error } } };
     case 'link_invalid':
       return event.flow === 'signup'
-        ? { url: '/auth/login?hint=link_invalid' }
+        ? { url: '/login?hint=link_invalid' }
         : { url: '/auth/forgot-password?hint=link_invalid' };
   }
 }

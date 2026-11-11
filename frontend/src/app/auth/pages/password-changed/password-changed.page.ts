@@ -14,8 +14,5 @@ import { RouterLink } from '@angular/router';
   imports: [RouterLink, IonNav, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, AppHeaderComponent, HomePage],
 })
 export class PasswordChangedPage{
-  private readonly router = inject(Router);
-  async submit(): Promise<void> {
-    await this.router.navigateByUrl('/login');
-  }
+  
 }
