@@ -1,0 +1,92 @@
+:host {
+  display: inline-block;
+  width: auto;
+
+  /* Größe: Default (md) */
+  --btn-height: var(--size-control); // 44px
+  --btn-padding-x: var(--spacing-16);
+  --btn-font-size: var(--font-size-14);
+  --btn-font-weight: var(--font-weight-medium);
+
+  &[expand='block'],
+  &[expand='full'] {
+    display: block;
+    width: 100%;
+  }
+
+  &.is-disabled {
+    --btn-opacity: var(--opacity-disabled);
+    pointer-events: none;
+  }
+}
+
+/* ==========================================================================
+   2 Farben - Immer filled
+   ========================================================================== */
+
+:host([color='primary']) {
+  --btn-bg: var(--color-primary-default-neu);
+  --btn-bg-hover: var(--color-primary-hover);
+  --btn-bg-pressed: var(--color-primary-pressed);
+  --btn-color: var(--color-neutral-0);
+}
+
+:host([color='secondary']) {
+  --btn-bg: var(--color-primary-secondary-default);
+  --btn-bg-hover: var(--color-primary-secondary-hover);
+  --btn-bg-pressed: var(--color-primary-secondary-pressed);
+  --btn-color: var(--color-neutral-0);
+}
+
+/* ==========================================================================
+   2 Größen (md ist im :host, hier kommt lg dazu)
+   ========================================================================== */
+
+:host([size='lg']) {
+  --btn-height: var(--size-control-lg); // 48px
+  --btn-padding-x: var(--spacing-24);
+  --btn-font-size: var(--font-size-16);
+  --btn-font-weight: var(--font-weight-semibold);
+}
+
+/* ==========================================================================
+   Ionic Override
+   ========================================================================== */
+
+.btn-inner {
+  margin: 0;
+  width: 100%;
+  height: var(--btn-height);
+  font-family: var(--font-family-inter);
+  font-size: var(--btn-font-size);
+  font-weight: var(--btn-font-weight);
+  opacity: var(--btn-opacity);
+
+  /* Ionic Custom Properties */
+  --background: var(--btn-bg);
+  --background-hover: var(--btn-bg-hover);
+  --background-activated: var(--btn-bg-pressed);
+  --background-focused: var(--btn-bg-hover);
+  --color: var(--btn-color);
+  --border-radius: var(--btn-radius);
+
+  --padding-start: var(--btn-padding-x);
+  --padding-end: var(--btn-padding-x);
+  --box-shadow: none;
+
+  .btn-label {
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+  }
+
+  .btn-icon {
+    font-size: var(--size-icon);
+  }
+
+  .btn-spinner {
+    width: var(--font-size-20);
+    height: var(--font-size-20);
+    color: currentColor;
+  }
+}
