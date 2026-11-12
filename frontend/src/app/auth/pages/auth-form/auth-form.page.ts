@@ -63,7 +63,7 @@ export class AuthPage {
       this.showMessage(result.error.message);
       return;
     }
-    await this.router.navigateByUrl(this.mode === 'register' ? '/display-name' : '/home');
+    await this.router.navigateByUrl(this.mode === 'register' ? '/confirmation-mail' : '/home');
   }
 
   async forgotPassword(): Promise<void> {

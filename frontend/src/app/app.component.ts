@@ -17,6 +17,7 @@ interface CallbackTarget {
 export function callbackTarget(event: AuthCallbackEvent): CallbackTarget {
   switch (event.type) {
     case 'email_confirmed':
+      return  {url: '/display-name'};
     case 'oauth_signed_in':
       return { url: '/home' };
     case 'email_confirmed_login_required':
