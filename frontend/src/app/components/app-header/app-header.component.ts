@@ -1,14 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { IonNav } from '@ionic/angular';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-header',
   templateUrl: './app-header.component.html',
   styleUrls: ['./app-header.component.scss'],
-  imports: [IonNav],
+  imports: [],
 })
-export class AppHeaderComponent implements OnInit {
+export class AppHeaderComponent {
   constructor() {}
 
-  ngOnInit() {}
+  //ngOnInit() {}
 }
