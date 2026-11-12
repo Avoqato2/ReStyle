@@ -6,7 +6,7 @@ export const environment = {
   production: false,
   supabaseUrl: 'http://127.0.0.1:54321', //Local Supabase URL
   supabase_publishable_key: 'YOUR_LOCAL_ANON_KEY', //Local Supabase Anon Key
-  hcaptchaSiteKey: '10000000-ffff-ffff-ffff-000000000001', //SPÄTER AUSTAUSCHEN lokale testing 
+  hcaptchaSiteKey: '10000000-ffff-ffff-ffff-00000000000', //Captcha Site Key // Das ist von Captcha für Local-Testing die Test Key, bei Prod austauschen
 };
 
 /*
