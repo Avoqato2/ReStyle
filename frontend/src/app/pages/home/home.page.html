@@ -1,8 +1,6 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Photo Gallery
-    </ion-title>
+    <ion-title>Photo Gallery</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -15,7 +13,6 @@
 
   <ion-grid>
     <ion-row>
-      <!-- CHANGE: Create a new column and image element for each photo -->
       @for (photo of photoService.photos(); track photo.filepath; let position = $index) {
         <ion-col size="6">
           <img [src]="photo.webviewPath" [attr.alt]="'Photo ' + (position + 1)" loading="lazy" />
@@ -24,9 +21,9 @@
     </ion-row>
   </ion-grid>
 
-<ion-fab vertical="bottom" horizontal="center" slot="fixed">
-  <ion-fab-button (click)="addPhotoToGallery()">
-    <ion-icon name="camera"></ion-icon>
-  </ion-fab-button>
-</ion-fab>
+  <ion-fab vertical="bottom" horizontal="center" slot="fixed">
+    <ion-fab-button (click)="addPhotoToGallery()">
+      <ion-icon name="camera"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>
