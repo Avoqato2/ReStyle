@@ -2,7 +2,7 @@ import { Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, type NavigationBehaviorOptions } from '@angular/router';
 import { App } from '@capacitor/app';
-import { IonApp, IonRouterOutlet } from '@ionic/angular';
+import { IonApp, IonRouterOutlet, IonContent, IonTitle, IonToolbar, IonHeader, IonMenu} from '@ionic/angular';
 
 import { AuthService, type AuthCallbackEvent } from './supabase/services/auth/auth.service';
 
@@ -37,7 +37,7 @@ export function callbackTarget(event: AuthCallbackEvent): CallbackTarget {
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
-  imports: [IonApp, IonRouterOutlet],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonApp, IonRouterOutlet, IonMenu],
 })
 export class AppComponent {
   private readonly auth = inject(AuthService);
