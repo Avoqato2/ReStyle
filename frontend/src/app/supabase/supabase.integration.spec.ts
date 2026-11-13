@@ -16,6 +16,9 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
     email: `integration-${Date.now()}@test.local`,
     password: 'password123',
   };
+  // Offizielles hCaptcha-Testtoken. Gilt nur, wenn lokal SUPABASE_AUTH_CAPTCHA_SECRET
+  // das Test-Secret 0x0000000000000000000000000000000000000000 ist (danach supabase stop && start).
+  const CAPTCHA_TOKEN = '10000000-aaaa-bbbb-cccc-000000000001';
   const passwordPlaceholder = '<password>';
   // Lokales Testpostfach der Supabase-CLI
   const MAILPIT_URL = 'http://127.0.0.1:54324';
@@ -35,7 +38,7 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
 
     // Der Test startet mit einem echten neuen Benutzer statt mit einem
     // fest im seed.sql angelegten Benutzer.
-    const registration = await authService.signUp(testUser.email, testUser.password);
+    const registration = await authService.signUp(testUser.email, testUser.password, CAPTCHA_TOKEN);
     logCall('AuthService.signUp', { email: testUser.email, password: passwordPlaceholder }, registration);
 
     if (!registration.ok) {
@@ -114,12 +117,12 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
       email: testUser.email,
       password: passwordPlaceholder,
     };
-    let result = await authService.signIn(testUser.email, testUser.password);
+    let result = await authService.signIn(testUser.email, testUser.password, CAPTCHA_TOKEN);
     logCall('AuthService.signIn', request, result);
 
     if (!result.ok && result.error.code === 'email_not_confirmed') {
       await confirmEmailViaMailpit(testUser.email);
-      result = await authService.signIn(testUser.email, testUser.password);
+      result = await authService.signIn(testUser.email, testUser.password, CAPTCHA_TOKEN);
       logCall('AuthService.signIn', request, result);
     }
 
@@ -216,7 +219,7 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
 
     it('rejects invalid login data', async () => {
       await authService.signOut();
-      const result = await authService.signIn(testUser.email, 'wrong-password');
+      const result = await authService.signIn(testUser.email, 'wrong-password', CAPTCHA_TOKEN);
       logCall(
         'AuthService.signIn',
         { email: testUser.email, password: passwordPlaceholder },
@@ -226,7 +229,7 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
     });
 
     it('does not reveal whether the email already exists', async () => {
-      const result = await authService.signUp(testUser.email, testUser.password);
+      const result = await authService.signUp(testUser.email, testUser.password, CAPTCHA_TOKEN);
       logCall(
         'AuthService.signUp',
         { email: testUser.email, password: passwordPlaceholder },
