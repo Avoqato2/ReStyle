@@ -1,4 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
+
 import {
   IonHeader,
   IonToolbar,
@@ -9,12 +10,11 @@ import {
   IonCol,
   IonFab,
   IonFabButton,
-  IonIcon,
-} from '@ionic/angular';
+  IonIcon, IonTab, IonTabBar, IonTabButton, IonTabs, IonLabel } from '@ionic/angular';
 
 import { addIcons } from 'ionicons';
 import { camera } from 'ionicons/icons';
-import { PhotoService } from '../services/photo.service';
+import { PhotoService } from '../../services/photo.service';
 
 @Component({
   selector: 'app-home',
