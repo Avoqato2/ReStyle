@@ -5,7 +5,7 @@ import { IonToolbar, IonButtons, IonMenuButton, IonHeader, IonTitle, IonContent,
   selector: 'app-header',
   templateUrl: './app-header.component.html',
   styleUrls: ['./app-header.component.scss'],
-  imports: [IonIcon, IonButton, IonContent, IonTitle, IonHeader, IonButtons, IonToolbar, IonMenuButton],
+  imports: [IonIcon, IonButton, IonButtons, IonToolbar, IonMenuButton],
 })
 export class AppHeaderComponent {
   constructor() {}
