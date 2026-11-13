@@ -25,6 +25,8 @@ vi.mock('@capacitor/browser', () => ({
   Browser: { open: vi.fn(), close: vi.fn(), addListener: vi.fn() },
 }));
 
+const CAPTCHA_TOKEN = 'captcha-token';
+
 type AuthListener = (event: AuthChangeEvent, session: Session | null) => void;
 
 function fakeSession(id = 'user-1', email = 'anna@example.com'): Session {
@@ -285,13 +287,13 @@ describe('AuthService', () => {
     it('registers with the signup redirect', async () => {
       const service = createService();
 
-      const result = await service.signUp(' anna@example.com ', 'abcd1234');
+      const result = await service.signUp(' anna@example.com ', 'abcd1234', CAPTCHA_TOKEN);
 
       expect(result).toEqual({ ok: true, data: undefined });
       expect(mock.auth.signUp).toHaveBeenCalledWith({
         email: 'anna@example.com',
         password: 'abcd1234',
-        options: { emailRedirectTo: callbackUrl('signup') },
+        options: { emailRedirectTo: callbackUrl('signup'), captchaToken: CAPTCHA_TOKEN },
       });
     });
 
@@ -302,7 +304,7 @@ describe('AuthService', () => {
       });
       const service = createService();
 
-      expect(await service.signUp('anna@example.com', 'abcd1234')).toEqual({ ok: true, data: undefined });
+      expect(await service.signUp('anna@example.com', 'abcd1234', CAPTCHA_TOKEN)).toEqual({ ok: true, data: undefined });
     });
 
     it.each(['user_already_exists', 'email_exists'])(
@@ -314,7 +316,7 @@ describe('AuthService', () => {
         });
         const service = createService();
 
-        expect(await service.signUp('anna@example.com', 'abcd1234')).toEqual({ ok: true, data: undefined });
+        expect(await service.signUp('anna@example.com', 'abcd1234', CAPTCHA_TOKEN)).toEqual({ ok: true, data: undefined });
       },
     );
 
@@ -325,7 +327,7 @@ describe('AuthService', () => {
       });
       const service = createService();
 
-      expect(await service.signUp('anna@example.com', 'abc')).toEqual({ ok: false, error: authError('weak_password') });
+      expect(await service.signUp('anna@example.com', 'abc', CAPTCHA_TOKEN)).toEqual({ ok: false, error: authError('weak_password') });
     });
 
     it('maps a rate limit', async () => {
@@ -335,7 +337,7 @@ describe('AuthService', () => {
       });
       const service = createService();
 
-      expect(await service.signUp('anna@example.com', 'abcd1234')).toEqual({
+      expect(await service.signUp('anna@example.com', 'abcd1234', CAPTCHA_TOKEN)).toEqual({
         ok: false,
         error: authError('rate_limited'),
       });
@@ -345,20 +347,20 @@ describe('AuthService', () => {
       mock.auth.signUp.mockRejectedValue(new TypeError('Failed to fetch'));
       const service = createService();
 
-      expect(await service.signUp('anna@example.com', 'abcd1234')).toEqual({ ok: false, error: authError('network') });
+      expect(await service.signUp('anna@example.com', 'abcd1234', CAPTCHA_TOKEN)).toEqual({ ok: false, error: authError('network') });
     });
 
     it('reuses the running promise for repeated calls', async () => {
       const service = createService();
 
-      const first = service.signUp('anna@example.com', 'abcd1234');
-      const second = service.signUp('anna@example.com', 'abcd1234');
+      const first = service.signUp('anna@example.com', 'abcd1234', CAPTCHA_TOKEN);
+      const second = service.signUp('anna@example.com', 'abcd1234', CAPTCHA_TOKEN);
 
       expect(second).toBe(first);
       await first;
       expect(mock.auth.signUp).toHaveBeenCalledTimes(1);
 
-      await service.signUp('anna@example.com', 'abcd1234');
+      await service.signUp('anna@example.com', 'abcd1234', CAPTCHA_TOKEN);
       expect(mock.auth.signUp).toHaveBeenCalledTimes(2);
     });
   });
@@ -442,8 +444,12 @@ describe('AuthService', () => {
       const service = createService();
       await flush();
 
-      expect(await service.signIn(' anna@example.com', 'abcd1234')).toEqual({ ok: true, data: undefined });
-      expect(mock.auth.signInWithPassword).toHaveBeenCalledWith({ email: 'anna@example.com', password: 'abcd1234' });
+      expect(await service.signIn(' anna@example.com', 'abcd1234', CAPTCHA_TOKEN)).toEqual({ ok: true, data: undefined });
+      expect(mock.auth.signInWithPassword).toHaveBeenCalledWith({
+        email: 'anna@example.com',
+        password: 'abcd1234',
+        options: { captchaToken: CAPTCHA_TOKEN },
+      });
       expect(service.status()).toBe('authenticated');
       expect(service.user()?.id).toBe('user-1');
     });
@@ -452,7 +458,7 @@ describe('AuthService', () => {
       rejectWith(new AuthApiError('Invalid login credentials', 400, 'invalid_credentials'));
       const service = createService();
 
-      const result = await service.signIn('unknown@example.com', 'abcd1234');
+      const result = await service.signIn('unknown@example.com', 'abcd1234', CAPTCHA_TOKEN);
 
       expect(result).toEqual({ ok: false, error: authError('invalid_credentials') });
     });
@@ -461,7 +467,7 @@ describe('AuthService', () => {
       rejectWith(new AuthApiError('Email not confirmed', 400, 'email_not_confirmed'));
       const service = createService();
 
-      expect(await service.signIn('anna@example.com', 'abcd1234')).toEqual({
+      expect(await service.signIn('anna@example.com', 'abcd1234', CAPTCHA_TOKEN)).toEqual({
         ok: false,
         error: authError('email_not_confirmed'),
       });
@@ -471,13 +477,13 @@ describe('AuthService', () => {
       mock.auth.signInWithPassword.mockRejectedValue(new TypeError('Failed to fetch'));
       const service = createService();
 
-      expect(await service.signIn('anna@example.com', 'abcd1234')).toEqual({ ok: false, error: authError('network') });
+      expect(await service.signIn('anna@example.com', 'abcd1234', CAPTCHA_TOKEN)).toEqual({ ok: false, error: authError('network') });
     });
 
     it('reuses the running promise for repeated calls', () => {
       const service = createService();
 
-      expect(service.signIn('a@example.com', 'abcd1234')).toBe(service.signIn('a@example.com', 'abcd1234'));
+      expect(service.signIn('a@example.com', 'abcd1234', CAPTCHA_TOKEN)).toBe(service.signIn('a@example.com', 'abcd1234', CAPTCHA_TOKEN));
     });
   });
 
@@ -609,7 +615,7 @@ describe('AuthService', () => {
       await flush();
       mock.emit('SIGNED_OUT', null);
 
-      await service.signIn('anna@example.com', 'abcd1234');
+      await service.signIn('anna@example.com', 'abcd1234', CAPTCHA_TOKEN);
 
       expect(service.signOutReason()).toBeNull();
     });
@@ -630,16 +636,17 @@ describe('AuthService', () => {
     it('requests the reset link with the recovery redirect', async () => {
       const service = createService();
 
-      expect(await service.requestPasswordReset(' anna@example.com ')).toEqual({ ok: true, data: undefined });
+      expect(await service.requestPasswordReset(' anna@example.com ', CAPTCHA_TOKEN)).toEqual({ ok: true, data: undefined });
       expect(mock.auth.resetPasswordForEmail).toHaveBeenCalledWith('anna@example.com', {
         redirectTo: callbackUrl('recovery'),
+        captchaToken: CAPTCHA_TOKEN,
       });
     });
 
     it('starts the recovery countdown for the normalized address', async () => {
       const service = createService();
 
-      await service.requestPasswordReset('Anna@Example.com');
+      await service.requestPasswordReset('Anna@Example.com', CAPTCHA_TOKEN);
 
       expect(service.recoveryResend()).toEqual({
         email: 'anna@example.com',
@@ -655,7 +662,7 @@ describe('AuthService', () => {
       });
       const service = createService();
 
-      expect(await service.requestPasswordReset('anna@example.com')).toEqual({
+      expect(await service.requestPasswordReset('anna@example.com', CAPTCHA_TOKEN)).toEqual({
         ok: false,
         error: authError('rate_limited'),
       });
@@ -666,7 +673,7 @@ describe('AuthService', () => {
       mock.auth.resetPasswordForEmail.mockRejectedValue(new TypeError('Failed to fetch'));
       const service = createService();
 
-      expect(await service.requestPasswordReset('anna@example.com')).toEqual({
+      expect(await service.requestPasswordReset('anna@example.com', CAPTCHA_TOKEN)).toEqual({
         ok: false,
         error: authError('network'),
       });
@@ -680,14 +687,14 @@ describe('AuthService', () => {
       });
       const service = createService();
 
-      expect(await service.requestPasswordReset('unknown@example.com')).toEqual({ ok: true, data: undefined });
+      expect(await service.requestPasswordReset('unknown@example.com', CAPTCHA_TOKEN)).toEqual({ ok: true, data: undefined });
       expect(service.recoveryResend()?.email).toBe('unknown@example.com');
     });
 
     it('reuses the running promise for repeated calls', () => {
       const service = createService();
 
-      expect(service.requestPasswordReset('a@example.com')).toBe(service.requestPasswordReset('a@example.com'));
+      expect(service.requestPasswordReset('a@example.com', CAPTCHA_TOKEN)).toBe(service.requestPasswordReset('a@example.com', CAPTCHA_TOKEN));
     });
   });
 
