@@ -15,12 +15,13 @@ import {
 import { addIcons } from 'ionicons';
 import { camera } from 'ionicons/icons';
 import { PhotoService } from '../services/photo.service';
+import { AppHeaderComponent } from '../components/app-header/app-header.component';
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, IonFab, IonFabButton, IonIcon],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, IonFab, IonFabButton, IonIcon, AppHeaderComponent],
 })
 export class HomePage implements OnInit {
   public photoService = inject(PhotoService);
