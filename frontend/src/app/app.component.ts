@@ -31,7 +31,7 @@ export function callbackTarget(event: AuthCallbackEvent): CallbackTarget {
     case 'link_invalid':
       return event.flow === 'signup'
         ? { url: '/login?hint=link_invalid' }
-        : { url: '/auth/forgot-password?hint=link_invalid' };
+        : { url: '/forgot-password?hint=link_invalid' };
   }
 }
 

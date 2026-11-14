@@ -74,7 +74,7 @@ describe('AppComponent', () => {
     const oauthError = { code: 'oauth_failed', message: 'Google fehlgeschlagen' } as const;
 
     it.each<[AuthCallbackEvent, string, object | undefined]>([
-      [{ type: 'email_confirmed' }, '/home', undefined],
+      [{ type: 'email_confirmed' }, '/display-name', undefined],
       [{ type: 'email_confirmed_login_required' }, '/login?hint=confirmed', undefined],
       [{ type: 'password_recovery' }, '/reset-password', { state: { passwordRecovery: true } }],
       [{ type: 'oauth_signed_in' }, '/home', undefined],
