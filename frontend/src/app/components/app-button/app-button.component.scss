@@ -1,0 +1,35 @@
+:host {
+  display: inline-block;
+  width: auto;
+  --background: var(--app-button-background);
+  --background-hover: var(--app-button-background-hover);
+  --background-activated: var(--app-button-background-pressed);
+  --background-focused: var(--app-button-background-hover);
+  --border-radius: var(--radius-full);
+  --box-shadow: none;
+  --color: var(--color-neutral-0);
+  --padding-start: var(--spacing-16);
+  --padding-end: var(--spacing-16);
+  --min-height: var(--size-control);
+  font-family: var(--font-family-inter);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-medium);
+
+  &[expand='block'],
+  &[expand='full'] {
+    display: block;
+    width: 100%;
+  }
+}
+
+:host([variant='primary']) {
+  --app-button-background: var(--color-primary-default-neu);
+  --app-button-background-hover: var(--color-primary-hover);
+  --app-button-background-pressed: var(--color-primary-pressed);
+}
+
+:host([variant='secondary']) {
+  --app-button-background: var(--color-primary-secondary-default);
+  --app-button-background-hover: var(--color-primary-secondary-hover);
+  --app-button-background-pressed: var(--color-primary-secondary-pressed);
+}
