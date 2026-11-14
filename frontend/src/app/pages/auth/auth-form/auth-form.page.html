@@ -1,0 +1,81 @@
+<ion-content>
+  <main class="auth-screen" [class.auth-screen--register]="mode === 'register'">
+    <section class="auth-content" aria-labelledby="auth-title">
+      <header class="auth-heading">
+        <h1 id="auth-title">
+          {{ mode === 'login' ? 'Willkommen!' : 'Konto erstellen' }}
+        </h1>
+        <p>
+          {{ mode === 'login' ? 'Bereit für deinen heutigen Look?' : 'Deine Garderobe beginnt hier!' }}
+        </p>
+      </header>
+
+      <img
+        class="restyle-logo"
+        src="../../../../assets/branding/restyle-logo.svg"
+        alt="ReStyle — style what you already own"
+        width="150"
+        height="150" />
+
+      <form class="auth-form" (ngSubmit)="submit()">
+        <div class="auth-fields">
+          <app-input
+            label="E-Mail:"
+            name="email"
+            type="email"
+            [(ngModel)]="email"
+            autocomplete="email"
+            placeholder="z.B. anna@test.local"
+            [required]="true" />
+
+          <app-input
+            label="Passwort:"
+            name="password"
+            type="password"
+            [(ngModel)]="password"
+            [placeholder]="mode === 'login' ? 'Passwort' : 'neues Passwort'"
+            [required]="true" />
+        </div>
+
+        @if (mode === 'login') {
+          <button class="auth-link auth-forgot" type="button" (click)="forgotPassword()">Passwort vergessen?</button>
+        }
+
+        <ng-hcaptcha
+          (verify)="onCaptchaVerified($event)"
+          (expired)="onCaptchaExpired()"
+          (error)="onCaptchaError()">
+        </ng-hcaptcha>
+
+        <button type="submit" [disabled]="!captchaToken">
+          {{ mode === 'login' ? 'Anmelden' : 'Registrieren' }}
+        </button>
+
+        @if (toastVisible) {
+          <p class="auth-error" role="alert">
+            {{ toastMessage }}
+          </p>
+        }
+      </form>
+    </section>
+
+    <footer class="auth-footer">
+      <button class="google-sign-in" type="button" (click)="AuthWithGoogle()">
+        <span>Oder anmelden mit</span>
+        <img src="../../../../assets/branding/google-logo.svg" alt="Google" width="24" height="24" />
+      </button>
+
+      @if (mode === 'login') {
+        <p class="auth-switch">
+          Noch kein Konto?
+          <a class="auth-link" routerLink="/register">Registrieren.</a>
+        </p>
+      } @else {
+        <p class="auth-switch">
+          Bereits ein Konto?
+          <a class="auth-link" routerLink="/login">Anmelden.</a>
+        </p>
+      }
+    </footer>
+  </main>
+</ion-content>
