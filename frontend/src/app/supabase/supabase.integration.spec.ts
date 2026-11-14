@@ -5,6 +5,7 @@ import { AuthService } from './services/auth/auth.service';
 import { SUPABASE_CLIENT } from './supabase.client';
 import { GarmentService } from './services/garment.service';
 import { OutfitService } from './services/outfit.service';
+import { ProfileService } from './services/profile.service';
 
 describe.skipIf(process.env['CI'])('Supabase integration', () => {
   let authService: AuthService;
@@ -357,6 +358,41 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
       const deletedOutfit = await outfitService.getById(createdId as string);
       logCall('OutfitService.getById (Löschkontrolle)', { table: 'outfits', id: createdId }, deletedOutfit);
       expect(deletedOutfit).toBeNull();
+    });
+  });
+
+  describe('ProfileService', () => {
+    it('updates the clothing preference', async () => {
+      const profileService = TestBed.inject(ProfileService);
+      const updated = await profileService.update({ clothing_preference: 'unisex' });
+      logCall('ProfileService.update', { clothing_preference: 'unisex' }, updated);
+
+      expect(updated.clothing_preference).toBe('unisex');
+    });
+
+    it('uploads, replaces and removes the avatar', async () => {
+      const profileService = TestBed.inject(ProfileService);
+      const supabase = TestBed.inject(SUPABASE_CLIENT);
+      const image = () => new Blob([new Uint8Array([137, 80, 78, 71])], { type: 'image/png' });
+
+      const first = await profileService.uploadAvatar(image());
+      logCall('ProfileService.uploadAvatar', { type: 'image/png' }, first);
+      expect(first.avatar_path).toMatch(new RegExp(`^${first.id}/`));
+
+      const url = await profileService.getAvatarUrl(first.avatar_path as string);
+      expect((await fetch(url)).ok).toBe(true);
+
+      const second = await profileService.uploadAvatar(image());
+      logCall('ProfileService.uploadAvatar', { type: 'image/png' }, second);
+      expect(second.avatar_path).not.toBe(first.avatar_path);
+      const oldFile = await supabase.storage.from('avatars').download(first.avatar_path as string);
+      expect(oldFile.error).not.toBeNull();
+
+      const removed = await profileService.removeAvatar();
+      logCall('ProfileService.removeAvatar', undefined, removed);
+      expect(removed.avatar_path).toBeNull();
+      const files = await supabase.storage.from('avatars').list(first.id);
+      expect(files.data).toEqual([]);
     });
   });
 });

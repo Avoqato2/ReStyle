@@ -3,25 +3,7 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 
 export type Database = {
   
-  "graphql_public": {
-          Tables: {
-            [_ in never]: never
-          }
-          Views: {
-            [_ in never]: never
-          }
-          Functions: {
-            "graphql":
-{ Args: { "extensions"?: Json,"operationName"?: string,"query"?: string,"variables"?: Json }; Returns: Json
-                           }
-          }
-          Enums: {
-            [_ in never]: never
-          }
-          CompositeTypes: {
-            [_ in never]: never
-          }
-        },"public": {
+  "public": {
           Tables: {
             "garments": {
                   Row: {
@@ -91,14 +73,14 @@ isOneToOne: false
                   ]
                 },"profiles": {
                   Row: {
-                    "created_at": string,"display_name": string | null,"id": string,"preferences": NonNullable<Json>
+                    "avatar_path": string | null,"clothing_preference": Database["public"]['Enums']["clothing_preference"] | null,"created_at": string,"display_name": string | null,"id": string,"preferences": NonNullable<Json>
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"display_name"?: string | null,"id": string,"preferences"?: NonNullable<Json>
+                    "avatar_path"?: string | null,"clothing_preference"?: Database["public"]['Enums']["clothing_preference"] | null,"created_at"?: string,"display_name"?: string | null,"id": string,"preferences"?: NonNullable<Json>
                   }
                   Update: {
-                    "created_at"?: string,"display_name"?: string | null,"id"?: string,"preferences"?: NonNullable<Json>
+                    "avatar_path"?: string | null,"clothing_preference"?: Database["public"]['Enums']["clothing_preference"] | null,"created_at"?: string,"display_name"?: string | null,"id"?: string,"preferences"?: NonNullable<Json>
                   }
                   Relationships: [
                     
@@ -114,7 +96,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "garment_category": "jacket"|"blazer"|"coat"|"t_shirt"|"shirt"|"blouse"|"polo"|"tank_top"|"sweater"|"hoodie"|"cardigan"|"jeans"|"trousers"|"shorts"|"skirt"|"leggings"|"sweatpants"|"dress"|"jumpsuit"|"sneakers"|"boots"|"sandals"|"heels"|"dress_shoes"|"other","garment_color": "black"|"white"|"grey"|"beige"|"brown"|"red"|"pink"|"orange"|"yellow"|"green"|"blue"|"purple"|"gold"|"silver"|"petrol"|"turquoise"|"olive"|"multicolor","garment_layer": "outer"|"top"|"bottom"|"full_body"|"shoes","garment_material": "cotton"|"linen"|"wool"|"cashmere"|"silk"|"denim"|"leather"|"faux_leather"|"suede"|"polyester"|"viscose"|"nylon"|"other","garment_season": "spring"|"summer"|"autumn"|"winter"|"transitional_season"
+            "clothing_preference": "womenswear"|"menswear"|"unisex","garment_category": "jacket"|"blazer"|"coat"|"t_shirt"|"shirt"|"blouse"|"polo"|"tank_top"|"sweater"|"hoodie"|"cardigan"|"jeans"|"trousers"|"shorts"|"skirt"|"leggings"|"sweatpants"|"dress"|"jumpsuit"|"sneakers"|"boots"|"sandals"|"heels"|"dress_shoes"|"other","garment_color": "black"|"white"|"grey"|"beige"|"brown"|"red"|"pink"|"orange"|"yellow"|"green"|"blue"|"purple"|"gold"|"silver"|"petrol"|"turquoise"|"olive"|"multicolor","garment_layer": "outer"|"top"|"bottom"|"full_body"|"shoes","garment_material": "cotton"|"linen"|"wool"|"cashmere"|"silk"|"denim"|"leather"|"faux_leather"|"suede"|"polyester"|"viscose"|"nylon"|"other","garment_season": "spring"|"summer"|"autumn"|"winter"|"transitional_season"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -228,13 +210,9 @@ export type CompositeTypes<
   : never
 
 export const Constants = {
-  "graphql_public": {
+  "public": {
           Enums: {
-            
-          }
-        },"public": {
-          Enums: {
-            "garment_category": ["jacket", "blazer", "coat", "t_shirt", "shirt", "blouse", "polo", "tank_top", "sweater", "hoodie", "cardigan", "jeans", "trousers", "shorts", "skirt", "leggings", "sweatpants", "dress", "jumpsuit", "sneakers", "boots", "sandals", "heels", "dress_shoes", "other"],"garment_color": ["black", "white", "grey", "beige", "brown", "red", "pink", "orange", "yellow", "green", "blue", "purple", "gold", "silver", "petrol", "turquoise", "olive", "multicolor"],"garment_layer": ["outer", "top", "bottom", "full_body", "shoes"],"garment_material": ["cotton", "linen", "wool", "cashmere", "silk", "denim", "leather", "faux_leather", "suede", "polyester", "viscose", "nylon", "other"],"garment_season": ["spring", "summer", "autumn", "winter", "transitional_season"]
+            "clothing_preference": ["womenswear", "menswear", "unisex"],"garment_category": ["jacket", "blazer", "coat", "t_shirt", "shirt", "blouse", "polo", "tank_top", "sweater", "hoodie", "cardigan", "jeans", "trousers", "shorts", "skirt", "leggings", "sweatpants", "dress", "jumpsuit", "sneakers", "boots", "sandals", "heels", "dress_shoes", "other"],"garment_color": ["black", "white", "grey", "beige", "brown", "red", "pink", "orange", "yellow", "green", "blue", "purple", "gold", "silver", "petrol", "turquoise", "olive", "multicolor"],"garment_layer": ["outer", "top", "bottom", "full_body", "shoes"],"garment_material": ["cotton", "linen", "wool", "cashmere", "silk", "denim", "leather", "faux_leather", "suede", "polyester", "viscose", "nylon", "other"],"garment_season": ["spring", "summer", "autumn", "winter", "transitional_season"]
           }
         }
 } as const
