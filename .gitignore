@@ -9,3 +9,6 @@ backend/supabase/.branches/
 
 # IDE
 .idea
+
+# Lokale Agent-Arbeitsdateien (Superpowers-Pläne, Workspaces)
+.superpowers/
