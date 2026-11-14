@@ -28,3 +28,25 @@ Basis für alles (ohne Login liefert RLS nichts). API-Contract: `specs/002-user-
 - Display-Name-Screen: Route und „nur einmal“-Logik nicht im Contract.
 - Confluence will Hinweis „Account existiert bereits“. `signUp` antwortet laut Contract bewusst neutral (`ok: true`).
 - Figma-Links fehlen in Confluence.
+
+---
+
+## Captcha in den Auth-Tests (2026-11-13 · Branch `frontend/copilot/feat/scrum-105-authv2`)
+
+**Warum:** `signUp`, `signIn` und `requestPasswordReset` verlangen seit dem hCaptcha-Einbau ein `captchaToken` und reichen es an Supabase weiter. Die Tests rufen sie noch ohne Token auf und passen deshalb nicht mehr.
+
+**Ziele:** Unit- und Integrationstests decken das Token ab, Lint + Tests grün. **Nicht-Ziel:** Service-Code, Captcha-UI oder Backend-Config ändern. **Anti-Ziel:** Captcha im Test umgehen (z. B. in `config.toml` abschalten).
+
+**Ansätze:**
+- **A (gewählt):** Offizielle hCaptcha-Testschlüssel. Lokales Secret `0x0000000000000000000000000000000000000000` in `.env` (`SUPABASE_AUTH_CAPTCHA_SECRET`), Integrationstest schickt Token `10000000-aaaa-bbbb-cccc-000000000001`. Echter Ablauf mit Captcha-Prüfung, braucht Internet.
+- B: Captcha lokal abschalten. Verworfen: testet nichts mehr, wäre Backend-Änderung auf Frontend-Branch.
+
+**Umsetzung:**
+1. `tests/auth.service.spec.ts`: Konstante `CAPTCHA_TOKEN = 'captcha-token'` an alle Aufrufe von `signUp`, `signIn`, `requestPasswordReset`. Die `toHaveBeenCalledWith`-Erwartungen prüfen das Token mit:
+   - `signUp`: `options: { emailRedirectTo, captchaToken }`
+   - `signIn`: `{ email, password, options: { captchaToken } }`
+   - `requestPasswordReset`: `{ redirectTo, captchaToken }`
+2. `supabase.integration.spec.ts`: Konstante mit dem hCaptcha-Testtoken (Kommentar: nur mit Test-Secret gültig), an `signUp`/`signIn` übergeben.
+3. `environment.example.ts`: Tippfehler im Site-Key → `10000000-ffff-ffff-ffff-000000000001`.
+
+**Dem Umsetzer überlassen:** Name/Position der Konstanten, Kommentartexte.
