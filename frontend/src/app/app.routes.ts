@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { guestGuard } from './supabase/services/auth/guards';
+//import { guestGuard } from './supabase/services/auth/guards';
 
 export const routes: Routes = [
   {
