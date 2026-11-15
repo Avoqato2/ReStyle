@@ -14,8 +14,9 @@ import {
 
 import { addIcons } from 'ionicons';
 import { camera } from 'ionicons/icons';
-import { PhotoService } from '../services/photo.service';
-import { AppHeaderComponent } from '../components/app-header/app-header.component';
+import { PhotoService } from '../../services/photo.service';
+import { AppHeaderComponent } from '../../components/app-header/app-header.component';
+import { AuthPage } from '../auth/auth-form/auth-form.page';
 
 @Component({
   selector: 'app-home',
@@ -36,6 +37,7 @@ import { AppHeaderComponent } from '../components/app-header/app-header.componen
   ],
 })
 export class HomePage implements OnInit {
+  component = AuthPage;
   public photoService = inject(PhotoService);
   constructor() {
     addIcons({ camera });

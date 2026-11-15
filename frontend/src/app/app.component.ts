@@ -17,20 +17,21 @@ interface CallbackTarget {
 export function callbackTarget(event: AuthCallbackEvent): CallbackTarget {
   switch (event.type) {
     case 'email_confirmed':
+      return { url: '/display-name' };
     case 'oauth_signed_in':
       return { url: '/home' };
     case 'email_confirmed_login_required':
-      return { url: '/auth/login?hint=confirmed' };
+      return { url: '/login?hint=confirmed' };
     case 'password_recovery':
-      return { url: '/auth/reset-password', extras: { state: { passwordRecovery: true } } };
+      return { url: '/reset-password', extras: { state: { passwordRecovery: true } } };
     case 'oauth_cancelled':
-      return { url: '/auth/login' };
+      return { url: '/login' };
     case 'oauth_failed':
-      return { url: '/auth/login', extras: { state: { authError: event.error } } };
+      return { url: '/login', extras: { state: { authError: event.error } } };
     case 'link_invalid':
       return event.flow === 'signup'
-        ? { url: '/auth/login?hint=link_invalid' }
-        : { url: '/auth/forgot-password?hint=link_invalid' };
+        ? { url: '/login?hint=link_invalid' }
+        : { url: '/forgot-password?hint=link_invalid' };
   }
 }
 

@@ -5,6 +5,7 @@ import { AuthService } from './services/auth/auth.service';
 import { SUPABASE_CLIENT } from './supabase.client';
 import { GarmentService } from './services/garment.service';
 import { OutfitService } from './services/outfit.service';
+import { ProfileService } from './services/profile.service';
 
 describe.skipIf(process.env['CI'])('Supabase integration', () => {
   let authService: AuthService;
@@ -16,6 +17,9 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
     email: `integration-${Date.now()}@test.local`,
     password: 'password123',
   };
+  // Offizielles hCaptcha-Testtoken. Gilt nur, wenn lokal SUPABASE_AUTH_CAPTCHA_SECRET
+  // das Test-Secret 0x0000000000000000000000000000000000000000 ist (danach supabase stop && start).
+  const CAPTCHA_TOKEN = '10000000-aaaa-bbbb-cccc-000000000001';
   const passwordPlaceholder = '<password>';
   // Lokales Testpostfach der Supabase-CLI
   const MAILPIT_URL = 'http://127.0.0.1:54324';
@@ -35,7 +39,7 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
 
     // Der Test startet mit einem echten neuen Benutzer statt mit einem
     // fest im seed.sql angelegten Benutzer.
-    const registration = await authService.signUp(testUser.email, testUser.password);
+    const registration = await authService.signUp(testUser.email, testUser.password, CAPTCHA_TOKEN);
     logCall('AuthService.signUp', { email: testUser.email, password: passwordPlaceholder }, registration);
 
     if (!registration.ok) {
@@ -114,12 +118,12 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
       email: testUser.email,
       password: passwordPlaceholder,
     };
-    let result = await authService.signIn(testUser.email, testUser.password);
+    let result = await authService.signIn(testUser.email, testUser.password, CAPTCHA_TOKEN);
     logCall('AuthService.signIn', request, result);
 
     if (!result.ok && result.error.code === 'email_not_confirmed') {
       await confirmEmailViaMailpit(testUser.email);
-      result = await authService.signIn(testUser.email, testUser.password);
+      result = await authService.signIn(testUser.email, testUser.password, CAPTCHA_TOKEN);
       logCall('AuthService.signIn', request, result);
     }
 
@@ -216,7 +220,7 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
 
     it('rejects invalid login data', async () => {
       await authService.signOut();
-      const result = await authService.signIn(testUser.email, 'wrong-password');
+      const result = await authService.signIn(testUser.email, 'wrong-password', CAPTCHA_TOKEN);
       logCall(
         'AuthService.signIn',
         { email: testUser.email, password: passwordPlaceholder },
@@ -226,7 +230,7 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
     });
 
     it('does not reveal whether the email already exists', async () => {
-      const result = await authService.signUp(testUser.email, testUser.password);
+      const result = await authService.signUp(testUser.email, testUser.password, CAPTCHA_TOKEN);
       logCall(
         'AuthService.signUp',
         { email: testUser.email, password: passwordPlaceholder },
@@ -357,6 +361,41 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
       const deletedOutfit = await outfitService.getById(createdId as string);
       logCall('OutfitService.getById (Löschkontrolle)', { table: 'outfits', id: createdId }, deletedOutfit);
       expect(deletedOutfit).toBeNull();
+    });
+  });
+
+  describe('ProfileService', () => {
+    it('updates the clothing preference', async () => {
+      const profileService = TestBed.inject(ProfileService);
+      const updated = await profileService.update({ clothing_preference: 'unisex' });
+      logCall('ProfileService.update', { clothing_preference: 'unisex' }, updated);
+
+      expect(updated.clothing_preference).toBe('unisex');
+    });
+
+    it('uploads, replaces and removes the avatar', async () => {
+      const profileService = TestBed.inject(ProfileService);
+      const supabase = TestBed.inject(SUPABASE_CLIENT);
+      const image = () => new Blob([new Uint8Array([137, 80, 78, 71])], { type: 'image/png' });
+
+      const first = await profileService.uploadAvatar(image());
+      logCall('ProfileService.uploadAvatar', { type: 'image/png' }, first);
+      expect(first.avatar_path).toMatch(new RegExp(`^${first.id}/`));
+
+      const url = await profileService.getAvatarUrl(first.avatar_path as string);
+      expect((await fetch(url)).ok).toBe(true);
+
+      const second = await profileService.uploadAvatar(image());
+      logCall('ProfileService.uploadAvatar', { type: 'image/png' }, second);
+      expect(second.avatar_path).not.toBe(first.avatar_path);
+      const oldFile = await supabase.storage.from('avatars').download(first.avatar_path as string);
+      expect(oldFile.error).not.toBeNull();
+
+      const removed = await profileService.removeAvatar();
+      logCall('ProfileService.removeAvatar', undefined, removed);
+      expect(removed.avatar_path).toBeNull();
+      const files = await supabase.storage.from('avatars').list(first.id);
+      expect(files.data).toEqual([]);
     });
   });
 });
