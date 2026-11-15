@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonToolbar, IonButtons, IonMenuButton, IonHeader, IonTitle, IonContent, IonButton, IonIcon } from '@ionic/angular';
+import { IonToolbar, IonButtons, IonMenuButton, IonButton, IonIcon } from '@ionic/angular';
 
 @Component({
   selector: 'app-header',
@@ -7,8 +7,4 @@ import { IonToolbar, IonButtons, IonMenuButton, IonHeader, IonTitle, IonContent,
   styleUrls: ['./app-header.component.scss'],
   imports: [IonIcon, IonButton, IonButtons, IonToolbar, IonMenuButton],
 })
-export class AppHeaderComponent {
-  constructor() {}
-
-  //ngOnInit() {}
-}
+export class AppHeaderComponent {}

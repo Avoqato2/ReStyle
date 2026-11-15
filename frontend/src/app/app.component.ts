@@ -2,7 +2,7 @@ import { Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, type NavigationBehaviorOptions } from '@angular/router';
 import { App } from '@capacitor/app';
-import { IonApp, IonRouterOutlet, IonContent, IonTitle, IonToolbar, IonHeader, IonMenu} from '@ionic/angular';
+import { IonApp, IonRouterOutlet, IonContent, IonTitle, IonToolbar, IonHeader, IonMenu } from '@ionic/angular';
 
 import { AuthService, type AuthCallbackEvent } from './supabase/services/auth/auth.service';
 
