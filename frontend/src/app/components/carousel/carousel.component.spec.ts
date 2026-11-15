@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CarouselComponent } from './carousel.component';
+import { describe, beforeEach, it, expect } from 'vitest';
 
 describe('CarouselComponent', () => {
   let component: CarouselComponent;
