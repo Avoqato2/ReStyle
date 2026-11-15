@@ -10,7 +10,8 @@ import {
   IonCol,
   IonFab,
   IonFabButton,
-  IonIcon, IonTab, IonTabBar, IonTabButton, IonTabs, IonLabel } from '@ionic/angular';
+  IonIcon,
+} from '@ionic/angular';
 
 import { addIcons } from 'ionicons';
 import { camera } from 'ionicons/icons';
