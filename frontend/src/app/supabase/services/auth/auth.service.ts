@@ -272,15 +272,19 @@ export class AuthService {
   // Eine bereits registrierte Adresse liefert denselben Erfolg (FR-006, research R7):
   // Supabase gibt dann einen User ohne Identities und keinen Fehler zurück. Ohne aktive
   // Bestätigung (z. B. lokal) kommt stattdessen `user_already_exists`, das ebenfalls als Erfolg gilt.
-  signUp(email: string, password: string): Promise<AuthResult> {
-    return this.once('signUp', () =>
-      this.call(async () => {
-        const response = await this.supabase.auth.signUp({
-          email: email.trim(),
-          password,
-          options: { emailRedirectTo: callbackUrl('signup') },
-        });
-        return isAlreadyRegistered(response.error) ? { error: null } : response;
+  signUp(email: string, password: string, captchaToken: string): Promise<AuthResult> {
+  return this.once('signUp', () =>
+    this.call(async () => {
+      const response = await this.supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          emailRedirectTo: callbackUrl('signup'),
+          captchaToken,
+        },
+      });
+
+      return isAlreadyRegistered(response.error) ? { error: null } : response;
       }),
     );
   }
@@ -301,19 +305,23 @@ export class AuthService {
 
   // Fordert einen Reset-Link an. Unbekannte Adressen und alle anderen Fehler außer
   // Netzwerk und Rate-Limit liefern Erfolg, damit nichts über Accounts verraten wird (FR-011).
-  requestPasswordReset(email: string): Promise<AuthResult> {
-    return this.once('requestPasswordReset', async () => {
-      const result = await this.call(() =>
-        this.supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: callbackUrl('recovery') }),
-      );
-      if (!result.ok && result.error.code === 'network') {
-        return result;
-      }
-      // Auch bei verschluckten Fehlern startet der Countdown, sonst wäre der Unterschied sichtbar.
-      this._recoveryResend.set(nextResend(email));
-      return result.ok || result.error.code === 'rate_limited' ? result : OK;
-    });
-  }
+  requestPasswordReset(email: string, captchaToken: string): Promise<AuthResult> {
+  return this.once('requestPasswordReset', async () => {
+    const result = await this.call(() =>
+      this.supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: callbackUrl('recovery'),
+        captchaToken,
+      }),
+    );
+
+    if (!result.ok && result.error.code === 'network') {
+      return result;
+    }
+
+    this._recoveryResend.set(nextResend(email));
+    return result.ok || result.error.code === 'rate_limited' ? result : OK;
+  });
+}
 
   // Setzt nach `password_recovery` ein neues Passwort und meldet andere Geräte ab
   // (FR-012, research R9). Die Sitzung auf diesem Gerät bleibt bestehen.
@@ -358,21 +366,29 @@ export class AuthService {
 
   // Login mit E-Mail und Passwort. Falsche Daten und unbekannte Adresse liefern
   // dieselbe neutrale Meldung (FR-008).
-  signIn(email: string, password: string): Promise<AuthResult> {
-    return this.once('signIn', async () => {
-      try {
-        const { data, error } = await this.supabase.auth.signInWithPassword({ email: email.trim(), password });
-        if (error) {
-          return fail(error);
-        }
-        this.applySession(data.session);
-        this._signOutReason.set(null);
-        return OK;
-      } catch (error) {
+  signIn(email: string, password: string, captchaToken: string): Promise<AuthResult> {
+  return this.once('signIn', async () => {
+    try {
+      const { data, error } = await this.supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+        options: {
+          captchaToken,
+        },
+      });
+
+      if (error) {
         return fail(error);
       }
-    });
-  }
+
+      this.applySession(data.session);
+      this._signOutReason.set(null);
+      return OK;
+    } catch (error) {
+      return fail(error);
+    }
+  });
+}
 
   // Logout nur auf diesem Gerät, danach Cleanup-Hooks und Login (FR-010, research R9).
   signOut(): Promise<void> {

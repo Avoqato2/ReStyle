@@ -7,6 +7,10 @@ Ziel: lauffähiges MVP in mind. einem App Store bis **19.01.2027**, Open Source 
 
 - Knapp antworten. Kein Smalltalk, keine Wiederholung der Aufgabe, keine ungefragten Erklärungen oder Zusammenfassungen.
 - Unklar oder mehrdeutig → eine konkrete Rückfrage statt raten. Gilt immer für Punkte unter „Offen“.
+- Vor jedem Anlegen oder Ändern einer Datei und vor jedem Command, der etwas verändert oder
+  ausführt (Schreiben, Tests, Commits, Installieren), den Menschen fragen, was genau passieren
+  soll, und erst nach Zustimmung ausführen. Lesen ist frei. Gilt auch, wenn ein Skill
+  durchgehendes Arbeiten vorsieht.
 - Nur lesen, was die Aufgabe braucht: dieses File → passendes `docs/features/Fxx-*.md` → gezielt Code.
 - Nicht lesen/durchsuchen: `node_modules/`, `www/`, `android/`, `ios/`, `package-lock.json`, `backend/supabase/.temp/`, `.specify/`. `supabase.types.ts` ist generiert: nur gezielt nach Typen suchen.
 - Minimale Diffs. Keine kompletten Dateien neu ausgeben, keine Refactorings außerhalb der Aufgabe.
@@ -31,6 +35,12 @@ Stattdessen Agent Skills (Liste wächst):
 | Review                          | `requesting-code-review` / `receiving-code-review`                                    |
 
 Skill nicht installiert → gleiche Schritte manuell.
+
+- Ablage (gilt vor den Skill-Vorgaben): `docs/superpowers/` nicht verwenden.
+  Designs als eigener Abschnitt mit Datum + Branch ins passende `docs/features/Fxx-*.md`.
+  Umsetzungspläne nur lokal unter `.superpowers/plans/` (git-ignoriert), nie committen.
+- `docs/features/` enthält nur Architektur und Entscheidungen, keine Prozessnotizen,
+  Ledger oder Review-Ergebnisse.
 
 ## Stack
 
