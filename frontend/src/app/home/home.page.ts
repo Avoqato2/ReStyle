@@ -28,7 +28,6 @@ export class HomePage implements OnInit {
     addIcons({ camera });
   }
 
-  // when user gets to this page, pics are loaded automatically
   async ngOnInit() {
     await this.photoService.loadSaved();
     console.log('hi');
