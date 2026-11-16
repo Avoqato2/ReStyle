@@ -12,6 +12,18 @@ type GarmentInsert = TablesInsert<'garments'>;
 // Dieser Typ beschreibt die Daten, die beim Ändern eines Kleidungsstücks erlaubt sind.
 type GarmentUpdate = TablesUpdate<'garments'>;
 
+// id und image_path vergibt createWithImage selbst, user_id setzt die DB.
+type GarmentInput = Omit<GarmentInsert, 'id' | 'image_path' | 'user_id'>;
+
+const GARMENT_BUCKET = 'garments';
+
+// Muss zu allowed_mime_types des Buckets passen.
+const IMAGE_EXTENSIONS: Record<string, string> = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+};
+
 @Injectable({
   providedIn: 'root',
 })
@@ -52,6 +64,33 @@ export class GarmentService {
     return response.data;
   }
 
+  // Lädt das Bild nach {user_id}/{id}.{ext} hoch und legt danach den Datensatz an.
+  async createWithImage(image: Blob, garment: GarmentInput): Promise<Garment> {
+    const extension = IMAGE_EXTENSIONS[image.type];
+    if (!extension) {
+      throw new Error(`Dateityp nicht erlaubt: ${image.type || 'unbekannt'}`);
+    }
+
+    const userId = await this.userId();
+    const id = crypto.randomUUID();
+    const path = `${userId}/${id}.${extension}`;
+    const bucket = this.supabase.storage.from(GARMENT_BUCKET);
+
+    // Bytes statt Blob: storage-js macht aus einem Blob FormData (siehe ProfileService.uploadAvatar).
+    const upload = await bucket.upload(path, await image.arrayBuffer(), { contentType: image.type });
+    if (upload.error) {
+      throw upload.error;
+    }
+
+    try {
+      return await this.create({ ...garment, id, image_path: path });
+    } catch (error) {
+      // Keine verwaisten Dateien im Storage.
+      await bucket.remove([path]);
+      throw error;
+    }
+  }
+
   // Ändert ein Kleidungsstück und gibt den aktualisierten Datensatz zurück.
   async update(id: string, changes: GarmentUpdate): Promise<Garment> {
     const response = await this.supabase.from('garments').update(changes).eq('id', id).select().single();
@@ -70,5 +109,16 @@ export class GarmentService {
     if (response.error) {
       throw response.error;
     }
+  }
+
+  private async userId(): Promise<string> {
+    const { data, error } = await this.supabase.auth.getSession();
+    if (error) {
+      throw error;
+    }
+    if (!data.session) {
+      throw new Error('Nicht eingeloggt');
+    }
+    return data.session.user.id;
   }
 }
