@@ -3,13 +3,13 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <button class="auth-link" routerLink="">Zurück</button>
+  <button class="auth-link" routerLink="">Zurück zum login</button>
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">Photo Gallery</ion-title>
     </ion-toolbar>
   </ion-header>
-
+  <app-carousel></app-carousel>
   <ion-grid>
     <ion-row>
       @for (photo of photoService.photos(); track photo.filepath; let position = $index) {
