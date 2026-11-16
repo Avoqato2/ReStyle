@@ -17,6 +17,7 @@ import { camera } from 'ionicons/icons';
 import { PhotoService } from '../../services/photo.service';
 import { AppHeaderComponent } from '../../components/app-header/app-header.component';
 import { AuthPage } from '../auth/auth-form/auth-form.page';
+import { CarouselComponent } from '../../components/carousel/carousel.component';
 
 @Component({
   selector: 'app-home',
@@ -34,6 +35,7 @@ import { AuthPage } from '../auth/auth-form/auth-form.page';
     IonFabButton,
     IonIcon,
     AppHeaderComponent,
+    CarouselComponent,
   ],
 })
 export class HomePage implements OnInit {
