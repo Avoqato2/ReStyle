@@ -19,7 +19,7 @@ export function callbackTarget(event: AuthCallbackEvent): CallbackTarget {
     case 'email_confirmed':
       return { url: '/display-name' };
     case 'oauth_signed_in':
-      return { url: '/home' };
+      return { url: '/tabs/home' };
     case 'email_confirmed_login_required':
       return { url: '/login?hint=confirmed' };
     case 'password_recovery':

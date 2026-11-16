@@ -5,7 +5,7 @@ import { TabsPage } from './pages/tabs/tabs.page';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'login', // Oder '/tabs/home', falls man ohne Login starten soll
+    redirectTo: 'login',
     pathMatch: 'full',
   },
   {
