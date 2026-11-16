@@ -364,6 +364,20 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
     });
   });
 
+  describe('Signup-Trigger', () => {
+    it('registers a user whose display name exceeds 50 characters', async () => {
+      // Google liefert Namen ungekürzt; der Trigger muss auf 50 Zeichen kürzen, sonst scheitert der Signup.
+      const { error } = await TestBed.inject(SUPABASE_CLIENT).auth.signUp({
+        email: `long-name-${Date.now()}@test.local`,
+        password: testUser.password,
+        options: { data: { display_name: 'A'.repeat(51) } },
+      });
+      logCall('AuthService.signUp', { display_name: '51 Zeichen' }, { error });
+
+      expect(error).toBeNull();
+    });
+  });
+
   describe('ProfileService', () => {
     it('updates the clothing preference', async () => {
       const profileService = TestBed.inject(ProfileService);
