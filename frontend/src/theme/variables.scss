@@ -1,92 +1,111 @@
-// For information on how to create your own theme, please refer to:
-// https://ionicframework.com/docs/theming/
+// ReStyle Design Tokens – Quelle: Figma "Digital Wardrobe – UI Design"
+// Ionic-Farben: base / contrast / shade (pressed) / tint (hover = base)
+// Kein Dark Mode im MVP.
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;700&display=swap');
 
 :root {
-  --color-neutral-0: #ffffff;
-  --color-neutral-50: #f9fafb;
-  --color-neutral-100: #f3f4f6;
-  --color-neutral-200: #e5e7eb;
-  --color-neutral-300: #d1d5db;
-  --color-neutral-400: #9ca3af;
-  --color-neutral-500: #6b7280;
-  --color-neutral-600: #4b5563;
-  --color-neutral-700: #374151;
-  --color-neutral-800: #1f2937;
-  --color-neutral-900: #111827;
-  --color-neutral-950: #030712;
-  --color-green-700: #15803d;
-  --color-amber-600: #d97706;
-  --color-red-700: #b91c1c;
-  --spacing-0: 0px;
-  --spacing-2: 2px;
-  --spacing-4: 4px;
-  --spacing-8: 8px;
-  --spacing-12: 12px;
-  --spacing-16: 16px;
-  --spacing-20: 20px;
-  --spacing-24: 24px;
-  --spacing-32: 32px;
-  --spacing-40: 40px;
-  --spacing-48: 48px;
-  --spacing-64: 64px;
-  --radius-none: 0px;
-  --radius-xs: 2px;
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-2xl: 24px;
-  --radius-full: 9999px;
-  --border-width-hairline: 1px;
-  --border-width-default: 1px;
-  --border-width-strong: 2px;
-  --opacity-disabled: 0.4000000059604645px;
-  --opacity-subtle: 0.07999999821186066px;
-  --opacity-hover: 0.07999999821186066px;
-  --opacity-pressed: 0.1599999964237213px;
-  --opacity-full: 1px;
-  --font-family-inter: "Inter";
-  --font-weight-regular: 400px;
-  --font-weight-medium: 500px;
-  --font-weight-semibold: 600px;
-  --font-weight-bold: 700px;
-  --font-size-12: 12px;
-  --font-size-14: 14px;
-  --font-size-16: 16px;
-  --font-size-20: 20px;
-  --font-size-24: 24px;
-  --font-size-32: 32px;
-  --font-line-height-16: 16px;
-  --font-line-height-20: 20px;
-  --font-line-height-24: 24px;
-  --font-line-height-28: 28px;
-  --font-line-height-32: 32px;
-  --font-line-height-40: 40px;
-  --font-letter-spacing-default: 0px;
-  --size-icon: 24px;
-  --size-control-sm: 32px;
-  --size-control: 44px;
-  --size-control-lg: 48px;
-  --size-touch-target: 48px;
-  --color-brand-cream: #f3e9dc;
-  --color-brand-blue: #427ca6;
-  --color-brand-blue-dark: #315e7f;
-  --color-brand-blue-light: #c6dce8;
-  --color-brand-violet: #795078;
-  --color-brand-lavender: #643d65;
-  --color-brand-coral: #d98c7a;
-  --color-brand-gray: #686868;
-  --color-brand-warm-gray: #d5cec5;
-  --color-brand-dark-blue: #111827;
-  --typography-font-family-scond: "Playfair Display";
-  --color-primary-hover: #35688e;
-  --color-primary-pressed: #28516f;
-  --color-primary-disabled: #91aec3;
-  --color-primary-secondary-default: #795078;
-  --color-primary-secondary-hover: #795078;
-  --color-primary-secondary-pressed: #643d65;
-  --color-primary-secondary-disabled: #b49bb8;
-  --color-primary-default-neu: #35688e;
-  --button-outline-pressed-fill: #478bbc;
-  --button-outline-innere-farbe: #478bbc;
+  /* --- Ionic: Primary --- */
+  --ion-color-primary: #35688e;
+  --ion-color-primary-rgb: 53, 104, 142;
+  --ion-color-primary-contrast: #f3e9dc;
+  --ion-color-primary-contrast-rgb: 243, 233, 220;
+  --ion-color-primary-shade: #28516f;
+  --ion-color-primary-tint: #35688e;
+
+  /* --- Ionic: Secondary --- */
+  --ion-color-secondary: #795078;
+  --ion-color-secondary-rgb: 121, 80, 120;
+  --ion-color-secondary-contrast: #f3e9dc;
+  --ion-color-secondary-contrast-rgb: 243, 233, 220;
+  --ion-color-secondary-shade: #643d65;
+  --ion-color-secondary-tint: #795078;
+
+  /* --- Ionic: Status ---
+     VORSCHLAG – nicht aus Figma (dort nur Tailwind-Platzhalter). */
+  --ion-color-danger: #b3393a;
+  --ion-color-danger-rgb: 179, 57, 58;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #9e3233;
+  --ion-color-danger-tint: #b3393a;
+
+  --ion-color-success: #2f7a55;
+  --ion-color-success-rgb: 47, 122, 85;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #296b4b;
+  --ion-color-success-tint: #2f7a55;
+
+  /* --- Ionic: global --- */
+  --ion-background-color: #f3e9dc;
+  --ion-background-color-rgb: 243, 233, 220;
+  --ion-text-color: #111827;
+  --ion-text-color-rgb: 17, 24, 39;
+  --ion-font-family: 'Inter', sans-serif;
+
+  /* --- ReStyle: Brand / Disabled --- */
+  --rs-color-brand-coral: #d98c7a;
+  --rs-color-primary-disabled: #a3bfd1;
+  --rs-color-secondary-disabled: #b49bb8;
+
+  /* --- ReStyle: Text / Icon --- */
+  --rs-color-text-primary: #111827;
+  --rs-color-text-secondary: #315e7f;
+  --rs-color-text-muted: #686868;
+  --rs-color-text-on-primary: #f3e9dc;
+  --rs-color-icon-primary: #111827;
+  --rs-color-icon-secondary: #315e7f;
+
+  /* --- ReStyle: Flächen / Rahmen --- */
+  --rs-color-bg-canvas: #f3e9dc;
+  --rs-color-bg-subtle: #c6dce8;
+  --rs-color-bg-surface: #ffffff;
+  --rs-color-border-default: #315e7f;
+  --rs-color-border-subtle: #d5cec5;
+
+  /* --- ReStyle: Typografie --- */
+  --rs-font-body: 'Inter', sans-serif;
+  --rs-font-heading: 'Playfair Display', serif;
+  --rs-font-size-sm: 14px;
+  --rs-font-size-md: 16px;
+  --rs-font-size-lg: 20px;
+  --rs-font-size-xl: 24px;
+  --rs-line-height-sm: 20px;
+  --rs-line-height-md: 24px;
+  --rs-line-height-lg: 32px;
+  --rs-font-weight-regular: 400;
+  --rs-font-weight-medium: 500;
+  --rs-font-weight-bold: 700;
+  --rs-letter-spacing-button: 0.02em;
+  --rs-letter-spacing-body: -0.025em;
+
+  /* --- ReStyle: Spacing ---
+     4/8/12/20 aus Figma; 16/24/32/48 VORSCHLAG – nicht aus Figma. */
+  --rs-space-1: 4px;
+  --rs-space-2: 8px;
+  --rs-space-3: 12px;
+  --rs-space-4: 16px;
+  --rs-space-5: 20px;
+  --rs-space-6: 24px;
+  --rs-space-8: 32px;
+  --rs-space-12: 48px;
+
+  /* --- ReStyle: Radius ---
+     VORSCHLAG – nicht aus Figma (abgeleitet aus Button-Doku: Karte ~12px, Pill). */
+  --rs-radius-sm: 4px;
+  --rs-radius-md: 8px;
+  --rs-radius-lg: 12px;
+  --rs-radius-xl: 16px;
+  --rs-radius-full: 9999px;
+
+  /* --- ReStyle: Shadows ---
+     button: aus Figma ("Button shadow").
+     card/overlay: VORSCHLAG – nicht aus Figma. */
+  --rs-shadow-button:
+    0 1px 5px 0 rgba(0, 0, 0, 0.12),
+    0 2px 2px 0 rgba(0, 0, 0, 0.14),
+    0 3px 1px -2px rgba(0, 0, 0, 0.2);
+  --rs-shadow-card: 0 2px 8px 0 rgba(17, 24, 39, 0.08);
+  --rs-shadow-overlay: 0 8px 24px -4px rgba(17, 24, 39, 0.16);
 }
