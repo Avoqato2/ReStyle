@@ -15,15 +15,15 @@ import {
 import { addIcons } from 'ionicons';
 import { camera } from 'ionicons/icons';
 import { PhotoService } from '../../services/photo.service';
+import { AppHeaderComponent } from '../../components/app-header/app-header.component';
 import { AuthPage } from '../auth/auth-form/auth-form.page';
-import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   imports: [
-    RouterLink,
+    AppHeaderComponent,
     IonHeader,
     IonToolbar,
     IonTitle,
