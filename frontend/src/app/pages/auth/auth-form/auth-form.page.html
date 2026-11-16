@@ -1,21 +1,21 @@
-<ion-content>
+<ion-content class="ion-padding" [fullscreen]="true">
   <main class="auth-screen" [class.auth-screen--register]="mode === 'register'">
     <section class="auth-content" aria-labelledby="auth-title">
       <header class="auth-heading">
         <h1 id="auth-title">
           {{ mode === 'login' ? 'Willkommen!' : 'Konto erstellen' }}
         </h1>
-        <p>
-          {{ mode === 'login' ? 'Bereit für deinen heutigen Look?' : 'Deine Garderobe beginnt hier!' }}
-        </p>
+          <p>
+            {{ mode === 'login' ? 'Bereit für deinen heutigen Look?' : 'Deine Garderobe beginnt hier!' }}
+          </p>
       </header>
 
       <img
         class="restyle-logo"
-        src="../../../../assets/branding/restyle-logo.svg"
+        src="/assets/branding/restyle-logo.svg"
         alt="ReStyle — style what you already own"
         width="150"
-        height="150" />
+        height="150"/>
 
       <form class="auth-form" (ngSubmit)="submit()">
         <div class="auth-fields">
@@ -26,7 +26,7 @@
             [(ngModel)]="email"
             autocomplete="email"
             placeholder="z.B. anna@test.local"
-            [required]="true" />
+            [required]="true"/>
 
           <app-input
             label="Passwort:"
@@ -34,11 +34,12 @@
             type="password"
             [(ngModel)]="password"
             [placeholder]="mode === 'login' ? 'Passwort' : 'neues Passwort'"
-            [required]="true" />
+            [required]="true"/>
         </div>
 
         @if (mode === 'login') {
-          <button class="auth-link auth-forgot" type="button" (click)="forgotPassword()">Passwort vergessen?</button>
+          <button class="auth-link auth-forgot" type="button" (click)="forgotPassword()">Passwort vergessen?
+          </button>
         }
 
         <ng-hcaptcha
@@ -47,22 +48,22 @@
           (error)="onCaptchaError()">
         </ng-hcaptcha>
 
-        <button type="submit" [disabled]="!captchaToken">
+        <app-button type="submit" [disabled]="!captchaToken">
           {{ mode === 'login' ? 'Anmelden' : 'Registrieren' }}
-        </button>
+        </app-button>
 
         @if (toastVisible) {
-          <p class="auth-error" role="alert">
-            {{ toastMessage }}
-          </p>
+            <p class="auth-error" role="alert">
+              {{ toastMessage }}
+            </p>
         }
       </form>
     </section>
 
     <footer class="auth-footer">
-      <button class="google-sign-in" type="button" (click)="AuthWithGoogle()">
+      <button class="google-sign-in" type="button" (click)="authWithGoogle()">
         <span>Oder anmelden mit</span>
-        <img src="../../../../assets/branding/google-logo.svg" alt="Google" width="24" height="24" />
+        <img src="/assets/branding/google-logo.svg" alt="Google" width="24" height="24"/>
       </button>
 
       @if (mode === 'login') {

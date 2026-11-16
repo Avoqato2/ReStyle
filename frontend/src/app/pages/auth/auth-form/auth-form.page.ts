@@ -5,7 +5,8 @@ import { AuthService } from '../../../supabase/services/auth/auth.service';
 import { FormsModule } from '@angular/forms';
 import { AppInputComponent } from '../../../components/app-input/app-input.component';
 import { NgHcaptchaModule } from 'ng-hcaptcha';
-import { IonContent } from '@ionic/angular';
+import { IonButton, IonContent, IonText } from '@ionic/angular';
+import { AppButtonComponent } from '../../../components/app-button/app-button.component';
 
 type AuthMode = 'login' | 'register';
 
@@ -14,7 +15,7 @@ type AuthMode = 'login' | 'register';
   templateUrl: './auth-form.page.html',
   styleUrls: ['./auth-form.page.scss'],
   standalone: true,
-  imports: [RouterLink, FormsModule, AppInputComponent, NgHcaptchaModule, IonContent],
+  imports: [RouterLink, FormsModule, AppInputComponent, NgHcaptchaModule, IonContent, AppButtonComponent],
 })
 export class AuthPage {
   private auth = inject(AuthService);
@@ -43,7 +44,7 @@ export class AuthPage {
 
   private readonly router = inject(Router);
 
-  async AuthWithGoogle(): Promise<void> {
+  async authWithGoogle(): Promise<void> {
     const result = await this.auth.signInWithGoogle();
 
     if (!result.ok) {
