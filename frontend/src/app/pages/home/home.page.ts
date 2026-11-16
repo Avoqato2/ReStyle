@@ -47,7 +47,6 @@ export class HomePage implements OnInit {
 
   async ngOnInit() {
     await this.photoService.loadSaved();
-    console.log('hi');
   }
   addPhotoToGallery() {
     this.photoService.HandlePhoto();
