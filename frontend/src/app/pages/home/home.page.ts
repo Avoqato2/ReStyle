@@ -1,4 +1,6 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { AuthService } from '../../supabase/services/auth/auth.service';
 
 import {
   IonHeader,
@@ -12,6 +14,8 @@ import {
   IonFabButton,
   IonIcon,
   IonText,
+  IonItem,
+  IonLabel,
 } from '@ionic/angular';
 
 import { addIcons } from 'ionicons';
@@ -28,6 +32,8 @@ import { ImageCardComponent } from '../../components/image-card/image-card.compo
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   imports: [
+    IonLabel,
+    IonItem,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -43,14 +49,22 @@ import { ImageCardComponent } from '../../components/image-card/image-card.compo
     IonText,
     CardButtonsComponent,
     ImageCardComponent,
+    RouterLink,
   ],
 })
 export class HomePage implements OnInit {
+  private auth = inject(AuthService);
+
   component = AuthPage;
   public photoService = inject(PhotoService);
   constructor() {
     addIcons({ camera });
   }
+
+  userName = computed(() => {
+    const email = this.auth.user()?.email ?? '';
+    return email ? email.split('@')[0] : 'Gast';
+  });
 
   async ngOnInit() {
     await this.photoService.loadSaved();

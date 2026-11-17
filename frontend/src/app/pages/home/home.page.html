@@ -3,36 +3,42 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-title>Hallo *Name*</ion-title>
+  <ion-title>Hallo {{ userName() }}</ion-title>
   <ion-text>Entdecke neue Looks in deiner Gaderobe</ion-text>
   
   <div class="card-button-grid">
     <app-card-buttons
       cardIcon="assets/icon/styling.svg"
       title="LOOK STYLEN"
-      cardDescription="Selbst kombinieren">
+      cardDescription="Selbst kombinieren"
+      routerLink="/tabs/styling">
     </app-card-buttons>
 
     <app-card-buttons
       cardIcon="assets/icon/sparkle.svg"
       title="IDEEN FINDEN"
-      cardDescription="Neues entdecken">
+      cardDescription="Neues entdecken"
+      routerLink="/tabs/looks">
     </app-card-buttons>
 
     <app-card-buttons
       cardIcon="assets/icon/my-looks.svg"
       title="MEINE LOOKS"
-      cardDescription="Gespeicherte Outfits">
+      cardDescription="Gespeicherte Outfits"
+      routerLink="/tabs/looks">
     </app-card-buttons>
 
     <app-card-buttons
       cardIcon="assets/icon/add.svg"
       title="TEIL HINZUFÜGEN"
-      cardDescription="Gaderobe erweitern">
+      cardDescription="Gaderobe erweitern"
+      routerLink="/tabs/garderobe">
     </app-card-buttons>
   </div>
   <app-image-card></app-image-card>
-  <ion-title>Meine Garderobe</ion-title>
+  <ion-item button routerLink="/tabs/garderobe" lines="none">
+    <ion-label>Meine Garderobe</ion-label>
+  </ion-item>
   <app-carousel></app-carousel>
   <ion-grid>
     <ion-row>
