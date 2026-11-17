@@ -1,17 +1,38 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Photo Gallery</ion-title>
-  </ion-toolbar>
   <app-header></app-header>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <button class="auth-link" routerLink="">Zurück zum login</button>
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Photo Gallery</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <ion-title>Hallo *Name*</ion-title>
+  <ion-text>Entdecke neue Looks in deiner Gaderobe</ion-text>
+  
+  <div class="card-button-grid">
+    <app-card-buttons
+      cardIcon="assets/icon/styling.svg"
+      title="LOOK STYLEN"
+      cardDescription="Selbst kombinieren">
+    </app-card-buttons>
+
+    <app-card-buttons
+      cardIcon="assets/icon/sparkle.svg"
+      title="IDEEN FINDEN"
+      cardDescription="Neues entdecken">
+    </app-card-buttons>
+
+    <app-card-buttons
+      cardIcon="assets/icon/my-looks.svg"
+      title="MEINE LOOKS"
+      cardDescription="Gespeicherte Outfits">
+    </app-card-buttons>
+
+    <app-card-buttons
+      cardIcon="assets/icon/add.svg"
+      title="TEIL HINZUFÜGEN"
+      cardDescription="Gaderobe erweitern">
+    </app-card-buttons>
+  </div>
+  <app-image-card></app-image-card>
+  <ion-title>Meine Garderobe</ion-title>
   <app-carousel></app-carousel>
   <ion-grid>
     <ion-row>
