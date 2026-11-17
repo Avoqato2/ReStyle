@@ -1,4 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
+
 import {
   IonHeader,
   IonToolbar,
@@ -17,13 +18,13 @@ import { camera } from 'ionicons/icons';
 import { PhotoService } from '../../services/photo.service';
 import { AppHeaderComponent } from '../../components/app-header/app-header.component';
 import { AuthPage } from '../auth/auth-form/auth-form.page';
+import { CarouselComponent } from '../../components/carousel/carousel.component';
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   imports: [
-    AppHeaderComponent,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -34,6 +35,8 @@ import { AuthPage } from '../auth/auth-form/auth-form.page';
     IonFab,
     IonFabButton,
     IonIcon,
+    AppHeaderComponent,
+    CarouselComponent,
   ],
 })
 export class HomePage implements OnInit {
@@ -43,10 +46,8 @@ export class HomePage implements OnInit {
     addIcons({ camera });
   }
 
-  // when user gets to this page, pics are loaded automatically
   async ngOnInit() {
     await this.photoService.loadSaved();
-    console.log('hi');
   }
   addPhotoToGallery() {
     this.photoService.HandlePhoto();

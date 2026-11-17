@@ -1,18 +1,44 @@
 import { Routes } from '@angular/router';
+import { TabsPage } from './pages/tabs/tabs.page';
+//import { guestGuard } from './supabase/services/auth/guards';
+
 export const routes: Routes = [
   {
-    path: 'home',
-    loadComponent: () => import('./pages/home/home.page').then((m) => m.HomePage),
+    path: '',
+    redirectTo: 'login',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tabs',
+    component: TabsPage,
+    children: [
+      {
+        path: 'home',
+        loadComponent: () => import('./pages/home/home.page').then((m) => m.HomePage),
+      },
+      {
+        path: 'styling',
+        loadComponent: () => import('./pages/styling/styling.page').then((m) => m.StylingPage),
+      },
+      {
+        path: 'garderobe',
+        loadComponent: () => import('./pages/garderobe/garderobe.page').then((m) => m.GarderobePage),
+      },
+      {
+        path: 'looks',
+        loadComponent: () => import('./pages/looks/looks.page').then((m) => m.LooksPage),
+      },
+      {
+        path: '',
+        redirectTo: '/tabs/home',
+        pathMatch: 'full',
+      },
+    ],
   },
   {
     // Nur Web: Ziel der Mail- und Google-Links im Browser (T048), ohne Guard.
     path: 'auth/callback',
     loadComponent: () => import('./pages/auth/callback/callback.page').then((m) => m.CallbackPage),
-  },
-  {
-    path: '',
-    redirectTo: 'login',
-    pathMatch: 'full',
   },
   {
     path: 'login',
