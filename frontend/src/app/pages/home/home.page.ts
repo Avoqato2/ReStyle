@@ -1,6 +1,6 @@
-import { Component, computed, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { AuthService } from '../../supabase/services/auth/auth.service';
+import { ProfileService } from '../../supabase/services/profile.service';
 
 import {
   IonHeader,
@@ -53,23 +53,37 @@ import { ImageCardComponent } from '../../components/image-card/image-card.compo
   ],
 })
 export class HomePage implements OnInit {
-  private auth = inject(AuthService);
-
   component = AuthPage;
   public photoService = inject(PhotoService);
   constructor() {
     addIcons({ camera });
   }
 
-  userName = computed(() => {
-    const email = this.auth.user()?.email ?? '';
-    return email ? email.split('@')[0] : 'Gast';
-  });
+  userName = signal<string>('');
+  private profileService = inject(ProfileService);
 
   async ngOnInit() {
-    await this.photoService.loadSaved();
+    await Promise.all([this.getUserName(), this.photoService.loadSaved()]);
   }
+
+  // wenn man Username ändert und wieder auf Home zurückkommt
+  async ionViewWillEnter() {
+    await this.getUserName();
+  }
+
   addPhotoToGallery() {
     this.photoService.HandlePhoto();
+  }
+
+  private async getUserName(): Promise<void> {
+    try {
+      const profile = await this.profileService.getOwn();
+      if (profile.display_name) {
+        this.userName.set(profile.display_name);
+        return;
+      }
+    } catch (error) {
+      console.error('Profil konnte nicht geladen werden: ', error);
+    }
   }
 }
