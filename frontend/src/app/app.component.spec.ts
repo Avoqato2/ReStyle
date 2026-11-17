@@ -77,7 +77,7 @@ describe('AppComponent', () => {
       [{ type: 'email_confirmed' }, '/display-name', undefined],
       [{ type: 'email_confirmed_login_required' }, '/login?hint=confirmed', undefined],
       [{ type: 'password_recovery' }, '/reset-password', { state: { passwordRecovery: true } }],
-      [{ type: 'oauth_signed_in' }, '/home', undefined],
+      [{ type: 'oauth_signed_in' }, '/tabs/home', undefined],
       [{ type: 'oauth_cancelled' }, '/login', undefined],
       [{ type: 'oauth_failed', error: oauthError }, '/login', { state: { authError: oauthError } }],
       [{ type: 'link_invalid', flow: 'signup' }, '/login?hint=link_invalid', undefined],

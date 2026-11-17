@@ -16,6 +16,6 @@ export class DisplayNamePage {
   private readonly router = inject(Router);
 
   async submit(): Promise<void> {
-    await this.router.navigateByUrl('/home');
+    await this.router.navigateByUrl('/tabs/home');
   }
 }

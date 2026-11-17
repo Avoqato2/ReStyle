@@ -51,7 +51,7 @@ export class AuthPage {
       this.showMessage(result.error.message);
       return;
     }
-    await this.router.navigateByUrl('/home');
+    await this.router.navigateByUrl('/tabs/home');
   }
 
   async submit(): Promise<void> {
@@ -64,7 +64,7 @@ export class AuthPage {
       this.showMessage(result.error.message);
       return;
     }
-    await this.router.navigateByUrl(this.mode === 'register' ? '/confirmation-mail' : '/home');
+    await this.router.navigateByUrl(this.mode === 'register' ? '/confirmation-mail' : '/tabs/home');
   }
 
   async forgotPassword(): Promise<void> {
