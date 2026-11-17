@@ -5,7 +5,7 @@ import { AuthService } from '../../../supabase/services/auth/auth.service';
 import { FormsModule } from '@angular/forms';
 import { AppInputComponent } from '../../../components/app-input/app-input.component';
 import { NgHcaptchaModule } from 'ng-hcaptcha';
-import { IonButton, IonContent, IonText } from '@ionic/angular';
+import { IonContent } from '@ionic/angular';
 import { AppButtonComponent } from '../../../components/app-button/app-button.component';
 
 type AuthMode = 'login' | 'register';
