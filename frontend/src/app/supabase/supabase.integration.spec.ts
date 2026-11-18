@@ -370,7 +370,7 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
       const { error } = await TestBed.inject(SUPABASE_CLIENT).auth.signUp({
         email: `long-name-${Date.now()}@test.local`,
         password: testUser.password,
-        options: { data: { display_name: 'A'.repeat(51) } },
+        options: { data: { display_name: 'A'.repeat(51) }, captchaToken: CAPTCHA_TOKEN },
       });
       logCall('AuthService.signUp', { display_name: '51 Zeichen' }, { error });
 
