@@ -364,6 +364,92 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
     });
   });
 
+  describe('GarmentService delete (SCRUM-124)', () => {
+    const garmentIds: string[] = [];
+    const outfitIds: string[] = [];
+
+    async function createGarment(layer: 'top' | 'bottom'): Promise<string> {
+      const garment = await garmentService.create({
+        image_path: `integration-test/${layer}-${Date.now()}.png`,
+        layer,
+        category: layer === 'top' ? 't_shirt' : 'jeans',
+      });
+      garmentIds.push(garment.id);
+      return garment.id;
+    }
+
+    async function createOutfit(items: { layer: 'top' | 'bottom'; garment_id: string }[]): Promise<string> {
+      const outfit = await outfitService.create({ name: 'Delete Test Outfit' });
+      outfitIds.push(outfit.id);
+      await outfitService.saveItems(outfit.id, items);
+      return outfit.id;
+    }
+
+    afterAll(async () => {
+      // Übrig gebliebene Testdaten entfernen; bereits gelöschte Einträge sind kein Fehler.
+      for (const id of outfitIds) {
+        await outfitService.delete(id).catch(() => undefined);
+      }
+      for (const id of garmentIds) {
+        await garmentService.delete(id, { deleteOutfits: true }).catch(() => undefined);
+      }
+    });
+
+    it('lists affected outfits before deleting', async () => {
+      const top = await createGarment('top');
+      const outfitId = await createOutfit([{ layer: 'top', garment_id: top }]);
+
+      const affected = await garmentService.getAffectedOutfitIds(top);
+      logCall('GarmentService.getAffectedOutfitIds', { garmentId: top }, affected);
+
+      expect(affected).toEqual([outfitId]);
+    });
+
+    it('deleteOutfits: false removes only the item and keeps the outfit', async () => {
+      const top = await createGarment('top');
+      const bottom = await createGarment('bottom');
+      const outfitId = await createOutfit([
+        { layer: 'top', garment_id: top },
+        { layer: 'bottom', garment_id: bottom },
+      ]);
+
+      await garmentService.delete(top, { deleteOutfits: false });
+      const items = await outfitService.getItems(outfitId);
+      logCall('GarmentService.delete', { id: top, deleteOutfits: false }, { items });
+
+      expect(await outfitService.getById(outfitId)).not.toBeNull();
+      expect(items.map((item) => item.garment_id)).toEqual([bottom]);
+    });
+
+    it('deleteOutfits: false deletes outfits that would become empty', async () => {
+      const top = await createGarment('top');
+      const outfitId = await createOutfit([{ layer: 'top', garment_id: top }]);
+
+      await garmentService.delete(top, { deleteOutfits: false });
+
+      expect(await outfitService.getById(outfitId)).toBeNull();
+    });
+
+    it('deleteOutfits: true deletes all outfits containing the garment', async () => {
+      const top = await createGarment('top');
+      const bottom = await createGarment('bottom');
+      const outfitId = await createOutfit([
+        { layer: 'top', garment_id: top },
+        { layer: 'bottom', garment_id: bottom },
+      ]);
+
+      await garmentService.delete(top, { deleteOutfits: true });
+
+      expect(await outfitService.getById(outfitId)).toBeNull();
+      expect(await garmentService.getById(top)).toBeNull();
+      expect(await garmentService.getById(bottom)).not.toBeNull();
+    });
+
+    it('rejects an unknown garment id', async () => {
+      await expect(garmentService.delete(crypto.randomUUID(), { deleteOutfits: true })).rejects.toBeTruthy();
+    });
+  });
+
   describe('Signup-Trigger', () => {
     it('registers a user whose display name exceeds 50 characters', async () => {
       // Google liefert Namen ungekürzt; der Trigger muss auf 50 Zeichen kürzen, sonst scheitert der Signup.
