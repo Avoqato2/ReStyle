@@ -92,7 +92,7 @@ CI (PR auf `main`): Branch-Name-Check, Frontend Lint + Test + Build, Backend `su
 - `user_id` nie mitschicken (DB-Default `auth.uid()`).
 - Kleine Standalone-Komponenten, Ionic-Komponenten statt Eigenbau, mobile-first.
 - Services und Datenlogik brauchen Unit-Tests (Vitest).
-- Immer an Design.md halten
+- UI/Styling: Tokens aus `src/theme/variables.scss`, Regeln in `docs/design-system.md`. Keine hardcodierten Farben/Abstände.
 
 ## Datenmodell (Ist = Migrationen)
 
