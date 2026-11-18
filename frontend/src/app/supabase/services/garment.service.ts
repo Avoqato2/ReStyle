@@ -102,12 +102,34 @@ export class GarmentService {
     return response.data;
   }
 
-  // Löscht ein Kleidungsstück anhand seiner ID.
-  async delete(id: string): Promise<void> {
-    const response = await this.supabase.from('garments').delete().eq('id', id);
+  // Liefert die Outfits, die das Kleidungsstück enthalten (für den Hinweis vor dem Löschen).
+  async getAffectedOutfitIds(garmentId: string): Promise<string[]> {
+    const response = await this.supabase.from('outfit_items').select('outfit_id').eq('garment_id', garmentId);
 
     if (response.error) {
       throw response.error;
+    }
+
+    return response.data.map((item) => item.outfit_id);
+  }
+
+  // Löscht ein Kleidungsstück und sein Bild.
+  // deleteOutfits = true: alle Outfits damit löschen. false: nur aus den Outfits entfernen,
+  // leer gewordene Outfits löscht die DB.
+  async delete(id: string, options: { deleteOutfits: boolean }): Promise<void> {
+    const response = await this.supabase.rpc('delete_garment', {
+      p_garment_id: id,
+      p_delete_outfits: options.deleteOutfits,
+    });
+
+    if (response.error) {
+      throw response.error;
+    }
+
+    try {
+      await this.supabase.storage.from(GARMENT_BUCKET).remove([response.data]);
+    } catch {
+      // Datensatz ist schon weg, übrig bleibt höchstens eine verwaiste Datei.
     }
   }
 

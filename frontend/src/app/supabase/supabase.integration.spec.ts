@@ -96,7 +96,7 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
     }
 
     if (testGarmentId) {
-      await garmentService.delete(testGarmentId);
+      await garmentService.delete(testGarmentId, { deleteOutfits: true });
       logCall('GarmentService.delete', { table: 'garments', id: testGarmentId }, { success: true });
     }
 
@@ -284,7 +284,7 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
         expect(updated.name).toBe('Updated Integration Test Garment');
       } finally {
         if (createdId) {
-          await garmentService.delete(createdId);
+          await garmentService.delete(createdId, { deleteOutfits: false });
           logCall('GarmentService.delete', { table: 'garments', id: createdId }, { success: true });
         }
       }
