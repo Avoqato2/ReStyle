@@ -48,12 +48,17 @@ function setup(options: { profileResults?: Result[]; session?: { user: { id: str
     upload: vi.fn().mockResolvedValue({ data: { path: 'x' }, error: null }),
     remove: vi.fn().mockResolvedValue({ data: [], error: null }),
     createSignedUrl: vi.fn().mockResolvedValue({ data: { signedUrl: 'https://signed.test/a' }, error: null }),
+    list: vi.fn().mockResolvedValue({ data: [], error: null }),
   };
   const session = options.session === undefined ? { user: { id: USER_ID } } : options.session;
   const client = {
     from: vi.fn(() => query.builder),
+    rpc: vi.fn().mockResolvedValue({ data: null, error: null }),
     storage: { from: vi.fn(() => bucket) },
-    auth: { getSession: vi.fn().mockResolvedValue({ data: { session }, error: null }) },
+    auth: {
+      getSession: vi.fn().mockResolvedValue({ data: { session }, error: null }),
+      signOut: vi.fn().mockResolvedValue({ error: null }),
+    },
   };
 
   TestBed.configureTestingModule({ providers: [{ provide: SUPABASE_CLIENT, useValue: client }] });
@@ -222,6 +227,46 @@ describe('ProfileService', () => {
       bucket.createSignedUrl.mockResolvedValue({ data: null, error });
 
       await expect(service.getAvatarUrl('p')).rejects.toBe(error);
+    });
+  });
+
+  describe('deleteAccount', () => {
+    it('löscht das Konto per RPC', async () => {
+      const { service, client } = setup();
+
+      await service.deleteAccount();
+
+      expect(client.rpc).toHaveBeenCalledWith('delete_own_account');
+    });
+
+    it('wirft bei RPC-Fehler und meldet nicht ab', async () => {
+      const error = new Error('rpc');
+      const { service, client } = setup();
+      client.rpc.mockResolvedValue({ data: null, error });
+
+      await expect(service.deleteAccount()).rejects.toBe(error);
+      expect(client.auth.signOut).not.toHaveBeenCalled();
+    });
+
+    it('löscht vorher alle eigenen Dateien in garments und avatars', async () => {
+      const { service, client, bucket } = setup();
+      bucket.list.mockResolvedValue({ data: [{ name: 'a.jpg' }, { name: 'b.png' }], error: null });
+
+      await service.deleteAccount();
+
+      expect(client.storage.from).toHaveBeenCalledWith('garments');
+      expect(client.storage.from).toHaveBeenCalledWith('avatars');
+      expect(bucket.list).toHaveBeenCalledWith(USER_ID);
+      expect(bucket.remove).toHaveBeenCalledWith([`${USER_ID}/a.jpg`, `${USER_ID}/b.png`]);
+      expect(bucket.remove.mock.invocationCallOrder[0]).toBeLessThan(client.rpc.mock.invocationCallOrder[0]);
+    });
+
+    it('meldet nach dem Löschen lokal ab', async () => {
+      const { service, client } = setup();
+
+      await service.deleteAccount();
+
+      expect(client.auth.signOut).toHaveBeenCalledWith({ scope: 'local' });
     });
   });
 });

@@ -94,6 +94,9 @@ isOneToOne: false
             "delete_garment":
 { Args: { "p_delete_outfits": boolean,"p_garment_id": string }; Returns: string
                            },
+"delete_own_account":
+{ Args: Record<PropertyKey, never>; Returns: undefined
+                           },
 "save_outfit":
 { Args: { "p_outfit_id": string,"p_outfit_items": Json }; Returns: undefined
                            }

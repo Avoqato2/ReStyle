@@ -9,6 +9,7 @@ type Profile = Tables<'profiles'>;
 type ProfileUpdate = Pick<TablesUpdate<'profiles'>, 'display_name' | 'preferences' | 'clothing_preference'>;
 
 const AVATAR_BUCKET = 'avatars';
+const GARMENT_BUCKET = 'garments';
 const SIGNED_URL_TTL_SECONDS = 3600;
 
 // Muss zu allowed_mime_types des Buckets passen.
@@ -99,6 +100,32 @@ export class ProfileService {
     }
 
     return response.data.signedUrl;
+  }
+
+  // Löscht das eigene Konto samt Daten: erst Dateien im Storage, dann User (DB-Cascade), dann lokal abmelden.
+  async deleteAccount(): Promise<void> {
+    const userId = await this.userId();
+
+    for (const bucketName of [GARMENT_BUCKET, AVATAR_BUCKET]) {
+      const bucket = this.supabase.storage.from(bucketName);
+      const { data, error } = await bucket.list(userId);
+      if (error) {
+        throw error;
+      }
+      if (data.length > 0) {
+        const removed = await bucket.remove(data.map((file) => `${userId}/${file.name}`));
+        if (removed.error) {
+          throw removed.error;
+        }
+      }
+    }
+
+    const response = await this.supabase.rpc('delete_own_account');
+    if (response.error) {
+      throw response.error;
+    }
+
+    await this.supabase.auth.signOut({ scope: 'local' });
   }
 
   private async updateOwn(changes: TablesUpdate<'profiles'>): Promise<Profile> {
