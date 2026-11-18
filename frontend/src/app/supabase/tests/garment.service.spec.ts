@@ -54,6 +54,7 @@ function setup(options: { garmentResults?: Result[]; session?: { user: { id: str
   const bucket = {
     upload: vi.fn().mockResolvedValue({ data: { path: 'x' }, error: null }),
     remove: vi.fn().mockResolvedValue({ data: [], error: null }),
+    createSignedUrls: vi.fn().mockResolvedValue({ data: [], error: null }),
   };
   const session = options.session === undefined ? { user: { id: USER_ID } } : options.session;
   const client = {
@@ -196,6 +197,51 @@ describe('GarmentService', () => {
       const { service } = setup({ garmentResults: [{ data: null, error }] });
 
       await expect(service.getAffectedOutfitIds('g-1')).rejects.toBe(error);
+    });
+  });
+
+  describe('getImageUrls', () => {
+    function signed(path: string, signedUrl: string | null, error: string | null = null) {
+      return { path, signedUrl, error };
+    }
+
+    it('liefert eine Signed URL je Pfad', async () => {
+      const { service, client, bucket } = setup();
+      bucket.createSignedUrls.mockResolvedValue({
+        data: [signed('a', 'url-a'), signed('b', 'url-b')],
+        error: null,
+      });
+
+      const result = await service.getImageUrls(['a', 'b']);
+
+      expect(client.storage.from).toHaveBeenCalledWith('garments');
+      expect(bucket.createSignedUrls).toHaveBeenCalledWith(['a', 'b'], 3600);
+      expect(result).toEqual({ a: 'url-a', b: 'url-b' });
+    });
+
+    it('lässt Pfade ohne URL weg', async () => {
+      const { service, bucket } = setup();
+      bucket.createSignedUrls.mockResolvedValue({
+        data: [signed('a', 'url-a'), signed('b', null, 'Object not found')],
+        error: null,
+      });
+
+      await expect(service.getImageUrls(['a', 'b'])).resolves.toEqual({ a: 'url-a' });
+    });
+
+    it('macht bei leerer Liste keinen Request', async () => {
+      const { service, bucket } = setup();
+
+      await expect(service.getImageUrls([])).resolves.toEqual({});
+      expect(bucket.createSignedUrls).not.toHaveBeenCalled();
+    });
+
+    it('wirft bei Fehler', async () => {
+      const error = new Error('storage');
+      const { service, bucket } = setup();
+      bucket.createSignedUrls.mockResolvedValue({ data: null, error });
+
+      await expect(service.getImageUrls(['a'])).rejects.toBe(error);
     });
   });
 });

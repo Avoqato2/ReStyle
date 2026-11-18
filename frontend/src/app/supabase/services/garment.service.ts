@@ -16,6 +16,7 @@ type GarmentUpdate = TablesUpdate<'garments'>;
 type GarmentInput = Omit<GarmentInsert, 'id' | 'image_path' | 'user_id'>;
 
 const GARMENT_BUCKET = 'garments';
+const SIGNED_URL_TTL_SECONDS = 3600;
 
 // Muss zu allowed_mime_types des Buckets passen.
 const IMAGE_EXTENSIONS: Record<string, string> = {
@@ -100,6 +101,30 @@ export class GarmentService {
     }
 
     return response.data;
+  }
+
+  // Liefert zeitlich begrenzte URLs für mehrere Bilder in einem Request (Bucket ist privat).
+  // Key = image_path. Pfade ohne URL (z. B. Datei fehlt) fehlen im Ergebnis.
+  async getImageUrls(paths: string[]): Promise<Record<string, string>> {
+    if (paths.length === 0) {
+      return {};
+    }
+
+    const response = await this.supabase.storage
+      .from(GARMENT_BUCKET)
+      .createSignedUrls(paths, SIGNED_URL_TTL_SECONDS);
+
+    if (response.error) {
+      throw response.error;
+    }
+
+    const urls: Record<string, string> = {};
+    for (const entry of response.data) {
+      if (entry.path && entry.signedUrl) {
+        urls[entry.path] = entry.signedUrl;
+      }
+    }
+    return urls;
   }
 
   // Liefert die Outfits, die das Kleidungsstück enthalten (für den Hinweis vor dem Löschen).
