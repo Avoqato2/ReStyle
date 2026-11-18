@@ -1,36 +1,41 @@
-ion-col{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex: 0 0 100px;
-    width: 100px;
-    height: 125px;
-    border-style: solid;
-    border-radius: 12px;
-    padding: 5px;
-    margin: 3px;
-}
-
-ion-col img {
-  flex-shrink: 0;
-  object-fit: cover;
+:host {
+  --carousel-item-width: 100px; // PRÜFEN: Kartenmaß, kein Token vorhanden
+  --carousel-item-height: 125px; // PRÜFEN: Kartenmaß, kein Token vorhanden
 }
 
 ion-row {
-    display: flex;
-    flex-wrap: nowrap;    
-    overflow-x: auto;
-    overflow-y: hidden;
+  flex-wrap: nowrap;
+  gap: var(--rs-space-1); // PRÜFEN: ersetzt margin 3px
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
-ion-col span {
-  flex: 1;
-  width: 100%;
-  font-size: var(--rs-font-size-xs);
-  line-height: 1.1;
+ion-col {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
+  flex: 0 0 var(--carousel-item-width);
+  inline-size: var(--carousel-item-width);
+  block-size: var(--carousel-item-height);
+  padding: var(--rs-space-1); // PRÜFEN: war 5px
+  color: var(--rs-color-text-primary);
+  border: var(--rs-border-width) solid var(--rs-color-border-default); // PRÜFEN: war border-style solid ohne Farbe/Breite
+  border-radius: var(--rs-radius-lg);
+
+  img {
+    flex-shrink: 0;
+    object-fit: cover;
+  }
+
+  span {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    inline-size: 100%;
+    font-size: var(--rs-font-size-xs);
+    line-height: var(--rs-line-height-xs); // PRÜFEN: Figma 1.1, Token 1rem ist konsistenter
+    text-align: center;
+  }
 }
