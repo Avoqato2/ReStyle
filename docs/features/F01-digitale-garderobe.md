@@ -37,7 +37,9 @@ Umfang: Migration + `GarmentService`. Buttons/Dialog sind nicht Teil davon.
 ### Datenbank
 - Trigger `garments_delete_outfits` bleibt, Funktion `delete_outfits_with_garment()` löscht nur noch Outfits,
   deren einziges Item das Garment ist. Restliche Items entfernt der bestehende FK `on delete cascade`.
-  Gilt für jeden Löschweg, also auch für direktes `delete` auf `garments`.
+  Gilt für jedes Löschen einzelner Garments, also auch für direktes `delete` auf `garments`.
+  Grenze: Löscht ein Statement mehrere Garments eines Outfits gleichzeitig, kann ein leeres Outfit
+  übrig bleiben (Row-Trigger laufen vor den FK-Cascades). Die App löscht nur einzeln.
 - Neue RPC `delete_garment(p_garment_id uuid, p_delete_outfits boolean) returns text`
   (`security invoker`, `search_path = ''`, nur `authenticated`):
   bei `true` zuerst alle Outfits mit dem Garment löschen, dann das Garment. Atomar.
