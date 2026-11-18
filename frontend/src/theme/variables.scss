@@ -72,11 +72,13 @@
   --rs-font-body: 'Inter', sans-serif;
   --rs-font-heading: 'Playfair Display', serif;
   /* xs: VORSCHLAG – nicht aus Figma (Carousel-Labels). */
-  --rs-font-size-xs: 0.75rem;
-  --rs-font-size-sm: 0.875rem;
-  --rs-font-size-md: 1rem;
-  --rs-font-size-lg: 1.25rem;
-  --rs-font-size-xl: 2rem;
+  --rs-font-size-xs: 0.75rem; // 12px
+  --rs-font-size-sm: 0.875rem; // 14px
+  --rs-font-size-md: 1rem; // 16px
+  --rs-font-size-lg: 1.25rem; // 20px
+  --rs-font-size-xl: 2rem; // 32px
+  /* xs: VORSCHLAG – nicht aus Figma. */
+  --rs-line-height-xs: 1rem;
   --rs-line-height-sm: 1.25rem;
   --rs-line-height-md: 1.5rem;
   --rs-line-height-lg: 2rem;

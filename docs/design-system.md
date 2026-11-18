@@ -41,8 +41,7 @@ Nicht verwenden (veraltet): `#427ca6`, `#3e759e`, `#89618e`, `#3880ff`, reines S
 ## Typografie
 - Headlines (h1–h3): `--rs-font-heading` (Playfair Display).
 - Alles andere: `--rs-font-body` (Inter).
-- Größen nur über `--rs-font-size-*`, Line-Height passend: sm→20, md→24, lg/xl→32.
-- Button-Text: Inter Medium, `--rs-letter-spacing-button`, Uppercase.
+- Größen nur über `--rs-font-size-*`, Line-Height passend: xs→16, sm→20, md→24, lg/xl→32.
 - Keine weiteren Schriften (kein Roboto, kein Geist).
 
 ## Spacing
