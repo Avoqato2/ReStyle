@@ -91,7 +91,10 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "save_outfit":
+            "delete_garment":
+{ Args: { "p_delete_outfits": boolean,"p_garment_id": string }; Returns: string
+                           },
+"save_outfit":
 { Args: { "p_outfit_id": string,"p_outfit_items": Json }; Returns: undefined
                            }
           }
