@@ -12,7 +12,7 @@
 
       <img
         class="restyle-logo"
-        src="/assets/branding/restyle-logo.svg"
+        src="assets/branding/restyle-logo.svg"
         alt="ReStyle — style what you already own"
         width="150"
         height="150"/>
@@ -24,7 +24,6 @@
             name="email"
             type="email"
             [(ngModel)]="email"
-            autocomplete="email"
             placeholder="z.B. anna@test.local"
             [required]="true"/>
 
@@ -63,7 +62,7 @@
     <footer class="auth-footer">
       <button class="google-sign-in" type="button" (click)="authWithGoogle()">
         <span>Oder anmelden mit</span>
-        <img src="/assets/branding/google-logo.svg" alt="Google" width="24" height="24" />
+        <img src="assets/branding/google-logo.svg" alt="Google" width="24" height="24" />
       </button>
 
       @if (mode === 'login') {
