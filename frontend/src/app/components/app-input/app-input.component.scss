@@ -1,4 +1,6 @@
 :host {
+  display: block;
+
   --app-input-border-color: var(--rs-color-border-default);
   --app-input-min-height: 48px; // PRÜFEN: Alt-Token --size-control-lg, kein Size-Token vorhanden
 }
@@ -8,8 +10,6 @@
 }
 
 .app-input {
-  display: block;
-
   &__field {
     display: flex;
     align-items: center;
@@ -18,7 +18,7 @@
     padding-inline: var(--rs-space-4); // PRÜFEN: Alt-Token --spacing-16
     background: var(--rs-color-bg-surface); // PRÜFEN: war auskommentiert/transparent; design-system: Inputs = surface
     border: var(--rs-border-width) solid var(--app-input-border-color);
-    border-radius: var(--rs-radius-full); // PRÜFEN: design-system sagt Inputs --rs-radius-md, Komponente ist Pill
+    border-radius: var(--rs-radius-full);
   }
 
   &__label {
@@ -35,6 +35,7 @@
     --border-width: 0;
     --color: var(--rs-color-text-primary);
     --placeholder-color: var(--rs-color-text-muted);
+    --placeholder-opacity: 1;
     --highlight-color-focused: transparent;
     --padding-top: 0;
     --padding-bottom: 0;
