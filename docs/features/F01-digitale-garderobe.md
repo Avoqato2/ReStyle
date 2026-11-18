@@ -15,7 +15,7 @@ Braucht F00. Basis für F02–F05. User baut eine digitale Kopie seines Kleiders
 - [ ] User sieht nur eigene Teile (RLS)
 
 ## Ist-Stand
-- `GarmentService` (`frontend/src/app/supabase/services/garment.service.ts`): `getAll`, `getById`, `create`, `update`, `delete`. Fehlt: Storage-Upload, Storage-Delete, Signed URLs.
+- `GarmentService` (`frontend/src/app/supabase/services/garment.service.ts`): `getAll`, `getById`, `create`, `createWithImage` (Upload + Insert), `update`, `delete(id, { deleteOutfits })` (RPC `delete_garment` + Bild löschen), `getAffectedOutfitIds`, `getImageUrls` (Signed URLs). Fehlt: Bild austauschen.
 - `PhotoService` (`frontend/src/app/services/photo.service.ts`): `Camera.takePhoto` → Hintergrund entfernen (`@imgly/background-removal`) → WebP (Qualität 0.6) → lokal in Filesystem + Preferences. Noch kein Upload, keine Galerie-Auswahl.
 
 ## Muster
