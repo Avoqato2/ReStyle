@@ -11,8 +11,8 @@
     /* Der Rahmen und Hintergrund liegen jetzt auf dem Container,
        damit das Label innerhalb der Pill-Form ist */
     background: var(--app-input-background);
-    border: var(--app-input-border-width) solid var(--app-input-border-color);
-    border-radius: var(--app-input-radius);
+    border: var(--rs-border-width) solid var(--rs-color-border-default);
+    border-radius: var(--rs-radius-full);
     padding: 0 var(--app-input-padding);
     min-height: var(--app-input-height);
   }
