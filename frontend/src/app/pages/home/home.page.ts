@@ -59,27 +59,27 @@ export class HomePage implements OnInit {
     addIcons({ camera });
   }
 
-  userName = signal<string>('');
+  private readonly displayName = signal<string>('');
   private profileService = inject(ProfileService);
 
   async ngOnInit() {
-    await Promise.all([this.getUserName(), this.photoService.loadSaved()]);
+    await Promise.all([this.GetDisplayName(), this.photoService.loadSaved()]);
   }
 
-  // wenn man Username ändert und wieder auf Home zurückkommt
+  // wenn man displayName ändert und wieder auf Home zurückkommt
   async ionViewWillEnter() {
-    await this.getUserName();
+    await this.GetDisplayName();
   }
 
   addPhotoToGallery() {
     this.photoService.HandlePhoto();
   }
 
-  private async getUserName(): Promise<void> {
+  private async GetDisplayName(): Promise<void> {
     try {
       const profile = await this.profileService.getOwn();
       if (profile.display_name) {
-        this.userName.set(profile.display_name);
+        this.displayName.set(profile.display_name);
         return;
       }
     } catch (error) {
