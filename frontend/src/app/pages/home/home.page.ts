@@ -1,4 +1,6 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { ProfileService } from '../../supabase/services/profile.service';
 
 import {
   IonHeader,
@@ -11,6 +13,9 @@ import {
   IonFab,
   IonFabButton,
   IonIcon,
+  IonText,
+  IonItem,
+  IonLabel,
 } from '@ionic/angular';
 
 import { addIcons } from 'ionicons';
@@ -19,12 +24,16 @@ import { PhotoService } from '../../services/photo.service';
 import { AppHeaderComponent } from '../../components/app-header/app-header.component';
 import { AuthPage } from '../auth/auth-form/auth-form.page';
 import { CarouselComponent } from '../../components/carousel/carousel.component';
+import { CardButtonsComponent } from '../../components/card-buttons/card-buttons.component';
+import { ImageCardComponent } from '../../components/image-card/image-card.component';
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   imports: [
+    IonLabel,
+    IonItem,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -37,6 +46,10 @@ import { CarouselComponent } from '../../components/carousel/carousel.component'
     IonIcon,
     AppHeaderComponent,
     CarouselComponent,
+    IonText,
+    CardButtonsComponent,
+    ImageCardComponent,
+    RouterLink,
   ],
 })
 export class HomePage implements OnInit {
@@ -46,10 +59,31 @@ export class HomePage implements OnInit {
     addIcons({ camera });
   }
 
+  private readonly displayName = signal<string>('');
+  private profileService = inject(ProfileService);
+
   async ngOnInit() {
-    await this.photoService.loadSaved();
+    await Promise.all([this.getDisplayName(), this.photoService.loadSaved()]);
   }
+
+  // wenn man displayName ändert und wieder auf Home zurückkommt
+  async ionViewWillEnter() {
+    await this.getDisplayName();
+  }
+
   addPhotoToGallery() {
     this.photoService.HandlePhoto();
+  }
+
+  private async getDisplayName(): Promise<void> {
+    try {
+      const profile = await this.profileService.getOwn();
+      if (profile.display_name) {
+        this.displayName.set(profile.display_name);
+        return;
+      }
+    } catch (error) {
+      console.error('Profil konnte nicht geladen werden: ', error);
+    }
   }
 }

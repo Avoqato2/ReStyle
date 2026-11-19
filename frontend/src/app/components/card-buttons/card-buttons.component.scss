@@ -1,0 +1,38 @@
+.card-container {
+  margin: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  border-style: solid;
+  border-radius: 12px;
+  width: 180px;
+  height: 100px;
+  padding-left: 10px;
+  padding-right: 16px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.main-icon {
+  font-size: 18px;
+}
+
+.bottom-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+}
+
+.arrow-icon {
+  font-size: 18px;
+  flex-shrink: 0; // Verhindert, dass der Pfeil bei langem Text gequetscht wird
+}
+
+ion-text {
+  font-family: var(--font-family-inter);
+  font-size: var(--font-size-14);
+}
