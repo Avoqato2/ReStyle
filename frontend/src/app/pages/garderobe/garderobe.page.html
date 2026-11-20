@@ -1,13 +1,37 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>garderobe</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header></app-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Garderobe</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+  @if (isLoading()) {
+    <p>Garderobe wird geladen...</p>
+  } @else {
+    <ion-grid>
+      <ion-row>
+        @for (garment of garments(); track garment.id) {
+          <ion-col size="6">
+            <div class="garment-card">
+              @if (garment.imageUrl) {
+                <img [src]="garment.imageUrl" [alt]="garment.name || categoryLabels[garment.category]" />
+              }
+              <div class="garment-card__info">
+                <strong>{{ garment.name || categoryLabels[garment.category] }}</strong>
+                @if (garment.brand) {
+                  <span>{{ garment.brand }}</span>
+                }
+              </div>
+            </div>
+          </ion-col>
+        } @empty {
+          <ion-col size="12">
+            <p>Noch keine Kleidungsstücke vorhanden. Füge dein erstes Teil hinzu!</p>
+          </ion-col>
+        }
+      </ion-row>
+    </ion-grid>
+  }
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button routerLink="/add-garment">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>

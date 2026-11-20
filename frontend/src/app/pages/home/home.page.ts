@@ -63,16 +63,12 @@ export class HomePage implements OnInit {
   private profileService = inject(ProfileService);
 
   async ngOnInit() {
-    await Promise.all([this.getUserName(), this.photoService.loadSaved()]);
+    await this.getUserName();
   }
 
   // wenn man Username ändert und wieder auf Home zurückkommt
   async ionViewWillEnter() {
     await this.getUserName();
-  }
-
-  addPhotoToGallery() {
-    this.photoService.HandlePhoto();
   }
 
   private async getUserName(): Promise<void> {

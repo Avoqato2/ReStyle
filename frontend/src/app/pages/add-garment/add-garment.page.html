@@ -1,0 +1,143 @@
+<app-header></app-header>
+
+<ion-content class="ion-padding">
+  <!-- Bild-Vorschau ganz oben -->
+  <div class="garment-preview">
+    @if (isProcessingImage()) {
+      <div class="garment-preview__loading">
+        <p>Hintergrund wird entfernt...</p>
+      </div>
+    } @else if (imagePreviewUrl(); as url) {
+      <img [src]="url" alt="Vorschau Kleidungsstück" class="garment-preview__image" />
+      <app-button type="button" variant="secondary" (click)="pickImage()">
+        Foto ändern
+      </app-button>
+    }
+  </div>
+
+  <form (ngSubmit)="submit()">
+    <ion-accordion-group [multiple]="true" [value]="openAccordions">
+
+      <ion-accordion value="garmentName">
+        <ion-item slot="header">
+          <ion-label>Name</ion-label>
+        </ion-item>
+        <div class="ion-padding" slot="content">
+          <app-input label="" name="name" [(ngModel)]="name"></app-input>
+        </div>
+      </ion-accordion>
+
+      <ion-accordion value="Layer">
+        <ion-item slot="header">
+          <ion-label>Layer *</ion-label>
+        </ion-item>
+        <div class="ion-padding" slot="content">
+          @for (layer of layers; track layer.value) {
+            <app-button
+              type="button"
+              (click)="toggleLayer(layer.value)"
+              [variant]="selectedLayer() === layer.value ? 'secondary' : 'primary'">
+              {{ layer.label }}
+            </app-button>
+          }
+        </div>
+      </ion-accordion>
+
+      <ion-accordion value="Kategorie">
+        <ion-item slot="header">
+          <ion-label>Kategorie *</ion-label>
+        </ion-item>
+        <div class="ion-padding" slot="content">
+          @for (category of categories; track category.value) {
+            <app-button
+              type="button"
+              (click)="toggleCategory(category.value)"
+              [variant]="selectedCategory() === category.value ? 'secondary' : 'primary'">
+              {{ category.label }}
+            </app-button>
+          }
+        </div>
+      </ion-accordion>
+
+      <ion-accordion value="Saison">
+        <ion-item slot="header">
+          <ion-label>Saison</ion-label>
+        </ion-item>
+        <div class="ion-padding" slot="content">
+          @for (season of seasons; track season.value) {
+            <app-button
+              type="button"
+              (click)="toggleSeason(season.value)"
+              [variant]="selectedSeasons().has(season.value) ? 'secondary' : 'primary'">
+              {{ season.label }}
+            </app-button>
+          }
+        </div>
+      </ion-accordion>
+
+      <ion-accordion value="Marke">
+        <ion-item slot="header">
+          <ion-label>Marke</ion-label>
+        </ion-item>
+        <div class="ion-padding" slot="content">
+          <app-input label="" name="brand" [(ngModel)]="brand"></app-input>
+        </div>
+      </ion-accordion>
+
+      <ion-accordion value="Farbpalette">
+        <ion-item slot="header">
+          <ion-label>Farbpalette</ion-label>
+        </ion-item>
+        <div class="ion-padding" slot="content">
+          @for (color of colors; track color.value) {
+            <app-button
+              type="button"
+              (click)="toggleColor(color.value)"
+              [variant]="selectedColors().has(color.value) ? 'secondary' : 'primary'">
+              {{ color.label }}
+            </app-button>
+          }
+        </div>
+      </ion-accordion>
+
+      <ion-accordion value="Material">
+        <ion-item slot="header">
+          <ion-label>Material</ion-label>
+        </ion-item>
+        <div class="ion-padding" slot="content">
+          @for (material of materials; track material.value) {
+            <app-button
+              type="button"
+              (click)="toggleMaterial(material.value)"
+              [variant]="selectedMaterial() === material.value ? 'secondary' : 'primary'">
+              {{ material.label }}
+            </app-button>
+          }
+        </div>
+      </ion-accordion>
+
+      <ion-accordion value="Notizen">
+        <ion-item slot="header">
+          <ion-label>Notizen</ion-label>
+        </ion-item>
+        <div class="ion-padding" slot="content">
+          <ion-textarea
+            label="Notiz"
+            labelPlacement="stacked"
+            name="notes"
+            maxlength="1000"
+            [(ngModel)]="notes">
+          </ion-textarea>
+        </div>
+      </ion-accordion>
+
+    </ion-accordion-group>
+
+    <app-button type="submit" [disabled]="!canSave()" (click)="submit()">
+      {{ isSaving() ? 'Wird gespeichert...' : 'Speichern' }}
+    </app-button>
+    <app-button type="button" variant="secondary" (click)="discard()">
+      Verwerfen
+    </app-button>
+  </form>
+</ion-content>

@@ -92,7 +92,7 @@ CI (PR auf `main`): Branch-Name-Check, Frontend Lint + Test + Build, Backend `su
 - `user_id` nie mitschicken (DB-Default `auth.uid()`).
 - Kleine Standalone-Komponenten, Ionic-Komponenten statt Eigenbau, mobile-first.
 - Services und Datenlogik brauchen Unit-Tests (Vitest).
-- Immer an Design.md halten
+- UI/Styling: Tokens aus `src/theme/variables.scss`, Regeln in `docs/design-system.md`. Keine hardcodierten Farben/Abstände.
 
 ## Datenmodell (Ist = Migrationen)
 
@@ -104,7 +104,8 @@ CI (PR auf `main`): Branch-Name-Check, Frontend Lint + Test + Build, Backend `su
 | `outfit_items` | PK (`outfit_id`, `layer`), `garment_id`                                                                                                                               | FK (`garment_id`, `layer`) → garments, max. 1 Teil pro Layer. Trigger: `full_body` schließt `top`/`bottom` aus. Kein UPDATE |
 
 - RPC `save_outfit(p_outfit_id uuid, p_outfit_items jsonb)`: ersetzt alle Items eines bestehenden Outfits atomar. `[{"layer":"top","garment_id":"…"}]`
-- Garment löschen → Trigger löscht alle Outfits, die es enthalten. Frontend warnt vorher.
+- RPC `delete_garment(p_garment_id uuid, p_delete_outfits boolean) returns text` (image_path): `true` löscht alle Outfits mit dem Garment, `false` entfernt es nur aus den Outfits. Frontend fragt vorher (`GarmentService.getAffectedOutfitIds`).
+- Trigger beim Garment-Löschen: löscht Outfits, die sonst leer wären. Restliche Items entfernt der FK-Cascade.
 - Storage: privater Bucket `garments`, Pfad `{user_id}/…`, max. 5 MB, `image/jpeg|png|webp`. Anzeige per Signed URL (Listen: `createSignedUrls`). Upload vor Insert, bei Insert-Fehler Datei löschen.
 
 ### Enums
