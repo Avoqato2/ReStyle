@@ -102,3 +102,11 @@ export const GARMENT_SEASONS = mapToOptions(SEASON_LABELS);
 export const GARMENT_MATERIALS = mapToOptions(MATERIAL_LABELS);
 export const GARMENT_COLORS = mapToOptions(COLOR_LABELS);
 export const GARMENT_LAYERS = mapToOptions(LAYER_LABELS);
+
+export const CATEGORIES_BY_LAYER: Record<GarmentLayer, GarmentCategory[]> = {
+  top: ['t_shirt', 'shirt', 'blouse', 'polo', 'tank_top', 'sweater', 'hoodie', 'cardigan', 'other'],
+  bottom: ['jeans', 'trousers', 'shorts', 'skirt', 'leggings', 'sweatpants', 'other'],
+  shoes: ['sneakers', 'boots', 'sandals', 'heels', 'dress_shoes', 'other'],
+  outer: ['jacket', 'blazer', 'coat', 'other'],
+  full_body: ['dress', 'jumpsuit', 'other'],
+};

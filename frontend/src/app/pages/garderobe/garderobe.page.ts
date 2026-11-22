@@ -4,37 +4,24 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { GarmentService, type Garment } from '../../supabase/services/garment.service';
-import { AppButtonComponent } from '../../components/app-button/app-button.component';
 import { RouterLink } from '@angular/router';
 
-import { CATEGORY_LABELS } from '../add-garment/garment.constants';
+import { CATEGORY_LABELS, LAYER_LABELS } from '../add-garment/garment.constants';
 
 // Garment kombiniert mit seiner geladenen Signed-URL
 export type GarmentWithUrl = Garment & {
   imageUrl?: string;
 };
 
-import {
-  IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
-  IonFab,
-  IonFabButton,
-  IonIcon,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonRouterLink,
-  NavController,
-} from '@ionic/angular';
+import { IonContent, IonFab, IonFabButton, IonIcon, IonGrid, IonRow, IonCol, IonRouterLink, NavController, IonText, IonTitle } from '@ionic/angular';
 import { AppHeaderComponent } from '../../components/app-header/app-header.component';
+import { GarmentCardComponent } from '../../components/garment-card/garment-card.component';
 
 @Component({
   selector: 'app-garderobe',
   templateUrl: './garderobe.page.html',
   styleUrls: ['./garderobe.page.scss'],
-  imports: [
+  imports: [IonText,
     IonCol,
     IonRow,
     IonGrid,
@@ -42,16 +29,12 @@ import { AppHeaderComponent } from '../../components/app-header/app-header.compo
     IonFabButton,
     IonFab,
     IonContent,
-    IonHeader,
-    IonTitle,
-    IonToolbar,
     CommonModule,
     FormsModule,
-    AppButtonComponent,
     IonRouterLink,
     RouterLink,
     AppHeaderComponent,
-],
+    GarmentCardComponent, IonTitle],
 })
 export class GarderobePage {
   public garmentService = inject(GarmentService);
@@ -60,6 +43,7 @@ export class GarderobePage {
   garments = signal<GarmentWithUrl[]>([]);
   isLoading = signal<boolean>(false);
   readonly categoryLabels = CATEGORY_LABELS;
+  readonly layerLabels = LAYER_LABELS;
 
   async ionViewWillEnter() {
     await this.loadGarments();
@@ -84,6 +68,19 @@ export class GarderobePage {
       console.log('Fehler beim Laden der Garderobe: ', error);
     } finally {
       this.isLoading.set(false);
+    }
+  }
+
+  async deleteGarment(garmentId: string) {
+    try {
+      const deleteOutfits = false;
+      console.log('delete Garment!!!', garmentId);
+      await this.garmentService.delete(garmentId, { deleteOutfits });
+      
+      // Karte sofort aus der Anzeige entfernen:
+      this.garments.update((list) => list.filter((g) => g.id !== garmentId));
+    } catch (error) {
+      console.error('Fehler beim Löschen:', error);
     }
   }
 }

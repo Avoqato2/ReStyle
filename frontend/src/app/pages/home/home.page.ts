@@ -2,21 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ProfileService } from '../../supabase/services/profile.service';
 
-import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonFab,
-  IonFabButton,
-  IonIcon,
-  IonText,
-  IonItem,
-  IonLabel,
-} from '@ionic/angular';
+import { IonHeader, IonTitle, IonContent, IonText, IonItem, IonLabel } from '@ionic/angular';
 
 import { addIcons } from 'ionicons';
 import { camera } from 'ionicons/icons';
@@ -35,15 +21,8 @@ import { ImageCardComponent } from '../../components/image-card/image-card.compo
     IonLabel,
     IonItem,
     IonHeader,
-    IonToolbar,
     IonTitle,
     IonContent,
-    IonGrid,
-    IonRow,
-    IonCol,
-    IonFab,
-    IonFabButton,
-    IonIcon,
     AppHeaderComponent,
     CarouselComponent,
     IonText,

@@ -7,23 +7,16 @@
     <ion-grid>
       <ion-row>
         @for (garment of garments(); track garment.id) {
-          <ion-col size="6">
-            <div class="garment-card">
-              @if (garment.imageUrl) {
-                <img [src]="garment.imageUrl" [alt]="garment.name || categoryLabels[garment.category]" />
-              }
-              <div class="garment-card__info">
-                <strong>{{ garment.name || categoryLabels[garment.category] }}</strong>
-                @if (garment.brand) {
-                  <span>{{ garment.brand }}</span>
-                }
-              </div>
-            </div>
-          </ion-col>
+          <app-garment-card
+          [garmentImageUrl]="garment.imageUrl"
+          [garmentName]="garment.name ?? categoryLabels[garment.category]"
+          [garmentLayer]="layerLabels[garment.layer]"
+          [garmentCategory]="categoryLabels[garment.category]"
+          (deleteClick)="deleteGarment(garment.id)">
+          </app-garment-card>
         } @empty {
-          <ion-col size="12">
-            <p>Noch keine Kleidungsstücke vorhanden. Füge dein erstes Teil hinzu!</p>
-          </ion-col>
+          <ion-title>Meine Garderobe ist nocht leer</ion-title>
+          <ion-text>Füge erste Kleidungsstücke hinzu und gestalte deine persönliche Garderobe.</ion-text>
         }
       </ion-row>
     </ion-grid>
