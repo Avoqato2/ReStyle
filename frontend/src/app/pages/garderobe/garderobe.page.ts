@@ -13,7 +13,7 @@ export type GarmentWithUrl = Garment & {
   imageUrl?: string;
 };
 
-import { IonContent, IonFab, IonFabButton, IonIcon, IonGrid, IonRow, IonCol, IonRouterLink, NavController, IonText, IonTitle } from '@ionic/angular';
+import { IonContent, IonFab, IonFabButton, IonIcon, IonGrid, IonRow, IonCol, IonRouterLink, IonText, IonTitle } from '@ionic/angular';
 import { AppHeaderComponent } from '../../components/app-header/app-header.component';
 import { GarmentCardComponent } from '../../components/garment-card/garment-card.component';
 
@@ -38,7 +38,6 @@ import { GarmentCardComponent } from '../../components/garment-card/garment-card
 })
 export class GarderobePage {
   public garmentService = inject(GarmentService);
-  private navCtrl = inject(NavController);
 
   garments = signal<GarmentWithUrl[]>([]);
   isLoading = signal<boolean>(false);
