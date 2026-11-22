@@ -94,13 +94,13 @@ insert into public.garments (id, user_id, image_path, layer, category, name, col
   ('a1000000-0000-0000-0000-00000000000b','a0000000-0000-0000-0000-000000000001','seed/anna/rock.png','bottom','skirt','Schwarzer Rock','{black}','{summer}','Zara','viscose','S'),
   ('a1000000-0000-0000-0000-00000000000c','a0000000-0000-0000-0000-000000000001','seed/anna/shorts.png','bottom','shorts','Jeansshorts','{blue}','{summer}',null,'denim','29'),
   -- FULL_BODY (Kleid/Overall - belegt top+bottom gleichzeitig)
-  ('a1000000-0000-0000-0000-00000000000d','a0000000-0000-0000-0000-000000000001','seed/anna/kleid.png','full_body','dress','Sommerkleid','{}','{summer}',null,'linen','S'), -- ohne Farbe
+  ('a1000000-0000-0000-0000-00000000000d','a0000000-0000-0000-0000-000000000001','seed/anna/kleid.png','full_body','dress','Sommerkleid','{blue}','{summer}',null,'linen','S'), -- ohne Farbe
   ('a1000000-0000-0000-0000-00000000000e','a0000000-0000-0000-0000-000000000001','seed/anna/jumpsuit.png','full_body','jumpsuit','Schwarzer Jumpsuit','{black}','{spring,autumn}','Zara',null,'S'),
   -- SHOES
   ('a1000000-0000-0000-0000-00000000000f','a0000000-0000-0000-0000-000000000001','seed/anna/sneaker-weiss.png','shoes','sneakers','Weisse Sneaker','{white}','{spring,summer,autumn}','Adidas',null,'39'),
   ('a1000000-0000-0000-0000-000000000010','a0000000-0000-0000-0000-000000000001','seed/anna/sneaker-schwarz.png','shoes','sneakers','Schwarze Sneaker','{black}','{spring,autumn}',null,null,'39'),
   ('a1000000-0000-0000-0000-000000000011','a0000000-0000-0000-0000-000000000001','seed/anna/stiefel.png','shoes','boots','Braune Stiefel','{brown}','{autumn,winter}',null,'leather','39'),
-  ('a1000000-0000-0000-0000-000000000012','a0000000-0000-0000-0000-000000000001','seed/anna/boots.png','shoes','boots','Schwarze Boots','{}','{winter}','Dr Martens','leather','39'), -- ohne Farbe
+  ('a1000000-0000-0000-0000-000000000012','a0000000-0000-0000-0000-000000000001','seed/anna/boots.png','shoes','boots','Schwarze Boots','{blue}','{winter}','Dr Martens','leather','39'), -- ohne Farbe
   ('a1000000-0000-0000-0000-000000000013','a0000000-0000-0000-0000-000000000001','seed/anna/sneaker-bunt.png','shoes','sneakers','Bunte Sneaker','{red,blue,yellow}','{summer}',null,null,'39');
 
 -- ===========================================================================

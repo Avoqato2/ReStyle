@@ -8,8 +8,8 @@ Braucht F01. Merkmale sind Basis für F03, F04 und spätere Empfehlungen. MVP: m
 - Nur das Nötigste ausfüllen, Rest später ergänzen.
 
 ## Akzeptanz
-- [ ] Pflicht: Bild, Layer, Kategorie. Speichern ohne Pflichtfelder nicht möglich
-- [ ] Optional: Name, Farben (mehrere), Saisons (mehrere), Marke (Freitext), Material, Größe (`size_label`), Notiz
+- [ ] Pflicht: Bild, Layer, Kategorie, mind. 1 Farbe, mind. 1 Saison. Speichern ohne Pflichtfelder nicht möglich
+- [ ] Optional: Name, weitere Farben, weitere Saisons, Marke (Freitext), Material, Größe (`size_label`), Notiz
 - [ ] Kategorie bestimmt den Layer
 - [ ] Kategorie, Farbe, Saison, Material nur aus fester Liste (Enums in AGENTS.md)
 - [ ] Ohne Namen: `<Marke> <Farbe> <Kategorie> <Nummer>`, bei mehreren Farben die erste. Name später editierbar
@@ -22,5 +22,5 @@ Saison: `transitional_season` = Übergangszeit (z. B. dünne Jacke)
 ## Offen
 - Confluence: Layer überschreibbar. DB-Check erzwingt Kategorie↔Layer, frei nur bei `other`.
 - `all_year` fehlt im Enum, `favorite` fehlt in `garments` (Confluence will beides).
-- Default-Name: Verhalten ohne Marke/Farbe und Bedeutung von `<Nummer>` unklar.
+- Default-Name: Verhalten ohne Marke und Bedeutung von `<Nummer>` unklar.
 - Figma-Links fehlen.

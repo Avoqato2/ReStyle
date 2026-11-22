@@ -72,7 +72,7 @@ function file(type = 'image/webp'): Blob {
   return new Blob(['img'], { type });
 }
 
-const INPUT = { layer: 'top', category: 't_shirt', colors: ['blue'] } as const;
+const INPUT = { layer: 'top', category: 't_shirt', colors: ['blue'], seasons: ['summer'] } as const;
 
 describe('GarmentService', () => {
   describe('createWithImage', () => {
@@ -80,7 +80,7 @@ describe('GarmentService', () => {
       const created = garment();
       const { service, client, bucket, calls } = setup({ garmentResults: [{ data: created, error: null }] });
 
-      const result = await service.createWithImage(file(), { ...INPUT, colors: [...INPUT.colors] });
+      const result = await service.createWithImage(file(), { ...INPUT, colors: [...INPUT.colors], seasons: [...INPUT.seasons] });
 
       expect(client.storage.from).toHaveBeenCalledWith('garments');
       const [path, body, opts] = bucket.upload.mock.calls[0];
@@ -101,7 +101,7 @@ describe('GarmentService', () => {
       const { service, bucket, calls } = setup();
       bucket.upload.mockResolvedValue({ data: null, error });
 
-      await expect(service.createWithImage(file(), { ...INPUT, colors: [] })).rejects.toBe(error);
+      await expect(service.createWithImage(file(), { ...INPUT, colors: [...INPUT.colors], seasons: [...INPUT.seasons] })).rejects.toBe(error);
       expect(calls.some((c) => c.method === 'insert')).toBe(false);
     });
 
@@ -109,7 +109,7 @@ describe('GarmentService', () => {
       const error = new Error('db');
       const { service, bucket } = setup({ garmentResults: [{ data: null, error }] });
 
-      await expect(service.createWithImage(file(), { ...INPUT, colors: [] })).rejects.toBe(error);
+      await expect(service.createWithImage(file(), { ...INPUT, colors: [...INPUT.colors], seasons: [...INPUT.seasons] })).rejects.toBe(error);
       const uploadedPath = bucket.upload.mock.calls[0][0];
       expect(bucket.remove).toHaveBeenCalledWith([uploadedPath]);
     });
@@ -117,14 +117,14 @@ describe('GarmentService', () => {
     it('lehnt nicht erlaubte Dateitypen ab', async () => {
       const { service, bucket } = setup();
 
-      await expect(service.createWithImage(file('image/gif'), { ...INPUT, colors: [] })).rejects.toThrow();
+      await expect(service.createWithImage(file('image/gif'), { ...INPUT, colors: [...INPUT.colors], seasons: [...INPUT.seasons] })).rejects.toThrow();
       expect(bucket.upload).not.toHaveBeenCalled();
     });
 
     it('wirft ohne Login', async () => {
       const { service, bucket } = setup({ session: null });
 
-      await expect(service.createWithImage(file(), { ...INPUT, colors: [] })).rejects.toThrow();
+      await expect(service.createWithImage(file(), { ...INPUT, colors: [...INPUT.colors], seasons: [...INPUT.seasons] })).rejects.toThrow();
       expect(bucket.upload).not.toHaveBeenCalled();
     });
   });
