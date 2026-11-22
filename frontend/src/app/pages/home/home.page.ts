@@ -2,25 +2,10 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ProfileService } from '../../supabase/services/profile.service';
 
-import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonFab,
-  IonFabButton,
-  IonIcon,
-  IonText,
-  IonItem,
-  IonLabel,
-} from '@ionic/angular';
+import { IonHeader, IonTitle, IonContent, IonText, IonItem, IonLabel } from '@ionic/angular';
 
 import { addIcons } from 'ionicons';
 import { camera } from 'ionicons/icons';
-import { PhotoService } from '../../services/photo.service';
 import { AppHeaderComponent } from '../../components/app-header/app-header.component';
 import { AuthPage } from '../auth/auth-form/auth-form.page';
 import { CarouselComponent } from '../../components/carousel/carousel.component';
@@ -35,15 +20,8 @@ import { ImageCardComponent } from '../../components/image-card/image-card.compo
     IonLabel,
     IonItem,
     IonHeader,
-    IonToolbar,
     IonTitle,
     IonContent,
-    IonGrid,
-    IonRow,
-    IonCol,
-    IonFab,
-    IonFabButton,
-    IonIcon,
     AppHeaderComponent,
     CarouselComponent,
     IonText,
@@ -54,7 +32,6 @@ import { ImageCardComponent } from '../../components/image-card/image-card.compo
 })
 export class HomePage implements OnInit {
   component = AuthPage;
-  public photoService = inject(PhotoService);
   constructor() {
     addIcons({ camera });
   }
@@ -63,16 +40,12 @@ export class HomePage implements OnInit {
   private profileService = inject(ProfileService);
 
   async ngOnInit() {
-    await Promise.all([this.getDisplayName(), this.photoService.loadSaved()]);
+    await this.getDisplayName();
   }
 
   // wenn man displayName ändert und wieder auf Home zurückkommt
   async ionViewWillEnter() {
     await this.getDisplayName();
-  }
-
-  addPhotoToGallery() {
-    this.photoService.HandlePhoto();
   }
 
   private async getDisplayName(): Promise<void> {
