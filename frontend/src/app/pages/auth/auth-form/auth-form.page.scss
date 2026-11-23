@@ -51,7 +51,7 @@ ion-content {
   }
 
   p {
-    margin: 2px 0 0; // PRÜFEN: Alt-Token --spacing-2, kein Token
+    margin: var(--rs-space-2) 0 0; // PRÜFEN: Alt-Token --spacing-2, kein Token
     font-family: var(--rs-font-body);
     font-size: var(--rs-font-size-md);
     line-height: var(--rs-line-height-md);
@@ -87,7 +87,7 @@ ion-content {
   padding: 0;
   border: 0;
   background: none;
-  color: var(--rs-color-text-secondary); // PRÜFEN: Alt-Token --color-text-link, kein Link-Token
+  color: var(--ion-color-secondary); // PRÜFEN: Alt-Token --color-text-link, kein Link-Token
   font-family: var(--rs-font-body);
   font-weight: var(--rs-font-weight-medium); // PRÜFEN: Alt-Token --font-weight-semibold, kein Semibold-Token
   text-decoration: none;
