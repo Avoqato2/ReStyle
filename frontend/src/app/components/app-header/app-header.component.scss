@@ -8,6 +8,7 @@ ion-toolbar {
   --padding-bottom: var(--rs-space-5);
   --padding-start: var(--rs-space-2); // PRÜFEN: war 10px, zwischen space-2 (8px) und space-3 (12px)
   --padding-end: var(--rs-space-2); // PRÜFEN: war 10px, zwischen space-2 (8px) und space-3 (12px)
+  border-bottom: 5px solid var(--rs-color-border-default);
 }
 
 ion-menu-button {
