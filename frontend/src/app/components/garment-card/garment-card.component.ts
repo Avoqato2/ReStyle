@@ -1,4 +1,5 @@
 import { Component, input, output } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { IonText, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { trashOutline, chevronForwardOutline } from 'ionicons/icons';
@@ -7,9 +8,11 @@ import { trashOutline, chevronForwardOutline } from 'ionicons/icons';
   selector: 'app-garment-card',
   templateUrl: './garment-card.component.html',
   styleUrls: ['./garment-card.component.scss'],
-  imports: [IonText, IonIcon],
+  standalone: true,
+  imports: [IonText, IonIcon, RouterLink],
 })
 export class GarmentCardComponent {
+  garmentId = input.required<string>();
   garmentImageUrl = input<string | undefined>();
   garmentName = input<string | null | undefined>();
   garmentLayer = input<string | null | undefined>();
@@ -23,6 +26,7 @@ export class GarmentCardComponent {
 
   onDeleteClick(event: Event) {
     event.stopPropagation();
+    event.preventDefault();
     this.deleteClick.emit();
   }
 }

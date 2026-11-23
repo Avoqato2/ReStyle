@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -33,6 +32,7 @@ import {
   CATEGORY_LABELS,
   CATEGORIES_BY_LAYER,
 } from './garment.constants';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-add-garment',
@@ -54,6 +54,11 @@ import {
   ],
 })
 export class AddGarmentPage {
+  // edit garment
+  private route = inject(ActivatedRoute);
+  garmentId = signal<string | null>(null);
+  isEditMode = computed(() => Boolean(this.garmentId()));
+
   openAccordions = ['garmentName', 'Layer', 'Kategorie', 'Saison', 'Marke', 'Farbpalette', 'Material', 'Notizen'];
   private photoService = inject(PhotoService);
   private garmentService = inject(GarmentService);
@@ -91,9 +96,7 @@ export class AddGarmentPage {
   });
 
   // Angezeigter & gespeicherter Name: manuelle Eingabe hat Vorrang vor Auto-Name
-  effectiveName = computed(() =>
-    this.isNameManuallyEdited() ? this.name() : this.generatedName()
-  );
+  effectiveName = computed(() => (this.isNameManuallyEdited() ? this.name() : this.generatedName()));
 
   brand = signal<string>('');
   notes = signal<string>('');
@@ -122,16 +125,56 @@ export class AddGarmentPage {
   colorsArray = computed(() => [...this.selectedColors()]);
 
   async ionViewWillEnter() {
+    const id = this.route.snapshot.paramMap.get('id');
+    this.garmentId.set(id);
+
+    if (id) {
+      await this.loadGarmentForEdit(id);
+      return;
+    }
     try {
-    const existing = await this.garmentService.getAll();
-    this.garmentNumber.set(existing.length + 1);
-  } catch {
-    this.garmentNumber.set(1);
+      const existing = await this.garmentService.getAll();
+      this.garmentNumber.set(existing.length + 1);
+    } catch {
+      this.garmentNumber.set(1);
+    }
+
+    if (!this.imageBlob()) {
+      await this.pickImage();
+    }
   }
 
-  if (!this.imageBlob()) {
-    await this.pickImage();
-  }
+  private async loadGarmentForEdit(id: string) {
+    try {
+      this.isProcessingImage.set(true);
+      const garment = await this.garmentService.getById(id);
+
+      if (!garment) {
+        this.navCtrl.back();
+        return;
+      }
+
+      // Werte in signals laden
+      this.name.set(garment.name ?? '');
+      this.isNameManuallyEdited.set(Boolean(garment.name));
+      this.brand.set(garment.brand ?? '');
+      this.notes.set(garment.notes ?? '');
+      this.selectedLayer.set(garment.layer);
+      this.selectedCategory.set(garment.category);
+      this.selectedMaterial.set(garment.material ?? null);
+      this.selectedSeasons.set(new Set(garment.seasons ?? []));
+      this.selectedColors.set(new Set(garment.colors ?? []));
+
+      if (garment.image_path) {
+        const urls = await this.garmentService.getImageUrls([garment.image_path]);
+        this.imagePreviewUrl.set(urls[garment.image_path] ?? null);
+      }
+    } catch (error) {
+      console.error('Fehler beim Laden des Kleidungsstücks:', error);
+      this.navCtrl.back();
+    } finally {
+      this.isProcessingImage.set(false);
+    }
   }
 
   ionViewDidLeave() {
@@ -145,69 +188,65 @@ export class AddGarmentPage {
   }
 
   onNameInput(value: string) {
-  this.name.set(value);
-  this.isNameManuallyEdited.set(value.trim().length > 0);
-}
+    this.name.set(value);
+    this.isNameManuallyEdited.set(value.trim().length > 0);
+  }
 
   private resetForm() {
     this.name.set('');
-  this.isNameManuallyEdited.set(false);
-  this.brand.set('');
-  this.notes.set('');
-  this.selectedLayer.set(null);
-  this.selectedCategory.set(null);
-  this.selectedMaterial.set(null);
-  this.selectedSeasons.set(new Set());
-  this.selectedColors.set(new Set());
+    this.isNameManuallyEdited.set(false);
+    this.brand.set('');
+    this.notes.set('');
+    this.selectedLayer.set(null);
+    this.selectedCategory.set(null);
+    this.selectedMaterial.set(null);
+    this.selectedSeasons.set(new Set());
+    this.selectedColors.set(new Set());
   }
 
   // Prüft Pflichtfelder
-  canSave = computed(() =>
-  Boolean(
-    this.imageBlob() &&
-    this.selectedLayer() &&
-    this.selectedSeasons().size > 0 &&
-    this.selectedCategory() &&
-    this.selectedColors().size > 0 &&
-    !this.isSaving()
-  ),
-);
+  canSave = computed(() => {
+    const hasImage = this.isEditMode()
+      ? Boolean(this.imageBlob() || this.imagePreviewUrl())
+      : Boolean(this.imageBlob());
 
-
+    return Boolean(
+      hasImage &&
+      this.selectedLayer() &&
+      this.selectedSeasons().size > 0 &&
+      this.selectedCategory() &&
+      this.selectedColors().size > 0 &&
+      !this.isSaving(),
+    );
+  });
 
   async submit(): Promise<void> {
-    console.log('SUBMIT CHECK:', {
-    hasImage: !!this.imageBlob(),
-    layer: this.selectedLayer(),
-    category: this.selectedCategory(),
-    isSaving: this.isSaving(),
-    });
-
-    const image = this.imageBlob();
-    const layer = this.selectedLayer();
-    const category = this.selectedCategory();
-
-    if (!image || !layer || !category || this.isSaving()) {
-      return;
-    }
+    if (!this.canSave()) return;
 
     const garment: GarmentInput = {
       name: this.effectiveName().trim() || null,
-  brand: this.brand().trim() || null,
-  notes: this.notes().trim() || null,
-  layer,
-  category,
-  material: this.selectedMaterial(),
-  seasons: this.seasonsArray(),
-  colors: this.colorsArray(),
+      brand: this.brand().trim() || null,
+      notes: this.notes().trim() || null,
+      layer: this.selectedLayer()!,
+      category: this.selectedCategory()!,
+      material: this.selectedMaterial(),
+      seasons: this.seasonsArray(),
+      colors: this.colorsArray(),
     };
 
     try {
       this.isSaving.set(true);
-      await this.garmentService.createWithImage(image, garment);
+      const editId = this.garmentId();
+
+      if (editId) {
+        await this.garmentService.update(editId, garment);
+      } else {
+        await this.garmentService.createWithImage(this.imageBlob()!, garment);
+      }
+
       this.navCtrl.back();
     } catch (error) {
-      console.error('Fehler beim Speichern des Kleidungsstücks:', error);
+      console.error('Fehler beim Speichern:', error);
     } finally {
       this.isSaving.set(false);
     }
@@ -257,22 +296,22 @@ export class AddGarmentPage {
   }
 
   filteredCategories = computed(() => {
-  const layer = this.selectedLayer();
-  if (!layer) return this.categories;
+    const layer = this.selectedLayer();
+    if (!layer) return this.categories;
 
-  const allowed = CATEGORIES_BY_LAYER[layer] ?? [];
-  return this.categories.filter((c) => allowed.includes(c.value));
-});
+    const allowed = CATEGORIES_BY_LAYER[layer] ?? [];
+    return this.categories.filter((c) => allowed.includes(c.value));
+  });
 
   toggleLayer(val: GarmentLayer) {
-  const nextLayer = this.selectedLayer() === val ? null : val;
-  this.selectedLayer.set(nextLayer);
+    const nextLayer = this.selectedLayer() === val ? null : val;
+    this.selectedLayer.set(nextLayer);
 
-  const currentCat = this.selectedCategory();
-  if (nextLayer && currentCat && !CATEGORIES_BY_LAYER[nextLayer]?.includes(currentCat)) {
-    this.selectedCategory.set(null);
+    const currentCat = this.selectedCategory();
+    if (nextLayer && currentCat && !CATEGORIES_BY_LAYER[nextLayer]?.includes(currentCat)) {
+      this.selectedCategory.set(null);
+    }
   }
-}
   toggleCategory(val: GarmentCategory) {
     this.selectedCategory.update((current) => (current === val ? null : val));
   }

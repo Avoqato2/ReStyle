@@ -76,4 +76,8 @@ export const routes: Routes = [
     path: 'add-garment',
     loadComponent: () => import('./pages/add-garment/add-garment.page').then((m) => m.AddGarmentPage),
   },
+  {
+    path: 'edit-garment/:id',
+    loadComponent: () => import('./pages/add-garment/add-garment.page').then((m) => m.AddGarmentPage),
+  },
 ];

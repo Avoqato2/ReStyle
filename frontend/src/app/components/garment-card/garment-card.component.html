@@ -1,4 +1,4 @@
-<div class="garmentCardContainer">
+<div class="garmentCardContainer" [routerLink]="['/edit-garment', garmentId()]">
   @if (garmentImageUrl(); as url) {
     <img [src]="url" [alt]="garmentName() || 'Garment Image'" />
   }
@@ -7,7 +7,6 @@
     <ion-text class="garmentDetails">{{ garmentLayer() }} · {{ garmentCategory() }}</ion-text>
   </div>
   <div class="garmentNavigation">
-    <ion-icon name="chevron-forward-outline"></ion-icon>
     <ion-icon name="trash-outline" (click)="onDeleteClick($event)"></ion-icon>
   </div>
 </div>

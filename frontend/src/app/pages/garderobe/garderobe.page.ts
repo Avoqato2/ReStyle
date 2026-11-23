@@ -13,7 +13,7 @@ export type GarmentWithUrl = Garment & {
   imageUrl?: string;
 };
 
-import { IonContent, IonFab, IonFabButton, IonIcon, IonGrid, IonRow, IonCol, IonRouterLink, IonText, IonTitle } from '@ionic/angular';
+import { IonContent, IonFab, IonFabButton, IonIcon, IonGrid, IonRow, IonRouterLink, IonText, IonTitle } from '@ionic/angular';
 import { AppHeaderComponent } from '../../components/app-header/app-header.component';
 import { GarmentCardComponent } from '../../components/garment-card/garment-card.component';
 
@@ -22,7 +22,6 @@ import { GarmentCardComponent } from '../../components/garment-card/garment-card
   templateUrl: './garderobe.page.html',
   styleUrls: ['./garderobe.page.scss'],
   imports: [IonText,
-    IonCol,
     IonRow,
     IonGrid,
     IonIcon,

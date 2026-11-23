@@ -8,6 +8,7 @@
       <ion-row>
         @for (garment of garments(); track garment.id) {
           <app-garment-card
+          [garmentId]="garment.id"
           [garmentImageUrl]="garment.imageUrl"
           [garmentName]="garment.name ?? categoryLabels[garment.category]"
           [garmentLayer]="layerLabels[garment.layer]"
@@ -25,6 +26,7 @@
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
     <ion-fab-button routerLink="/add-garment">
       <ion-icon name="add"></ion-icon>
+      TEIL HINZUFÜGEN
     </ion-fab-button>
   </ion-fab>
 </ion-content>
