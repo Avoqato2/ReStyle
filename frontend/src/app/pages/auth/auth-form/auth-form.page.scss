@@ -6,9 +6,9 @@
 ion-content {
   --background: linear-gradient(
     180deg,
-    var(--color-background-canvas) 0%,
-    var(--color-background-canvas) 60%,
-    var(--color-background-gradient) 100%
+    var(--rs-color-bg-canvas) 0%,
+    var(--rs-color-bg-canvas) 60%,
+    var(--rs-color-bg-subtle) 100%
   );
 }
 
@@ -39,16 +39,16 @@ ion-content {
 
   h1 {
     margin: 0;
-    font-family: var(--typographie-font-family-second);
-    font-size: var(--typography-heading-lg-font-size);
-    font-weight: var(--typography-heading-lg-font-weight);
+    font-family: var(--rs-font-heading);
+    font-size: var(--rs-font-size-xl);
+    font-weight: var(--rs-font-weight-bold);
     line-height: var(--typography-heading-lg-line-height);
     letter-spacing: -0.25px;
   }
 
   p {
     margin: var(--spacing-2) 0 0;
-    font-family: var(--typography-font-family);
+    font-family: var(--rs-font-body);
     font-size: var(--typography-body-font-size);
     line-height: var(--typography-body-line-height);
     letter-spacing: 0.15px;
@@ -84,7 +84,7 @@ ion-content {
   border: 0;
   background: none;
   color: var(--color-text-link);
-  font-family: var(--font-family-inter);
+  font-family: var(--rs-font-body);
   font-weight: var(--font-weight-semibold);
   text-decoration: none;
   cursor: pointer;
@@ -119,24 +119,24 @@ ion-content {
   border: 0;
   background: transparent;
   color: var(--color-text-primary);
-  font-family: var(--typography-font-family);
-  font-size: var(--font-size-20);
-  line-height: var(--font-line-height-24);
+  font-family: var(--rs-font-body);
+  font-size: var(--rs-font-size-lg);
+  //line-height: var(--font-line-height-24);
   letter-spacing: -0.4px;
   cursor: pointer;
 
   img {
     display: block;
-    width: var(--size-icon);
-    height: var(--size-icon);
+    width: var(--rs-icon-size);
+    height: var(--rs-icon-size);
   }
 }
 
 .auth-switch {
   margin: 0;
   color: var(--color-text-primary);
-  font-family: var(--font-family-inter);
-  font-size: var(--typography-body-font-size);
+  font-family: var(--rs-font-body);
+  font-size: var(--rs-font-size-md);
   line-height: var(--typography-body-line-height);
   letter-spacing: 0.15px;
   text-align: center;

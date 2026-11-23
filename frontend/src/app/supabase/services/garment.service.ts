@@ -16,6 +16,7 @@ type GarmentUpdate = TablesUpdate<'garments'>;
 type GarmentInput = Omit<GarmentInsert, 'id' | 'image_path' | 'user_id'>;
 
 const GARMENT_BUCKET = 'garments';
+const SIGNED_URL_TTL_SECONDS = 3600;
 
 // Muss zu allowed_mime_types des Buckets passen.
 const IMAGE_EXTENSIONS: Record<string, string> = {
@@ -102,12 +103,58 @@ export class GarmentService {
     return response.data;
   }
 
-  // Löscht ein Kleidungsstück anhand seiner ID.
-  async delete(id: string): Promise<void> {
-    const response = await this.supabase.from('garments').delete().eq('id', id);
+  // Liefert zeitlich begrenzte URLs für mehrere Bilder in einem Request (Bucket ist privat).
+  // Key = image_path. Pfade ohne URL (z. B. Datei fehlt) fehlen im Ergebnis.
+  async getImageUrls(paths: string[]): Promise<Record<string, string>> {
+    if (paths.length === 0) {
+      return {};
+    }
+
+    const response = await this.supabase.storage
+      .from(GARMENT_BUCKET)
+      .createSignedUrls(paths, SIGNED_URL_TTL_SECONDS);
 
     if (response.error) {
       throw response.error;
+    }
+
+    const urls: Record<string, string> = {};
+    for (const entry of response.data) {
+      if (entry.path && entry.signedUrl) {
+        urls[entry.path] = entry.signedUrl;
+      }
+    }
+    return urls;
+  }
+
+  // Liefert die Outfits, die das Kleidungsstück enthalten (für den Hinweis vor dem Löschen).
+  async getAffectedOutfitIds(garmentId: string): Promise<string[]> {
+    const response = await this.supabase.from('outfit_items').select('outfit_id').eq('garment_id', garmentId);
+
+    if (response.error) {
+      throw response.error;
+    }
+
+    return response.data.map((item) => item.outfit_id);
+  }
+
+  // Löscht ein Kleidungsstück und sein Bild.
+  // deleteOutfits = true: alle Outfits damit löschen. false: nur aus den Outfits entfernen,
+  // leer gewordene Outfits löscht die DB.
+  async delete(id: string, options: { deleteOutfits: boolean }): Promise<void> {
+    const response = await this.supabase.rpc('delete_garment', {
+      p_garment_id: id,
+      p_delete_outfits: options.deleteOutfits,
+    });
+
+    if (response.error) {
+      throw response.error;
+    }
+
+    try {
+      await this.supabase.storage.from(GARMENT_BUCKET).remove([response.data]);
+    } catch {
+      // Datensatz ist schon weg, übrig bleibt höchstens eine verwaiste Datei.
     }
   }
 

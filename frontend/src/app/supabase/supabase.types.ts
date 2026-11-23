@@ -11,7 +11,7 @@ export type Database = {
                   }
                   ComputedFields: never
                   Insert: {
-                    "brand"?: string | null,"category": Database["public"]['Enums']["garment_category"],"colors"?: (Database["public"]['Enums']["garment_color"])[],"created_at"?: string,"id"?: string,"image_path": string,"layer": Database["public"]['Enums']["garment_layer"],"material"?: Database["public"]['Enums']["garment_material"] | null,"name"?: string | null,"notes"?: string | null,"seasons"?: (Database["public"]['Enums']["garment_season"])[],"size_label"?: string | null,"user_id"?: string
+                    "brand"?: string | null,"category": Database["public"]['Enums']["garment_category"],"colors": (Database["public"]['Enums']["garment_color"])[],"created_at"?: string,"id"?: string,"image_path": string,"layer": Database["public"]['Enums']["garment_layer"],"material"?: Database["public"]['Enums']["garment_material"] | null,"name"?: string | null,"notes"?: string | null,"seasons": (Database["public"]['Enums']["garment_season"])[],"size_label"?: string | null,"user_id"?: string
                   }
                   Update: {
                     "brand"?: string | null,"category"?: Database["public"]['Enums']["garment_category"],"colors"?: (Database["public"]['Enums']["garment_color"])[],"created_at"?: string,"id"?: string,"image_path"?: string,"layer"?: Database["public"]['Enums']["garment_layer"],"material"?: Database["public"]['Enums']["garment_material"] | null,"name"?: string | null,"notes"?: string | null,"seasons"?: (Database["public"]['Enums']["garment_season"])[],"size_label"?: string | null,"user_id"?: string
@@ -91,7 +91,13 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "save_outfit":
+            "delete_garment":
+{ Args: { "p_delete_outfits": boolean,"p_garment_id": string }; Returns: string
+                           },
+"delete_own_account":
+{ Args: Record<PropertyKey, never>; Returns: undefined
+                           },
+"save_outfit":
 { Args: { "p_outfit_id": string,"p_outfit_items": Json }; Returns: undefined
                            }
           }
