@@ -1,8 +1,13 @@
 :host {
-  display: block;
-
   --app-input-border-color: var(--rs-color-border-default);
   --app-input-min-height: 48px; // PRÜFEN: Alt-Token --size-control-lg, kein Size-Token vorhanden
+
+  display: flex;
+  align-items: center;
+  min-block-size: var(--app-input-min-height);
+  padding-inline: var(--rs-space-4); // PRÜFEN: Alt-Token --spacing-16
+  border: var(--rs-border-width) solid var(--app-input-border-color);
+  border-radius: var(--rs-radius-full);
 }
 
 :host(.app-input--secondary) {
@@ -10,26 +15,16 @@
 }
 
 .app-input {
-  &__field {
-    display: flex;
-    align-items: center;
-    gap: var(--rs-space-2); // PRÜFEN: Alt-Token --spacing-8, war auskommentiert
-    min-block-size: var(--app-input-min-height);
-    padding-inline: var(--rs-space-4); // PRÜFEN: Alt-Token --spacing-16
-    background: var(--rs-color-bg-surface); // PRÜFEN: war auskommentiert/transparent; design-system: Inputs = surface
-    border: var(--rs-border-width) solid var(--app-input-border-color);
-    border-radius: var(--rs-radius-full);
-  }
-
   &__label {
-    color: var(--rs-color-text-secondary);
+    margin-inline-end: var(--rs-space-2); // PRÜFEN: Alt-Token --spacing-8
+    color: var(--rs-color-text-primary);
     font-size: var(--rs-font-size-sm);
     line-height: var(--rs-line-height-sm);
     font-weight: var(--rs-font-weight-medium);
     white-space: nowrap;
   }
 
-  // Rahmen und Padding liegen auf __field, Ionic-Defaults daher neutralisiert.
+  // Rahmen und Padding liegen auf :host, Ionic-Defaults daher neutralisiert.
   &__control {
     --background: transparent;
     --border-width: 0;
@@ -43,6 +38,7 @@
     --padding-end: 0;
 
     flex: 1;
+    min-height: 0;
     font-size: var(--rs-font-size-md);
   }
 }
