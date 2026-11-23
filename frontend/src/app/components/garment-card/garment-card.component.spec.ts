@@ -12,6 +12,7 @@ describe('GarmentCardComponent', () => {
     TestBed.configureTestingModule({ providers: [provideRouter([])] });
     fixture = TestBed.createComponent(GarmentCardComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('garmentId', 'test-id');
     fixture.detectChanges();
   });
 
