@@ -1,47 +1,89 @@
-/* eslint-disable prettier/prettier */
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { addIcons } from 'ionicons';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import {
+  IonContent,
+  IonFab,
+  IonFabButton,
+  IonIcon,
+  IonGrid,
+  IonRow,
+  IonText,
+  IonTitle,
+  IonAccordion,
+  IonAccordionGroup,
+  IonItem,
+  IonLabel,
+  IonSearchbar,
+} from '@ionic/angular';
 
 import { GarmentService, type Garment } from '../../supabase/services/garment.service';
-import { RouterLink } from '@angular/router';
+import { CATEGORY_LABELS, GARMENT_LAYERS, GarmentLayer, LAYER_LABELS } from '../add-garment/garment.constants';
+import { AppHeaderComponent } from '../../components/app-header/app-header.component';
+import { GarmentCardComponent } from '../../components/garment-card/garment-card.component';
+import { optionsOutline, addCircle } from 'ionicons/icons';
 
-import { CATEGORY_LABELS, LAYER_LABELS } from '../add-garment/garment.constants';
-
-// Garment kombiniert mit seiner geladenen Signed-URL
 export type GarmentWithUrl = Garment & {
   imageUrl?: string;
 };
-
-import { IonContent, IonFab, IonFabButton, IonIcon, IonGrid, IonRow, IonRouterLink, IonText, IonTitle } from '@ionic/angular';
-import { AppHeaderComponent } from '../../components/app-header/app-header.component';
-import { GarmentCardComponent } from '../../components/garment-card/garment-card.component';
 
 @Component({
   selector: 'app-garderobe',
   templateUrl: './garderobe.page.html',
   styleUrls: ['./garderobe.page.scss'],
-  imports: [IonText,
+  standalone: true,
+  imports: [
+    IonText,
     IonRow,
     IonGrid,
     IonIcon,
     IonFabButton,
     IonFab,
     IonContent,
+    IonAccordion,
+    IonAccordionGroup,
+    IonItem,
+    IonLabel,
     CommonModule,
     FormsModule,
-    IonRouterLink,
     RouterLink,
     AppHeaderComponent,
-    GarmentCardComponent, IonTitle],
+    GarmentCardComponent,
+    IonTitle,
+    IonSearchbar,
+  ],
 })
 export class GarderobePage {
+  constructor() {
+    addIcons({ addCircle, optionsOutline });
+  }
+
   public garmentService = inject(GarmentService);
 
   garments = signal<GarmentWithUrl[]>([]);
   isLoading = signal<boolean>(false);
+
+  readonly layers = GARMENT_LAYERS;
   readonly categoryLabels = CATEGORY_LABELS;
   readonly layerLabels = LAYER_LABELS;
+
+  // Standardmäßig alle Layer-Accordions geöffnet halten
+  openAccordions = GARMENT_LAYERS.map((l) => l.value);
+
+  // Garments automatisch nach Layer gruppieren
+  garmentsByLayer = computed(() => {
+    const grouped: Partial<Record<GarmentLayer, GarmentWithUrl[]>> = {};
+
+    for (const garment of this.garments()) {
+      const list = grouped[garment.layer] ?? [];
+      list.push(garment);
+      grouped[garment.layer] = list;
+    }
+
+    return grouped;
+  });
 
   async ionViewWillEnter() {
     await this.loadGarments();
@@ -52,7 +94,6 @@ export class GarderobePage {
       this.isLoading.set(true);
 
       const items = await this.garmentService.getAll();
-
       const paths = items.map((g) => g.image_path).filter(Boolean);
       const urls = await this.garmentService.getImageUrls(paths);
 
@@ -72,10 +113,7 @@ export class GarderobePage {
   async deleteGarment(garmentId: string) {
     try {
       const deleteOutfits = false;
-      console.log('delete Garment!!!', garmentId);
       await this.garmentService.delete(garmentId, { deleteOutfits });
-      
-      // Karte sofort aus der Anzeige entfernen:
       this.garments.update((list) => list.filter((g) => g.id !== garmentId));
     } catch (error) {
       console.error('Fehler beim Löschen:', error);
