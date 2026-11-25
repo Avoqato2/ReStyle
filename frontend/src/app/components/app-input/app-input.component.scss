@@ -1,6 +1,7 @@
 :host {
   --app-input-border-color: var(--rs-color-border-default);
   --app-input-min-height: 48px; // PRÜFEN: Alt-Token --size-control-lg, kein Size-Token vorhanden
+  --app-input-autofill-bg: var(--ion-background-color); // PRÜFEN: passendes --rs-color-bg-* Token
 
   display: flex;
   align-items: center;
@@ -40,5 +41,17 @@
     flex: 1;
     min-height: 0;
     font-size: var(--rs-font-size-md);
+
+    ::ng-deep input.native-input {
+      &:-webkit-autofill,
+      &:-webkit-autofill:hover,
+      &:-webkit-autofill:focus,
+      &:autofill {
+        -webkit-text-fill-color: var(--rs-color-text-primary);
+        caret-color: var(--rs-color-text-primary);
+        box-shadow: 0 0 0 1000px var(--app-input-autofill-bg, #fff) inset !important;
+      }
+    }
   }
 }
+
