@@ -1,0 +1,52 @@
+ion-content {
+  --background: linear-gradient(
+    180deg,
+    var(--rs-color-bg-canvas) 0%,
+    var(--rs-color-bg-canvas) 60%,
+    var(--rs-color-bg-subtle) 100%
+  );
+}
+
+
+.confirmation-mail-screen {
+  box-sizing: border-box;
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  // unten mehr als oben → optische Mitte wie in Figma
+  padding: var(--rs-space-4) var(--rs-space-6) var(--rs-space-12);
+}
+
+.confirmation-mail-content {
+  display: flex;
+  width: 100%;
+  max-width: 400px; // PRÜFEN: kein Token
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--rs-space-8);
+}
+
+
+.confirmation-mail-heading {
+  text-align: center;
+  color: var(--rs-color-text-primary);
+
+  h1 {
+    font-family: var(--rs-font-heading);
+    font-size: var(--rs-font-size-xl);
+    font-weight: var(--rs-font-weight-bold);
+    line-height: var(--rs-line-height-lg);
+    letter-spacing: -0.25px; // PRÜFEN: kein Token
+  }
+
+  p {
+    margin: var(--rs-space-8) 0 0; // PRÜFEN: Alt-Token --spacing-2, kein Token
+    font-family: var(--rs-font-body);
+    font-size: var(--rs-font-size-md);
+    line-height: var(--rs-line-height-md);
+    letter-spacing: 0.15px; // PRÜFEN: kein Token
+  }
+}

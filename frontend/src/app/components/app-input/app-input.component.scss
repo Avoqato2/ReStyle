@@ -1,59 +1,61 @@
-.app-input {
-  display: block;
-  color: var(--app-input-border-color);
-
-  &__field {
-    display: flex;
-    flex-direction: row; /* Ändert die Anordnung, sodass das Label links (am Start) steht */
-    align-items: center; /* Zentriert Label und Input vertikal auf einer Linie */
-    gap: var(--app-input-label-gap);
-
-    /* Der Rahmen und Hintergrund liegen jetzt auf dem Container,
-       damit das Label innerhalb der Pill-Form ist */
-    background: var(--app-input-background);
-    border: var(--rs-border-width) solid var(--rs-color-border-default);
-    border-radius: var(--rs-radius-full);
-    padding: 0 var(--app-input-padding);
-    min-height: var(--app-input-height);
-  }
-
-  &__label {
-    color: var(--app-input-label-color);
-    font-size: var(--app-input-label-size);
-    font-weight: var(--app-input-label-weight);
-    white-space: nowrap; /* Verhindert, dass das Label bei wenig Platz umbricht */
-  }
-
-  &__control {
-    flex: 1; /* Das Input-Feld nimmt den restlichen Platz ein */
-
-    /* Die Ionic-Variablen des Inputs werden zurückgesetzt,
-       da der Container bereits den Rahmen und das Padding übernimmt */
-    --background: transparent;
-    --border-width: 0px;
-    --color: var(--app-input-color);
-    --highlight-color-focused: transparent;
-    --padding-bottom: 0;
-    --padding-end: 0;
-    --padding-start: 0;
-    --padding-top: 0;
-  }
-}
-
 :host {
-  --app-input-background: transparent; /* Keine Hintergrundfarbe */
-  --app-input-border-color: var(--color-border-default);
-  --app-input-border-width: var(--border-width-default);
-  --app-input-color: var(--color-neutral-900);
-  --app-input-height: var(--size-control-lg);
-  --app-input-label-color: var(--color-neutral-800);
-  --app-input-label-gap: var(--spacing-8);
-  --app-input-label-size: var(--font-size-14);
-  --app-input-label-weight: var(--font-weight-medium);
-  --app-input-padding: var(--spacing-16); /* Bei Pill-Shapes ist seitlich oft minimal mehr Platz (16px) schöner als 12px */
-  --app-input-radius: var(--radius-full); /* Pill Shaped (vollständig abgerundet) */
+  --app-input-border-color: var(--rs-color-border-default);
+  --app-input-min-height: 48px; // PRÜFEN: Alt-Token --size-control-lg, kein Size-Token vorhanden
+  --app-input-autofill-bg: var(--ion-background-color); // PRÜFEN: passendes --rs-color-bg-* Token
+
+  display: flex;
+  align-items: center;
+  min-block-size: var(--app-input-min-height);
+  padding-inline: var(--rs-space-4); // PRÜFEN: Alt-Token --spacing-16
+  border: var(--rs-border-width) solid var(--app-input-border-color);
+  border-radius: var(--rs-radius-full);
 }
 
 :host(.app-input--secondary) {
-  --app-input-border-color: var(--color-brand-violet);
+  --app-input-border-color: var(--ion-color-secondary); // PRÜFEN: Alt-Token --color-brand-violet, kein Violett-Token
 }
+
+.app-input {
+  &__label {
+    margin-inline-end: var(--rs-space-2); // PRÜFEN: Alt-Token --spacing-8
+    color: var(--rs-color-text-primary);
+    font-size: var(--rs-font-size-sm);
+    line-height: var(--rs-line-height-sm);
+    font-weight: var(--rs-font-weight-medium);
+    white-space: nowrap;
+  }
+
+  // Rahmen und Padding liegen auf :host, Ionic-Defaults daher neutralisiert.
+  &__control {
+    --background: transparent;
+    --border-width: 0;
+    --color: var(--rs-color-text-primary);
+    --placeholder-color: var(--rs-color-text-muted);
+    --placeholder-opacity: 1;
+    --highlight-color-focused: transparent;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    --padding-start: 0;
+    --padding-end: 0;
+    // resets margin made by ionic
+    ::ng-deep .label-text-wrapper.label-text-wrapper {
+      margin-inline-end: 0;
+    }
+
+    flex: 1;
+    min-height: 0;
+    font-size: var(--rs-font-size-md);
+
+    ::ng-deep input.native-input {
+      &:-webkit-autofill,
+      &:-webkit-autofill:hover,
+      &:-webkit-autofill:focus,
+      &:autofill {
+        -webkit-text-fill-color: var(--rs-color-text-primary);
+        caret-color: var(--rs-color-text-primary);
+        box-shadow: 0 0 0 1000px var(--app-input-autofill-bg, #fff) inset !important;
+      }
+    }
+  }
+}
+
