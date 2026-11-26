@@ -14,6 +14,12 @@
     font-weight: var(--rs-font-weight-bold);
 }
 
+.garderobeEmpty {
+    font-family: var(--rs-font-heading);
+    font-size: var(--rs-font-size-xl);
+    font-weight: var(--rs-font-weight-bold);
+}
+
 .countGarment{
     margin: 0px;
     font-family: var(--ion-font-family);
@@ -32,7 +38,7 @@ ion-searchbar.garmentSearchBar {
 }
 
 .buttonContainer ion-icon {
-  font-size: var(--rs-icon-size);
+  font-size: var(--rs-icon-size-lg);
   color: var(--rs-color-text-primary);
 }
 
@@ -61,4 +67,47 @@ ion-searchbar.garmentSearchBar {
 .garderobeDescription {
     font-family: var(--ion-font-family);
     font-size: var(--rs-font-size-md);
+}
+
+.garderobeHint {
+    color: var(--rs-color-text-secondary);
+    font-family: var(--ion-font-family);
+    font-size: var(--rs-font-size-md);
+    text-wrap: balance;
+}
+
+ion-fab-button {
+  width: 220px;
+  height: 36px;
+  font-size: var(--rs-font-size-sm);
+
+  --border-radius: 25px;
+  --box-shadow: none;
+  box-shadow: none;
+
+  ion-icon {
+    margin-right: var(--rs-space-2)
+  }
+}
+
+.accordionFabRow {
+  display: flex;
+  justify-content: center;
+  margin: 12px 0 20px 0;
+}
+
+.emptyGarderobe {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: var(--rs-space-4);
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -45%);
+  width: 100%;
+  padding: 0 var(--rs-space-5);
 }

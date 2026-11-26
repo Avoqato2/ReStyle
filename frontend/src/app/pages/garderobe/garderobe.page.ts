@@ -23,7 +23,7 @@ import { GarmentService, type Garment } from '../../supabase/services/garment.se
 import { CATEGORY_LABELS, GARMENT_LAYERS, GarmentLayer, LAYER_LABELS } from '../add-garment/garment.constants';
 import { AppHeaderComponent } from '../../components/app-header/app-header.component';
 import { GarmentCardComponent } from '../../components/garment-card/garment-card.component';
-import { optionsOutline, addCircle } from 'ionicons/icons';
+import { optionsOutline, addCircle, addCircleOutline } from 'ionicons/icons';
 
 export type GarmentWithUrl = Garment & {
   imageUrl?: string;
@@ -57,7 +57,7 @@ export type GarmentWithUrl = Garment & {
 })
 export class GarderobePage {
   constructor() {
-    addIcons({ addCircle, optionsOutline });
+    addIcons({ addCircle, optionsOutline, addCircleOutline });
   }
 
   public garmentService = inject(GarmentService);

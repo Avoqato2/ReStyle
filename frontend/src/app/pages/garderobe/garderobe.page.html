@@ -11,19 +11,28 @@
     </div>
     <ion-text class="garderobeDescription">Alle meine Teile, ansehen und bearbeiten</ion-text>
   </div>
-  <ion-searchbar class="garmentSearchBar" placeholder="Kleidungsnamen suchen …" show-clear-button="focus" border-radius="13px"></ion-searchbar>
   @if (isLoading()) {
   <p>Garderobe wird geladen...</p>
   } @else if (garments().length === 0) {
-  <ion-title>Meine Garderobe ist noch leer</ion-title>
-  <ion-text>Füge erste Kleidungsstücke hinzu und gestalte deine persönliche Garderobe.</ion-text>
+  <div class="emptyGarderobe">
+    <ion-title class="garderobeEmpty">Meine Garderobe ist noch leer.</ion-title>
+    <ion-text class="garderobeHint">Füge erste Kleidungsstücke hinzu und gestalte deine persönliche Garderobe.
+    </ion-text>
+    <div class="accordionFabRow">
+      <ion-fab-button routerLink="/add-garment">
+        <ion-icon name="add-circle"></ion-icon>
+        TEILE HINZUFÜGEN
+      </ion-fab-button>
+    </div>
+  </div>
   } @else {
   <ion-accordion-group [multiple]="true" [value]="openAccordions">
     @for (layer of layers; track layer.value) {
     @let layerItems = garmentsByLayer()[layer.value] ?? [];
 
     @if (layerItems.length > 0) {
-
+    <ion-searchbar class="garmentSearchBar" placeholder="Kleidungsnamen suchen …" show-clear-button="focus"
+      border-radius="13px"></ion-searchbar>
     <ion-accordion [value]="layer.value">
       <ion-item slot="header">
         <ion-title class="layerLabel">{{ layer.label}}</ion-title>
@@ -46,15 +55,14 @@
         </ion-grid>
       </div>
     </ion-accordion>
+    <div class="accordionFabRow">
+      <ion-fab-button routerLink="/add-garment">
+        <ion-icon name="add-circle"></ion-icon>
+        TEILE HINZUFÜGEN
+      </ion-fab-button>
+    </div>
     }
     }
   </ion-accordion-group>
   }
-
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button routerLink="/add-garment">
-      <ion-icon name="add"></ion-icon>
-      TEIL HINZUFÜGEN
-    </ion-fab-button>
-  </ion-fab>
 </ion-content>
