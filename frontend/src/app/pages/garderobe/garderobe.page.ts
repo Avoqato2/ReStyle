@@ -49,7 +49,7 @@ export type GarmentWithUrl = Garment & {
     GarmentCardComponent,
     IonTitle,
     IonSearchbar,
-],
+  ],
 })
 export class GarderobePage {
   constructor() {
