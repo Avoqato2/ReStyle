@@ -1,35 +1,34 @@
 :host {
+  --app-button-min-height: 48px; // PRÜFEN: Alt-Token --size-control, kein Size-Token vorhanden
+
   display: inline-block;
-  width: auto;
-  --background: var(--app-button-background);
-  --background-hover: var(--app-button-background-hover);
-  --background-activated: var(--app-button-background-pressed);
-  --background-focused: var(--app-button-background-hover);
-  --border-radius: var(--radius-full);
-  --box-shadow: none;
-  --color: var(--color-neutral-0);
-  --padding-start: var(--spacing-16);
-  --padding-end: var(--spacing-16);
-  --min-height: var(--size-control);
-  font-family: var(--font-family-inter);
-  font-size: var(--font-size-14);
-  font-weight: var(--font-weight-medium);
+}
 
-  &[expand='block'],
-  &[expand='full'] {
-    display: block;
-    width: 100%;
+:host([expand='block']),
+:host([expand='full']) {
+  display: block;
+}
+
+ion-button {
+  --border-radius: var(--rs-radius-full);
+  --box-shadow: var(--rs-shadow-button);
+  --padding-start: var(--rs-space-4); // PRÜFEN: Alt-Token --spacing-16
+  --padding-end: var(--rs-space-4); // PRÜFEN: Alt-Token --spacing-16
+  --background-hover-opacity: 0; // Design-System: Default = Hover
+
+  min-height: var(--app-button-min-height);
+  font-family: var(--rs-font-body);
+  font-size: var(--rs-font-size-sm);
+  font-weight: var(--rs-font-weight-medium);
+  letter-spacing: var(--rs-letter-spacing-button);
+  text-transform: uppercase;
+
+  // Ionic dimmt Disabled per Opacity; Design-System verlangt eigene Disabled-Farbe.
+  // --ion-color-base ist global per !important gesetzt, daher die Quellfarbe überschreiben.
+  &.button-disabled {
+    --ion-color-primary: var(--rs-color-primary-disabled);
+    --ion-color-secondary: var(--rs-color-secondary-disabled);
+
+    opacity: 1;
   }
-}
-
-:host([variant='primary']) {
-  --app-button-background: var(--color-primary-default-neu);
-  --app-button-background-hover: var(--color-primary-hover);
-  --app-button-background-pressed: var(--color-primary-pressed);
-}
-
-:host([variant='secondary']) {
-  --app-button-background: var(--color-primary-secondary-default);
-  --app-button-background-hover: var(--color-primary-secondary-hover);
-  --app-button-background-pressed: var(--color-primary-secondary-pressed);
 }

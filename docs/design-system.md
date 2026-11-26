@@ -41,7 +41,7 @@ Nicht verwenden (veraltet): `#427ca6`, `#3e759e`, `#89618e`, `#3880ff`, reines S
 ## Typografie
 - Headlines (h1–h3): `--rs-font-heading` (Playfair Display).
 - Alles andere: `--rs-font-body` (Inter).
-- Größen nur über `--rs-font-size-*`, Line-Height passend: sm→20, md→24, lg/xl→32.
+- Größen nur über `--rs-font-size-*`, Line-Height passend: xs→16, sm→20, md→24, lg/xl→32.
 - Button-Text: Inter Medium, `--rs-letter-spacing-button`, Uppercase.
 - Keine weiteren Schriften (kein Roboto, kein Geist).
 
@@ -52,7 +52,8 @@ Nicht verwenden (veraltet): `#427ca6`, `#3e759e`, `#89618e`, `#3880ff`, reines S
 - Abstand zwischen Sektionen: `--rs-space-6` bzw. `--rs-space-8`.
 
 ## Radius & Schatten
-- Inputs, Chips: `--rs-radius-md`.
+- Inputs: `--rs-radius-full` (Pill).
+- Chips: `--rs-radius-md`.
 - Karten (Kleidungsstück, Outfit): `--rs-radius-lg` + `--rs-shadow-card`.
 - Modals, Popover, Action Sheets: `--rs-radius-xl` + `--rs-shadow-overlay`.
 
