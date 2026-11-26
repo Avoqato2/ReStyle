@@ -6,12 +6,23 @@ import { AppHeaderComponent } from '../../../components/app-header/app-header.co
 import { Router } from '@angular/router';
 import { AuthService } from '../../../supabase/services/auth/auth.service';
 import { NgHcaptchaModule } from 'ng-hcaptcha';
+import { AppInputComponent } from '../../../components/app-input/app-input.component';
+import { AppButtonComponent } from '../../../components/app-button/app-button.component';
 
 @Component({
   selector: 'app-forgot-password',
   templateUrl: './forgot-password.page.html',
   styleUrls: ['./forgot-password.page.scss'],
-  imports: [NgHcaptchaModule, IonContent, CommonModule, FormsModule, AppHeaderComponent],
+  imports: [
+    NgHcaptchaModule,
+    IonContent,
+    CommonModule,
+    FormsModule,
+    AppHeaderComponent,
+    AppInputComponent,
+    AppButtonComponent,
+    AppHeaderComponent,
+  ],
 })
 export class ForgotPasswordPage {
   private readonly router = inject(Router);
