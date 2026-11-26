@@ -1,15 +1,18 @@
+:host {
+  --app-header-menu-icon-size: 60px; // PRÜFEN: --rs-icon-size ist 24px, 60px wirkt groß
+  --app-header-profile-icon-size: 36px; // PRÜFEN: kein Token vorhanden
+}
+
 ion-toolbar {
-  --padding-top: var(--rs-space-6);
-  --padding-bottom: var(--rs-space-6);
-  --padding-start: var(--rs-space-2);
-  --padding-end: var(--rs-space-2);
-  height: 98px;
+  --padding-top: var(--rs-space-5);
+  --padding-bottom: var(--rs-space-5);
+  --padding-start: var(--rs-space-2); // PRÜFEN: war 10px, zwischen space-2 (8px) und space-3 (12px)
+  --padding-end: var(--rs-space-2); // PRÜFEN: war 10px, zwischen space-2 (8px) und space-3 (12px)
   border-bottom: 5px solid var(--rs-color-border-default);
-  box-shadow: none;
 }
 
 ion-menu-button {
-  font-size: 60px;
+  font-size: var(--app-header-menu-icon-size);
 }
 
 .header-logo {
@@ -22,6 +25,6 @@ ion-menu-button {
 }
 
 .profile-icon {
-  width: 36px;
-  height: 36px;
+  inline-size: var(--app-header-profile-icon-size);
+  block-size: var(--app-header-profile-icon-size);
 }
