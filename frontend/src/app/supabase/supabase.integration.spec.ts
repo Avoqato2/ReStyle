@@ -55,6 +55,8 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
       image_path: 'integration-test/garment.png',
       layer: 'top',
       category: 't_shirt',
+      colors: ['blue'],
+      seasons: ['summer'],
       name: 'Integration Test Garment',
     });
     testGarmentId = garment.id;
@@ -267,6 +269,8 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
           image_path: 'integration-test/temporary-garment.png',
           layer: 'top',
           category: 't_shirt',
+          colors: ['blue'],
+          seasons: ['summer'],
           name: 'Temporary Integration Garment',
         });
         createdId = created.id;
@@ -373,6 +377,8 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
         image_path: `integration-test/${layer}-${Date.now()}.png`,
         layer,
         category: layer === 'top' ? 't_shirt' : 'jeans',
+        colors: ['blue'],
+        seasons: ['summer'],
       });
       garmentIds.push(garment.id);
       return garment.id;

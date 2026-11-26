@@ -25,3 +25,9 @@
 #container a {
   text-decoration: none;
 }
+
+.card-button-grid{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
