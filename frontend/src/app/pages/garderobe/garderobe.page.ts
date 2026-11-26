@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import {
   IonContent,
-  IonFab,
   IonFabButton,
   IonIcon,
   IonGrid,
@@ -15,7 +14,6 @@ import {
   IonAccordion,
   IonAccordionGroup,
   IonItem,
-  IonLabel,
   IonSearchbar,
 } from '@ionic/angular';
 
@@ -40,12 +38,10 @@ export type GarmentWithUrl = Garment & {
     IonGrid,
     IonIcon,
     IonFabButton,
-    IonFab,
     IonContent,
     IonAccordion,
     IonAccordionGroup,
     IonItem,
-    IonLabel,
     CommonModule,
     FormsModule,
     RouterLink,
@@ -53,7 +49,7 @@ export type GarmentWithUrl = Garment & {
     GarmentCardComponent,
     IonTitle,
     IonSearchbar,
-  ],
+],
 })
 export class GarderobePage {
   constructor() {
