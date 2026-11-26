@@ -27,16 +27,22 @@
   </div>
   } @else {
   <ion-accordion-group [multiple]="true" [value]="openAccordions">
+    <ion-searchbar class="garmentSearchBar" placeholder="Kleidungsnamen suchen …" show-clear-button="focus"></ion-searchbar>
     @for (layer of layers; track layer.value) {
     @let layerItems = garmentsByLayer()[layer.value] ?? [];
 
     @if (layerItems.length > 0) {
-    <ion-searchbar class="garmentSearchBar" placeholder="Kleidungsnamen suchen …" show-clear-button="focus"
-      border-radius="13px"></ion-searchbar>
     <ion-accordion [value]="layer.value">
       <ion-item slot="header">
-        <ion-title class="layerLabel">{{ layer.label}}</ion-title>
-        <ion-label class="countGarment">{{ layerItems.length }} Teile</ion-label>
+        <div class="accordionHeaderTitle">
+          <ion-text class="layerLabel">{{ layer.label }}</ion-text>
+          @if (layerItems.length > 1){
+            <ion-text class="countGarment">{{ layerItems.length }} Teile</ion-text>
+          } @else {
+            <ion-text class="countGarment">{{ layerItems.length }} Teil</ion-text>
+          }
+          
+        </div>
       </ion-item>
 
       <div slot="content">

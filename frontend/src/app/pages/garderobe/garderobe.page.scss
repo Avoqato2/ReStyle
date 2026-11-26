@@ -1,30 +1,37 @@
 .garmentCard {
-    margin-bottom: var(--rs-space-2);
+  margin-bottom: var(--rs-space-2);
+}
+
+.accordionHeaderTitle {
+  display: flex;
+  align-items: baseline;
+  gap: var(--rs-space-2);
 }
 
 .layerLabel {
-    padding: 0px;
-    font-family: var(--rs-font-heading);
-    font-weight: var(--rs-font-weight-bold);
+  padding: 0px;
+  font-family: var(--rs-font-heading);
+  font-weight: var(--rs-font-weight-bold);
+  font-size: var(--rs-font-size-lg);
 }
 
 .garderobeTitle {
-    font-family: var(--rs-font-heading);
-    font-size: var(--rs-font-size-xl);
-    font-weight: var(--rs-font-weight-bold);
+  font-family: var(--rs-font-heading);
+  font-size: var(--rs-font-size-xl);
+  font-weight: var(--rs-font-weight-bold);
 }
 
 .garderobeEmpty {
-    font-family: var(--rs-font-heading);
-    font-size: var(--rs-font-size-xl);
-    font-weight: var(--rs-font-weight-bold);
+  font-family: var(--rs-font-heading);
+  font-size: var(--rs-font-size-xl);
+  font-weight: var(--rs-font-weight-bold);
 }
 
-.countGarment{
-    margin: 0px;
-    font-family: var(--ion-font-family);
-    font-size: var(--rs-font-size-sm);
-    color: var(--rs-color-text-muted);
+.countGarment {
+  margin: 0px;
+  font-family: var(--ion-font-family);
+  font-size: var(--rs-font-size-sm);
+  color: var(--rs-color-text-muted);
 }
 
 ion-searchbar.garmentSearchBar {
@@ -35,6 +42,10 @@ ion-searchbar.garmentSearchBar {
   border: 3.5px solid var(--ion-color-secondary);
   border-radius: var(--rs-line-height-lg);
   padding: 0;
+  margin-bottom: var(--rs-space-4);
+  width: 343px;
+  max-width: 100%;
+  margin: 0 auto var(--rs-space-5) auto;
 }
 
 .buttonContainer ion-icon {
@@ -56,24 +67,25 @@ ion-searchbar.garmentSearchBar {
 }
 
 .garderobeTop {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--rs-space-1);
-    margin-bottom: var(--rs-space-5);
-    
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--rs-space-1);
+  margin-bottom: var(--rs-space-5);
+  margin-left: var(--rs-space-3);
+  margin-right: var(--rs-space-3);
 }
 
 .garderobeDescription {
-    font-family: var(--ion-font-family);
-    font-size: var(--rs-font-size-md);
+  font-family: var(--ion-font-family);
+  font-size: var(--rs-font-size-md);
 }
 
 .garderobeHint {
-    color: var(--rs-color-text-secondary);
-    font-family: var(--ion-font-family);
-    font-size: var(--rs-font-size-md);
-    text-wrap: balance;
+  color: var(--rs-color-text-secondary);
+  font-family: var(--ion-font-family);
+  font-size: var(--rs-font-size-md);
+  text-wrap: balance;
 }
 
 ion-fab-button {
@@ -110,4 +122,15 @@ ion-fab-button {
   transform: translate(-50%, -45%);
   width: 100%;
   padding: 0 var(--rs-space-5);
+}
+
+ion-accordion ion-item[slot="header"] {
+  --min-height: 28px;
+}
+
+ion-accordion ion-item[slot="header"]::part(native) {
+  min-height: 28px;
+  height: 28px;
+  padding-top: 0;
+  padding-bottom: 0;
 }
