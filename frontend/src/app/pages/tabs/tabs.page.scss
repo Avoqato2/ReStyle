@@ -1,0 +1,9 @@
+ion-tab-bar {
+  height: 105px;
+  border-top: 5px solid var(--rs-color-border-default);
+}
+
+ion-tab-button {
+  --color: var(--ion-color-primary);
+  --color-selected: var(--ion-color-secondary);
+}
