@@ -37,6 +37,10 @@
     --padding-bottom: 0;
     --padding-start: 0;
     --padding-end: 0;
+    // resets margin made by ionic
+    ::ng-deep .label-text-wrapper.label-text-wrapper {
+      margin-inline-end: 0;
+    }
 
     flex: 1;
     min-height: 0;

@@ -5,12 +5,14 @@ import { IonContent } from '@ionic/angular';
 import { AppHeaderComponent } from '../../../components/app-header/app-header.component';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../supabase/services/auth/auth.service';
+import { AppButtonComponent } from '../../../components/app-button/app-button.component';
+import { AppInputComponent } from '../../../components/app-input/app-input.component';
 
 @Component({
   selector: 'app-reset-password',
   templateUrl: './reset-password.page.html',
   styleUrls: ['./reset-password.page.scss'],
-  imports: [IonContent, CommonModule, FormsModule, AppHeaderComponent],
+  imports: [IonContent, CommonModule, FormsModule, AppHeaderComponent, AppButtonComponent, AppInputComponent],
 })
 export class ResetPasswordPage {
   newPassword = '';

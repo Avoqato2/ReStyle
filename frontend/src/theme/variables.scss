@@ -5,21 +5,29 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;700&display=swap');
 
 :root {
+  /* --- Ionic: global (Basis für Aliase unten) --- */
+  --ion-background-color: #f3e9dc;
+  --ion-background-color-rgb: 243, 233, 220;
+  --ion-text-color: #111827;
+  --ion-text-color-rgb: 17, 24, 39;
+  --ion-font-family: 'Inter', sans-serif;
+  --ion-toolbar-background: var(--ion-background-color);
+
   /* --- Ionic: Primary --- */
   --ion-color-primary: #35688e;
   --ion-color-primary-rgb: 53, 104, 142;
-  --ion-color-primary-contrast: #f3e9dc;
-  --ion-color-primary-contrast-rgb: 243, 233, 220;
+  --ion-color-primary-contrast: var(--ion-background-color);
+  --ion-color-primary-contrast-rgb: var(--ion-background-color-rgb);
   --ion-color-primary-shade: #28516f;
-  --ion-color-primary-tint: #35688e;
+  --ion-color-primary-tint: var(--ion-color-primary);
 
   /* --- Ionic: Secondary --- */
   --ion-color-secondary: #795078;
   --ion-color-secondary-rgb: 121, 80, 120;
-  --ion-color-secondary-contrast: #f3e9dc;
-  --ion-color-secondary-contrast-rgb: 243, 233, 220;
+  --ion-color-secondary-contrast: var(--ion-background-color);
+  --ion-color-secondary-contrast-rgb: var(--ion-background-color-rgb);
   --ion-color-secondary-shade: #643d65;
-  --ion-color-secondary-tint: #795078;
+  --ion-color-secondary-tint: var(--ion-color-secondary);
 
   /* --- Ionic: Status ---
      VORSCHLAG – nicht aus Figma (dort nur Tailwind-Platzhalter). */
@@ -28,21 +36,14 @@
   --ion-color-danger-contrast: #ffffff;
   --ion-color-danger-contrast-rgb: 255, 255, 255;
   --ion-color-danger-shade: #9e3233;
-  --ion-color-danger-tint: #b3393a;
+  --ion-color-danger-tint: var(--ion-color-danger);
 
   --ion-color-success: #2f7a55;
   --ion-color-success-rgb: 47, 122, 85;
   --ion-color-success-contrast: #ffffff;
   --ion-color-success-contrast-rgb: 255, 255, 255;
   --ion-color-success-shade: #296b4b;
-  --ion-color-success-tint: #2f7a55;
-
-  /* --- Ionic: global --- */
-  --ion-background-color: #f3e9dc;
-  --ion-background-color-rgb: 243, 233, 220;
-  --ion-text-color: #111827;
-  --ion-text-color-rgb: 17, 24, 39;
-  --ion-font-family: 'Inter', sans-serif;
+  --ion-color-success-tint: var(--ion-color-success);
 
   /* --- ReStyle: Brand / Disabled --- */
   --rs-color-brand-coral: #d98c7a;
@@ -50,18 +51,18 @@
   --rs-color-secondary-disabled: #937798;
 
   /* --- ReStyle: Text / Icon --- */
-  --rs-color-text-primary: #111827;
+  --rs-color-text-primary: var(--ion-text-color);
   --rs-color-text-secondary: #315e7f;
   --rs-color-text-muted: #686868;
-  --rs-color-text-on-primary: #f3e9dc;
-  --rs-color-icon-primary: #111827;
-  --rs-color-icon-secondary: #315e7f;
+  --rs-color-text-on-primary: var(--ion-color-primary-contrast);
+  --rs-color-icon-primary: var(--rs-color-text-primary);
+  --rs-color-icon-secondary: var(--rs-color-text-secondary);
 
   /* --- ReStyle: Flächen / Rahmen --- */
-  --rs-color-bg-canvas: #f3e9dc;
+  --rs-color-bg-canvas: var(--ion-background-color);
   --rs-color-bg-subtle: #c6dce8;
   --rs-color-bg-surface: #ffffff;
-  --rs-color-border-default: #315e7f;
+  --rs-color-border-default: var(--rs-color-text-secondary);
   --rs-color-border-subtle: #d5cec5;
   --rs-border-width: 2.5px;
 
@@ -69,7 +70,7 @@
   --rs-icon-size: 24px;
 
   /* --- ReStyle: Typografie --- */
-  --rs-font-body: 'Inter', sans-serif;
+  --rs-font-body: var(--ion-font-family);
   --rs-font-heading: 'Playfair Display', serif;
   /* xs: VORSCHLAG – nicht aus Figma (Carousel-Labels). */
   --rs-font-size-xs: 0.75rem; // 12px
