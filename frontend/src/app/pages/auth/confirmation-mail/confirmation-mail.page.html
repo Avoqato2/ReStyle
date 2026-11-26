@@ -1,14 +1,14 @@
-<ion-content [fullscreen]="true">
+<app-header variant="sub" backHref="/login"/>
+<ion-content>
   <main class="confirmation-mail-screen">
     <section class="confirmation-mail-content" aria-labelledby="confirmation-mail-title">
       <header class="confirmation-mail-heading">
-        <app-header></app-header>
+        <h1 class="confirmation-mail-title">
+          Prüfe dein E-Mail-Postfach
+        </h1>
+        <p>Keine E-Mail erhalten? Prüfe auch deinen Spam-Ordner.</p>
       </header>
-      <h1>
-        Prüfe dein E-Mail-Postfach
-      </h1>
-      <p>Keine E-Mail erhalten? Prüfe auch deinen Spam-Ordner.</p>
-      <button click="backToLogin()" class="auth-link" routerLink="/login">Zur Startseite</button>
+      <app-button routerLink="/login" routerDirection="root">Zurück zum Login</app-button>
     </section>
   </main>
 </ion-content>
