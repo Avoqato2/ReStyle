@@ -1,13 +1,74 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>garderobe</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header></app-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Garderobe</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+  <div class="garderobeTop">
+    <div class="titleAndButtons">
+      <ion-text class="garderobeTitle">Meine Garderobe</ion-text>
+      <div class="buttonContainer">
+        <ion-icon name="add-circle"></ion-icon>
+        <ion-icon name="options-outline"></ion-icon>
+      </div>
+    </div>
+    <ion-text class="garderobeDescription">Alle meine Teile, ansehen und bearbeiten</ion-text>
+  </div>
+  @if (isLoading()) {
+  <p>Garderobe wird geladen...</p>
+  } @else if (garments().length === 0) {
+  <div class="emptyGarderobe">
+    <ion-title class="garderobeEmpty">Meine Garderobe ist noch leer.</ion-title>
+    <ion-text class="garderobeHint">Füge erste Kleidungsstücke hinzu und gestalte deine persönliche Garderobe.
+    </ion-text>
+    <div class="accordionFabRow">
+      <ion-fab-button routerLink="/add-garment">
+        <ion-icon name="add-circle"></ion-icon>
+        TEILE HINZUFÜGEN
+      </ion-fab-button>
+    </div>
+  </div>
+  } @else {
+  <ion-accordion-group [multiple]="true" [value]="openAccordions">
+    <ion-searchbar class="garmentSearchBar" placeholder="Kleidungsnamen suchen …" show-clear-button="focus"></ion-searchbar>
+    @for (layer of layers; track layer.value) {
+    @let layerItems = garmentsByLayer()[layer.value] ?? [];
+
+    @if (layerItems.length > 0) {
+    <ion-accordion [value]="layer.value">
+      <ion-item slot="header">
+        <div class="accordionHeaderTitle">
+          <ion-text class="layerLabel">{{ layer.label }}</ion-text>
+          @if (layerItems.length > 1){
+            <ion-text class="countGarment">{{ layerItems.length }} Teile</ion-text>
+          } @else {
+            <ion-text class="countGarment">{{ layerItems.length }} Teil</ion-text>
+          }
+          
+        </div>
+      </ion-item>
+
+      <div slot="content">
+        <ion-grid>
+          <ion-row>
+            @for (garment of layerItems; track garment.id) {
+            <app-garment-card class="garmentCard" [garmentId]="garment.id" [garmentImageUrl]="garment.imageUrl"
+              [garmentName]="garment.name ?? categoryLabels[garment.category]"
+              [garmentLayer]="layerLabels[garment.layer]" [garmentCategory]="categoryLabels[garment.category]"
+              (deleteClick)="deleteGarment(garment.id)">
+            </app-garment-card>
+            } @empty {
+            <ion-text class="ion-padding">Keine Teile in dieser Kategorie.</ion-text>
+            }
+          </ion-row>
+        </ion-grid>
+      </div>
+    </ion-accordion>
+    <div class="accordionFabRow">
+      <ion-fab-button routerLink="/add-garment">
+        <ion-icon name="add-circle"></ion-icon>
+        TEILE HINZUFÜGEN
+      </ion-fab-button>
+    </div>
+    }
+    }
+  </ion-accordion-group>
+  }
 </ion-content>

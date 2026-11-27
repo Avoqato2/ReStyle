@@ -7,7 +7,7 @@ import type { Tables, TablesInsert, TablesUpdate } from '../supabase.types';
 type Outfit = Tables<'outfits'>;
 
 // Dieser Typ beschreibt eine Kleidungsstück-Zuordnung innerhalb eines Outfits.
-type OutfitItem = Tables<'outfit_items'>;
+export type OutfitItem = Tables<'outfit_items'>;
 
 // Dieser Typ beschreibt die Daten, die beim Anlegen eines Outfits erlaubt sind.
 type OutfitInsert = TablesInsert<'outfits'>;

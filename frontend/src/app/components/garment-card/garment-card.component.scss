@@ -1,0 +1,58 @@
+:host {
+  font-family: var(--rs-font-body);
+  display: block;
+  width: 100%;
+}
+
+.garmentCardContainer {
+  padding-left: var(--rs-space-2);
+  padding-right: var(--rs-space-2);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-style: solid;
+  border-radius: var(--rs-radius-lg);
+  border-color: var(--rs-color-border-default);
+  width: 370px;
+  height: 106px;
+}
+
+img {
+  width: 70px;
+  height: 87px;
+  object-fit: contain;
+  flex-shrink: 0;
+  border-radius: 8px;
+}
+
+.garmentLabels {
+  margin-left: var(--rs-space-3);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 4px;
+}
+
+.garmentNavigation {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+ion-icon {
+  color: var(--rs-color-icon-secondary);
+  font-size: 20px;
+  margin-left: auto;
+}
+
+.garmentName {
+  font-size: var(--rs-font-size-md);
+  font-weight: var(--rs-font-weight-bold);
+}
+
+.garmentDetails {
+  font-size: var(--rs-font-size-sm);
+  color: var(--rs-color-text-muted);
+}

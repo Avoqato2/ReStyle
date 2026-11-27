@@ -4,16 +4,16 @@ import { SUPABASE_CLIENT } from '../supabase.client';
 import type { Tables, TablesInsert, TablesUpdate } from '../supabase.types';
 
 // Dieser Typ beschreibt ein Kleidungsstück, wie es aus der Datenbank gelesen wird.
-type Garment = Tables<'garments'>;
+export type Garment = Tables<'garments'>;
 
 // Dieser Typ beschreibt die Daten, die beim Anlegen eines Kleidungsstücks erlaubt sind.
-type GarmentInsert = TablesInsert<'garments'>;
+export type GarmentInsert = TablesInsert<'garments'>;
 
 // Dieser Typ beschreibt die Daten, die beim Ändern eines Kleidungsstücks erlaubt sind.
 type GarmentUpdate = TablesUpdate<'garments'>;
 
 // id und image_path vergibt createWithImage selbst, user_id setzt die DB.
-type GarmentInput = Omit<GarmentInsert, 'id' | 'image_path' | 'user_id'>;
+export type GarmentInput = Omit<GarmentInsert, 'id' | 'image_path' | 'user_id'>;
 
 const GARMENT_BUCKET = 'garments';
 const SIGNED_URL_TTL_SECONDS = 3600;

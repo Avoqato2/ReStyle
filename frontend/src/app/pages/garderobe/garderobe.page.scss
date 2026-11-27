@@ -1,0 +1,136 @@
+.garmentCard {
+  margin-bottom: var(--rs-space-2);
+}
+
+.accordionHeaderTitle {
+  display: flex;
+  align-items: baseline;
+  gap: var(--rs-space-2);
+}
+
+.layerLabel {
+  padding: 0px;
+  font-family: var(--rs-font-heading);
+  font-weight: var(--rs-font-weight-bold);
+  font-size: var(--rs-font-size-lg);
+}
+
+.garderobeTitle {
+  font-family: var(--rs-font-heading);
+  font-size: var(--rs-font-size-xl);
+  font-weight: var(--rs-font-weight-bold);
+}
+
+.garderobeEmpty {
+  font-family: var(--rs-font-heading);
+  font-size: var(--rs-font-size-xl);
+  font-weight: var(--rs-font-weight-bold);
+}
+
+.countGarment {
+  margin: 0px;
+  font-family: var(--ion-font-family);
+  font-size: var(--rs-font-size-sm);
+  color: var(--rs-color-text-muted);
+}
+
+ion-searchbar.garmentSearchBar {
+  --border-radius: var(--rs-line-height-lg);
+  --box-shadow: none;
+  --background: transparent;
+
+  border: 3.5px solid var(--ion-color-secondary);
+  border-radius: var(--rs-line-height-lg);
+  padding: 0;
+  margin-bottom: var(--rs-space-4);
+  width: 343px;
+  max-width: 100%;
+  margin: 0 auto var(--rs-space-5) auto;
+}
+
+.buttonContainer ion-icon {
+  font-size: var(--rs-icon-size-lg);
+  color: var(--rs-color-text-primary);
+}
+
+.titleAndButtons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.buttonContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--rs-space-5);
+}
+
+.garderobeTop {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--rs-space-1);
+  margin-bottom: var(--rs-space-5);
+  margin-left: var(--rs-space-3);
+  margin-right: var(--rs-space-3);
+}
+
+.garderobeDescription {
+  font-family: var(--ion-font-family);
+  font-size: var(--rs-font-size-md);
+}
+
+.garderobeHint {
+  color: var(--rs-color-text-secondary);
+  font-family: var(--ion-font-family);
+  font-size: var(--rs-font-size-md);
+  text-wrap: balance;
+}
+
+ion-fab-button {
+  width: 220px;
+  height: 36px;
+  font-size: var(--rs-font-size-sm);
+
+  --border-radius: 25px;
+  --box-shadow: none;
+  box-shadow: none;
+
+  ion-icon {
+    margin-right: var(--rs-space-2)
+  }
+}
+
+.accordionFabRow {
+  display: flex;
+  justify-content: center;
+  margin: 12px 0 20px 0;
+}
+
+.emptyGarderobe {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: var(--rs-space-4);
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -45%);
+  width: 100%;
+  padding: 0 var(--rs-space-5);
+}
+
+ion-accordion ion-item[slot="header"] {
+  --min-height: 28px;
+}
+
+ion-accordion ion-item[slot="header"]::part(native) {
+  min-height: 28px;
+  height: 28px;
+  padding-top: 0;
+  padding-bottom: 0;
+}

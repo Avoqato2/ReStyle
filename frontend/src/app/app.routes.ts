@@ -72,4 +72,12 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/auth/confirmation-mail/confirmation-mail.page').then((m) => m.ConfirmationMailPage),
   },
+  {
+    path: 'add-garment',
+    loadComponent: () => import('./pages/add-garment/add-garment.page').then((m) => m.AddGarmentPage),
+  },
+  {
+    path: 'edit-garment/:id',
+    loadComponent: () => import('./pages/add-garment/add-garment.page').then((m) => m.AddGarmentPage),
+  },
 ];
