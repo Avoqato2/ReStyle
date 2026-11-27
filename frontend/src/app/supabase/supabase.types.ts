@@ -7,14 +7,14 @@ export type Database = {
           Tables: {
             "garments": {
                   Row: {
-                    "brand": string | null,"category": Database["public"]['Enums']["garment_category"],"colors": (Database["public"]['Enums']["garment_color"])[],"created_at": string,"id": string,"image_path": string,"layer": Database["public"]['Enums']["garment_layer"],"material": Database["public"]['Enums']["garment_material"] | null,"name": string | null,"notes": string | null,"seasons": (Database["public"]['Enums']["garment_season"])[],"size_label": string | null,"user_id": string
+                    "brand": string | null,"category": Database["public"]['Enums']["garment_category"],"colors": (Database["public"]['Enums']["garment_color"])[],"created_at": string,"favorite": boolean,"id": string,"image_path": string,"layer": Database["public"]['Enums']["garment_layer"],"material": Database["public"]['Enums']["garment_material"] | null,"name": string | null,"notes": string | null,"seasons": (Database["public"]['Enums']["garment_season"])[],"size_label": string | null,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "brand"?: string | null,"category": Database["public"]['Enums']["garment_category"],"colors": (Database["public"]['Enums']["garment_color"])[],"created_at"?: string,"id"?: string,"image_path": string,"layer": Database["public"]['Enums']["garment_layer"],"material"?: Database["public"]['Enums']["garment_material"] | null,"name"?: string | null,"notes"?: string | null,"seasons": (Database["public"]['Enums']["garment_season"])[],"size_label"?: string | null,"user_id"?: string
+                    "brand"?: string | null,"category": Database["public"]['Enums']["garment_category"],"colors": (Database["public"]['Enums']["garment_color"])[],"created_at"?: string,"favorite"?: boolean,"id"?: string,"image_path": string,"layer": Database["public"]['Enums']["garment_layer"],"material"?: Database["public"]['Enums']["garment_material"] | null,"name"?: string | null,"notes"?: string | null,"seasons": (Database["public"]['Enums']["garment_season"])[],"size_label"?: string | null,"user_id"?: string
                   }
                   Update: {
-                    "brand"?: string | null,"category"?: Database["public"]['Enums']["garment_category"],"colors"?: (Database["public"]['Enums']["garment_color"])[],"created_at"?: string,"id"?: string,"image_path"?: string,"layer"?: Database["public"]['Enums']["garment_layer"],"material"?: Database["public"]['Enums']["garment_material"] | null,"name"?: string | null,"notes"?: string | null,"seasons"?: (Database["public"]['Enums']["garment_season"])[],"size_label"?: string | null,"user_id"?: string
+                    "brand"?: string | null,"category"?: Database["public"]['Enums']["garment_category"],"colors"?: (Database["public"]['Enums']["garment_color"])[],"created_at"?: string,"favorite"?: boolean,"id"?: string,"image_path"?: string,"layer"?: Database["public"]['Enums']["garment_layer"],"material"?: Database["public"]['Enums']["garment_material"] | null,"name"?: string | null,"notes"?: string | null,"seasons"?: (Database["public"]['Enums']["garment_season"])[],"size_label"?: string | null,"user_id"?: string
                   }
                   Relationships: [
                     {
