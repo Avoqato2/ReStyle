@@ -456,6 +456,45 @@ describe.skipIf(process.env['CI'])('Supabase integration', () => {
     });
   });
 
+  describe('GarmentService favorite (SCRUM-155)', () => {
+    let favoriteId: string | undefined;
+
+    afterAll(async () => {
+      if (favoriteId) {
+        await garmentService.delete(favoriteId, { deleteOutfits: true }).catch(() => undefined);
+      }
+    });
+
+    it('is false by default and lists favorites first', async () => {
+      // Neuestes Garment, aber zuerst kein Favorit: steht trotzdem nicht vor bestehenden Favoriten.
+      const created = await garmentService.create({
+        image_path: `integration-test/favorite-${Date.now()}.png`,
+        layer: 'top',
+        category: 't_shirt',
+        colors: ['red'],
+        seasons: ['summer'],
+      });
+      favoriteId = created.id;
+      expect(created.favorite).toBe(false);
+
+      const updated = await garmentService.setFavorite(created.id, true);
+      const garments = await garmentService.getAll();
+      logCall('GarmentService.setFavorite + getAll', { id: created.id }, garments.map((g) => [g.id, g.favorite]));
+
+      expect(updated.favorite).toBe(true);
+      const firstNonFavorite = garments.findIndex((g) => !g.favorite);
+      const lastFavorite = garments.map((g) => g.favorite).lastIndexOf(true);
+      expect(garments.some((g) => g.id === created.id && g.favorite)).toBe(true);
+      expect(firstNonFavorite === -1 || lastFavorite < firstNonFavorite).toBe(true);
+    });
+
+    it('removes the favorite again', async () => {
+      const updated = await garmentService.setFavorite(favoriteId as string, false);
+
+      expect(updated.favorite).toBe(false);
+    });
+  });
+
   describe('Signup-Trigger', () => {
     it('registers a user whose display name exceeds 50 characters', async () => {
       // Google liefert Namen ungekürzt; der Trigger muss auf 50 Zeichen kürzen, sonst scheitert der Signup.

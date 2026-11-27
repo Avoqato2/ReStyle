@@ -23,6 +23,7 @@ function garment(changes: Partial<Garment> = {}): Garment {
     material: null,
     size_label: null,
     notes: null,
+    favorite: false,
     created_at: '2026-11-15T00:00:00Z',
     ...changes,
   };
@@ -33,7 +34,7 @@ function createQuery(results: Result[]) {
   const calls: { method: string; args: unknown[] }[] = [];
   const next = () => Promise.resolve(results.shift() ?? { data: null, error: null });
   const builder: Record<string, unknown> = {};
-  for (const method of ['select', 'insert', 'eq']) {
+  for (const method of ['select', 'insert', 'update', 'eq', 'order']) {
     builder[method] = (...args: unknown[]) => {
       calls.push({ method, args });
       return builder;
@@ -75,6 +76,57 @@ function file(type = 'image/webp'): Blob {
 const INPUT = { layer: 'top', category: 't_shirt', colors: ['blue'], seasons: ['summer'] } as const;
 
 describe('GarmentService', () => {
+  describe('getAll', () => {
+    it('sortiert Favoriten zuerst, danach die neuesten', async () => {
+      const garments = [garment({ id: 'g-1', favorite: true }), garment({ id: 'g-2' })];
+      const { service, client, calls } = setup({ garmentResults: [{ data: garments, error: null }] });
+
+      const result = await service.getAll();
+
+      expect(client.from).toHaveBeenCalledWith('garments');
+      expect(calls.filter((c) => c.method === 'order')).toEqual([
+        { method: 'order', args: ['favorite', { ascending: false }] },
+        { method: 'order', args: ['created_at', { ascending: false }] },
+      ]);
+      expect(result).toEqual(garments);
+    });
+
+    it('wirft bei Fehler', async () => {
+      const error = new Error('db');
+      const { service } = setup({ garmentResults: [{ data: null, error }] });
+
+      await expect(service.getAll()).rejects.toBe(error);
+    });
+  });
+
+  describe('setFavorite', () => {
+    it('speichert den Favoriten-Status und gibt den Datensatz zurück', async () => {
+      const updated = garment({ favorite: true });
+      const { service, calls } = setup({ garmentResults: [{ data: updated, error: null }] });
+
+      const result = await service.setFavorite('g-1', true);
+
+      expect(calls).toContainEqual({ method: 'update', args: [{ favorite: true }] });
+      expect(calls).toContainEqual({ method: 'eq', args: ['id', 'g-1'] });
+      expect(result).toEqual(updated);
+    });
+
+    it('kann den Favoriten wieder entfernen', async () => {
+      const { service, calls } = setup({ garmentResults: [{ data: garment(), error: null }] });
+
+      await service.setFavorite('g-1', false);
+
+      expect(calls).toContainEqual({ method: 'update', args: [{ favorite: false }] });
+    });
+
+    it('wirft bei Fehler', async () => {
+      const error = new Error('db');
+      const { service } = setup({ garmentResults: [{ data: null, error }] });
+
+      await expect(service.setFavorite('g-1', true)).rejects.toBe(error);
+    });
+  });
+
   describe('createWithImage', () => {
     it('lädt das Bild hoch und legt den Datensatz mit gleicher ID und Pfad an', async () => {
       const created = garment();

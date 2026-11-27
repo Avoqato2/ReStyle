@@ -99,7 +99,7 @@ CI (PR auf `main`): Branch-Name-Check, Frontend Lint + Test + Build, Backend `su
 | Tabelle        | Spalten                                                                                                                                                               | Hinweise                                                                                                                    |
 | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | `profiles`     | `id` (= auth.users.id), `display_name` ≤50, `preferences` jsonb, `created_at`                                                                                         | Signup-Trigger legt an (Name aus Metadaten → Google → E-Mail-Prefix). Update nur `display_name`, `preferences`              |
-| `garments`     | `id`, `user_id`, `image_path`\*, `layer`\*, `category`\*, `name` ≤100, `colors[]` mind. 1 Wert, `seasons[]` mind. 1 Wert, `brand` ≤100, `material`, `size_label` ≤20, `notes` ≤1000, `created_at` | \* Pflicht. Arrays mit GIN-Index. Check: Kategorie muss zum Layer passen                                                    |
+| `garments`     | `id`, `user_id`, `image_path`\*, `layer`\*, `category`\*, `name` ≤100, `colors[]` mind. 1 Wert, `seasons[]` mind. 1 Wert, `brand` ≤100, `material`, `size_label` ≤20, `notes` ≤1000, `favorite` (default false), `created_at` | \* Pflicht. Arrays mit GIN-Index. Check: Kategorie muss zum Layer passen. `getAll` sortiert Favoriten zuerst|
 | `outfits`      | `id`, `user_id`, `name` ≤100 (optional), `favorite` (Default `false`), `notes` ≤1000, `created_at`                                                                    |                                                                                                                             |
 | `outfit_items` | PK (`outfit_id`, `layer`), `garment_id`                                                                                                                               | FK (`garment_id`, `layer`) → garments, max. 1 Teil pro Layer. Trigger: `full_body` schließt `top`/`bottom` aus. Kein UPDATE |
 
@@ -140,7 +140,6 @@ Kleiderpuppe (verworfen), Outfit-Empfehlungen, KI-Styling-Assistent, automatisch
 
 Confluence weicht vom Schema ab. Schema gilt, bis das Team entscheidet:
 
-- `favorite` fehlt in `garments` (F02, F03)
 - Saison `all_year` fehlt im Enum (F02)
 - Confluence: Layer „überschreibbar“. DB erzwingt Kategorie↔Layer, frei nur bei `other` (F02)
 - Confluence: Swiper mit 3 Ebenen. DB hat zusätzlich `outer` (optional) und `full_body` (F04)

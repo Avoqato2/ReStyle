@@ -21,6 +21,6 @@ Saison: `transitional_season` = Übergangszeit (z. B. dünne Jacke)
 
 ## Offen
 - Confluence: Layer überschreibbar. DB-Check erzwingt Kategorie↔Layer, frei nur bei `other`.
-- `all_year` fehlt im Enum, `favorite` fehlt in `garments` (Confluence will beides).
+- `all_year` fehlt im Enum (Confluence will es). `favorite` ist seit SCRUM-155 vorhanden (`GarmentService.setFavorite`).
 - Default-Name: Verhalten ohne Marke und Bedeutung von `<Nummer>` unklar.
 - Figma-Links fehlen.
