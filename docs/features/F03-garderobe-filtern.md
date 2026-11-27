@@ -18,7 +18,7 @@ Braucht F02. Filterlogik so bauen, dass F04 sie wiederverwendet.
 - Marke/Material: Auswahl nur aus Werten, die der User schon verwendet.
 
 ## Offen
-- `favorite` fehlt im Schema → Favoriten-Filter blockiert.
+- `garments.favorite` vorhanden (SCRUM-155), `getAll` liefert Favoriten zuerst. Der Favoriten-Filter fehlt noch und kommt mit der Filter-Methode.
 - Mehrfachauswahl in einem Filter (blau + schwarz): ODER (`overlaps`) oder UND (`contains`)?
 - Suche: über welche Felder?
 - Figma-Links fehlen.
