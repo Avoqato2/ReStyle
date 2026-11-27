@@ -34,7 +34,12 @@ export class GarmentService {
 
   // Lädt alle Kleidungsstücke des aktuell berechtigten Benutzers.
   async getAll(): Promise<Garment[]> {
-    const response = await this.supabase.from('garments').select('*');
+    // Favoriten zuerst, innerhalb beider Gruppen die neuesten oben.
+    const response = await this.supabase
+      .from('garments')
+      .select('*')
+      .order('favorite', { ascending: false })
+      .order('created_at', { ascending: false });
 
     if (response.error) {
       throw response.error;
@@ -101,6 +106,11 @@ export class GarmentService {
     }
 
     return response.data;
+  }
+
+  // Markiert ein Kleidungsstück als Favorit oder entfernt die Markierung (Herz-Button).
+  async setFavorite(id: string, favorite: boolean): Promise<Garment> {
+    return this.update(id, { favorite });
   }
 
   // Liefert zeitlich begrenzte URLs für mehrere Bilder in einem Request (Bucket ist privat).
