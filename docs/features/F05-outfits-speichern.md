@@ -16,11 +16,12 @@ Braucht F04. Basis für spätere Empfehlungen und Social.
 - [ ] Enthaltenes Garment gelöscht → Outfit weg (Trigger), vorher Alert
 
 ## Ist-Stand
-- `OutfitService` (`frontend/src/app/supabase/services/outfit.service.ts`): `getAll`, `getById`, `getItems`, `create`, `saveItems` (RPC `save_outfit`), `update`, `delete`.
+- `OutfitService` (`frontend/src/app/supabase/services/outfit.service.ts`): `getAll`, `getById`, `getItems`, `create`, `saveItems` (RPC `save_outfit`), `update`, `setFavorite`, `delete`.
+- `getAll` sortiert Favoriten zuerst, danach neueste zuerst.
 - Neues Outfit = `create` + `saveItems`. Nicht atomar: schlägt `saveItems` fehl, Outfit wieder löschen.
 - Liste inkl. Teile in einem Request: `.select('id, name, created_at, outfit_items(layer, garments(*))')`
+- `outfits.favorite` (bool, Default `false`) und `outfits.notes` (≤1000) seit SCRUM-156. UI fehlt noch.
 
 ## Offen
-- `favorite` und `notes` fehlen in `outfits`.
 - Vorschau laut Confluence 3 Bilder, mit `outer`/`full_body` sind es 2–4.
 - Figma-Links fehlen.

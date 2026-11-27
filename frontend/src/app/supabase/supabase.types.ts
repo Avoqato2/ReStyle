@@ -53,14 +53,14 @@ isOneToOne: false
                   ]
                 },"outfits": {
                   Row: {
-                    "created_at": string,"id": string,"name": string | null,"user_id": string
+                    "created_at": string,"favorite": boolean,"id": string,"name": string | null,"notes": string | null,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"id"?: string,"name"?: string | null,"user_id"?: string
+                    "created_at"?: string,"favorite"?: boolean,"id"?: string,"name"?: string | null,"notes"?: string | null,"user_id"?: string
                   }
                   Update: {
-                    "created_at"?: string,"id"?: string,"name"?: string | null,"user_id"?: string
+                    "created_at"?: string,"favorite"?: boolean,"id"?: string,"name"?: string | null,"notes"?: string | null,"user_id"?: string
                   }
                   Relationships: [
                     {

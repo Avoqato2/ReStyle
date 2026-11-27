@@ -30,7 +30,10 @@ export class OutfitService {
 
   // Lädt alle Outfits des aktuell berechtigten Benutzers.
   async getAll(): Promise<Outfit[]> {
-    const response = await this.supabase.from('outfits').select('*');
+    const response = await this.supabase.from('outfits')
+      .select('*')
+      .order('favorite', {ascending: false})
+      .order('created_at',{ascending: false});
 
     if (response.error) {
       throw response.error;
@@ -70,6 +73,11 @@ export class OutfitService {
     }
 
     return response.data;
+  }
+
+  // Markiert ein Outfit als Favorit oder entfernt die Markierung (Herz-Button).
+  async setFavorite(id: string, favorite: boolean): Promise<Outfit> {
+    return this.update(id, { favorite });
   }
 
   // Speichert alle Kleidungsstück-Zuordnungen eines Outfits atomar.
